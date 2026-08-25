@@ -3,6 +3,7 @@
 import sys
 from typing import Any, Dict, List
 from src.extract.netflix import NetflixExtractor
+from src.extract.netflix_scraper import NetflixWebScraper
 from src.extract.tmdb import TMDbExtractor
 from src.transform.cleaner import clean_title_record
 from src.transform.entity_resolution import EntityResolver
@@ -20,9 +21,16 @@ def run_pipeline() -> None:
     if not is_connected:
         logger.warning("Database unavailable; proceeding in offline/dry-run simulation mode.")
 
-    # 2. Extract from Netflix
-    netflix_extractor = NetflixExtractor()
-    raw_netflix_titles = netflix_extractor.fetch_recent_additions(days_back=14, limit=settings.batch_size)
+    # 2. Extract from Netflix (API or Zero-Cost Web Scraper)
+    if settings.rapidapi_key:
+        logger.info("Using RapidAPI Netflix Extractor...")
+        netflix_extractor = NetflixExtractor()
+        raw_netflix_titles = netflix_extractor.fetch_recent_additions(days_back=14, limit=settings.batch_size)
+    else:
+        logger.info("No RAPIDAPI_KEY provided; executing zero-cost live Netflix Web Scraper...")
+        scraper = NetflixWebScraper()
+        raw_netflix_titles = scraper.scrape_live_catalog(limit=settings.batch_size)
+
     logger.info(f"Ingested {len(raw_netflix_titles)} Netflix catalog items.")
 
     # 3. Initialize TMDb & Entity Resolution

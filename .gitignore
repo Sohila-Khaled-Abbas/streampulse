@@ -26,14 +26,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtual Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# Airbyte CLI & Docker binaries
+abctl*
+*.exe
+abctl-v*/
 
 # Environment Variables & Secrets
 *.env

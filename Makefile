@@ -12,9 +12,21 @@ help:
 	@echo "  test            Run pytest suite with coverage"
 	@echo "  docker-up       Start PostgreSQL and pgAdmin via Docker Compose"
 	@echo "  docker-down     Stop and tear down Docker containers"
+	@echo "  airbyte-install Install and launch Airbyte locally in Docker"
+	@echo "  airbyte-status  Check local Airbyte cluster health"
+	@echo "  airbyte-creds   View local Airbyte login credentials"
 	@echo "  fetch-historical Download and cache 5,800+ historical enriched Netflix titles"
 	@echo "  run-pipeline    Execute the full end-to-end ELT pipeline"
 	@echo "  clean           Remove temporary caches and build artifacts"
+
+airbyte-install:
+	.\abctl-v0.30.4-windows-amd64\abctl.exe local install --low-resource-mode --no-browser
+
+airbyte-status:
+	.\abctl-v0.30.4-windows-amd64\abctl.exe local status
+
+airbyte-creds:
+	.\abctl-v0.30.4-windows-amd64\abctl.exe local credentials
 
 fetch-historical:
 	$(PYTHON) scripts/fetch_historical_dataset.py

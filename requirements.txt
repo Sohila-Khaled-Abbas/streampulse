@@ -1,0 +1,35 @@
+# Core Data Processing
+pandas>=2.1.0
+numpy>=1.26.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# API & Networking
+requests>=2.31.0
+urllib3>=2.0.0
+backoff>=2.2.1
+
+# Database & SQL
+psycopg2-binary>=2.9.9
+SQLAlchemy>=2.0.23
+
+# Entity Resolution & Matching
+rapidfuzz>=3.5.2
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.23.0
+
+# Logging & Utilities
+python-dotenv>=1.0.0
+loguru>=0.7.2
+tqdm>=4.66.1
+
+# Development, Testing & Code Quality
+pytest>=7.4.3
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+ruff>=0.1.6
+black>=23.11.0
+mypy>=1.7.1
+pre-commit>=3.5.0
+types-requests>=2.31.0
+types-psycopg2>=2.9.21

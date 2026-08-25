@@ -1,0 +1,56 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint-and-test:
+    name: Lint & Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with Ruff
+        run: |
+          ruff check .
+
+      - name: Type Check with Mypy
+        run: |
+          mypy src/
+
+      - name: Run Test Suite
+        env:
+          RAPIDAPI_KEY: "mock_key"
+          TMDB_API_KEY: "mock_key"
+          DB_USER: "postgres"
+          DB_PASSWORD: "mock_password"
+          DB_HOST: "localhost"
+          DB_NAME: "streampulse_test"
+        run: |
+          pytest --cov=src --cov-report=xml
+
+      - name: Upload Coverage Artifacts
+        uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.10'
+        with:
+          name: code-coverage-report
+          path: coverage.xml

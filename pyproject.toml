@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streampulse"
+version = "0.1.0"
+description = "Live Netflix Catalog ELT and Entity Resolution Pipeline"
+authors = [
+    { name = "StreamPulse Team" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["data-engineering", "elt", "netflix", "tmdb", "airbyte", "postgresql", "powerbi"]
+dependencies = [
+    "pandas>=2.1.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "requests>=2.31.0",
+    "psycopg2-binary>=2.9.9",
+    "SQLAlchemy>=2.0.23",
+    "rapidfuzz>=3.5.2",
+    "loguru>=0.7.2",
+    "python-dotenv>=1.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.6",
+    "black>=23.11.0",
+    "mypy>=1.7.1",
+    "pre-commit>=3.5.0"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "I", "W", "B", "C4", "ARG", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.isort]
+known-first-party = ["src"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=src --cov-report=term-missing"
+testpaths = [
+    "tests"
+]
+pythonpath = ["."]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

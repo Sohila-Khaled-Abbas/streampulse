@@ -20,6 +20,7 @@
 [Explore Architecture](docs/architecture.md) •
 [Data Dictionary](docs/data_dictionary.md) •
 [Setup Guide](docs/setup_guide.md) •
+[Airbyte ELT Guide](docs/airbyte_elt_powerbi_guide.md) •
 [Live Implementation Guide](docs/live_project_implementation_guide.md) •
 [Report a Bug](.github/ISSUE_TEMPLATE/bug_report.md)
 

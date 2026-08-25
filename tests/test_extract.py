@@ -48,6 +48,17 @@ def test_netflix_web_scraper_fallback():
     scraper = NetflixWebScraper()
     data = scraper._get_fallback_catalog()
     assert len(data) == 3
-    assert data[0]["title"] == "Leave the World Behind"
+    assert data[0]["title"] == "Society of the Snow"
     assert data[0]["id"].startswith("scraped_")
+
+
+def test_historical_dataset_loader():
+    """Test historical dataset loader safe parsers."""
+    from src.extract.historical_loader import HistoricalDatasetLoader
+
+    assert HistoricalDatasetLoader._safe_float("8.5") == 8.5
+    assert HistoricalDatasetLoader._safe_float(None) is None
+    assert HistoricalDatasetLoader._safe_int("120") == 120
+    assert HistoricalDatasetLoader._safe_int("") is None
+
 

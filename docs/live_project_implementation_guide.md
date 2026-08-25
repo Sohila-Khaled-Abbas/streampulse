@@ -20,22 +20,21 @@ flowchart LR
 
 ## 📋 Phase 1: Environment & API Provisioning
 
-### 1.1 Catalog Ingestion Options: API vs. Web Scraping
+### 1.1 Ingestion Architecture: Hybrid Historical + Live Scraping
 
-You can choose either of the two ingestion approaches:
+StreamPulse uses a **hybrid architecture** combining thousands of historical benchmark titles with live real-time web scraped additions:
 
-#### Option A: Zero-Cost Web Scraping (Recommended — No API Subscriptions)
-If you do not want to use RapidAPI or want to avoid monthly rate limits:
-- Use the built-in **`src/extract/netflix_scraper.py`** module.
-- It parses new release feeds directly from public Netflix catalog trackers (e.g. *What's on Netflix*, *Flixable*, *JustWatch*).
-- **Cost**: $0.00 / completely free.
-- **Requirements**: `beautifulsoup4` and `requests` (included in `requirements.txt`).
+1. **Historical Enriched Baseline (5,800+ Titles)**:
+   - Built-in via **`src/extract/historical_loader.py`**.
+   - Sourced from the **Kaggle Netflix Enriched Dataset** with pre-linked IMDb IDs, IMDb scores, TMDb scores, and popularity metrics.
+   - Run `python scripts/fetch_historical_dataset.py` (or `make fetch-historical`) to download and cache locally into `data/raw/netflix_enriched_historical.csv`.
 
-#### Option B: RapidAPI (Netflix UnoGS / Streaming Catalog)
-- Navigate to [RapidAPI](https://rapidapi.com/) and register an account.
-- Search for **uNoGS** (Netflix Online Global Search) or alternative Netflix Catalog API.
-- Subscribe to the Basic/Free tier.
-- Copy your `X-RapidAPI-Key` and `X-RapidAPI-Host` into `.env`.
+2. **Live Incremental Web Scraping (Zero Cost)**:
+   - Sourced from **`src/extract/netflix_scraper.py`** to scrape daily additions and latest 2024/2026 releases.
+   - Requires zero paid subscriptions or API keys.
+
+3. **Optional RapidAPI / UnoGS Ingestion**:
+   - Optional connector in **`src/extract/netflix.py`** if a RapidAPI key is provided in `.env`.
 
 ---
 

@@ -12,8 +12,12 @@ help:
 	@echo "  test            Run pytest suite with coverage"
 	@echo "  docker-up       Start PostgreSQL and pgAdmin via Docker Compose"
 	@echo "  docker-down     Stop and tear down Docker containers"
+	@echo "  fetch-historical Download and cache 5,800+ historical enriched Netflix titles"
 	@echo "  run-pipeline    Execute the full end-to-end ELT pipeline"
 	@echo "  clean           Remove temporary caches and build artifacts"
+
+fetch-historical:
+	$(PYTHON) scripts/fetch_historical_dataset.py
 
 install:
 	$(PIP) install -r requirements.txt

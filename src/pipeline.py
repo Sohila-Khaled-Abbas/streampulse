@@ -2,6 +2,7 @@
 
 import sys
 from typing import Any, Dict, List
+from src.extract.historical_loader import HistoricalDatasetLoader
 from src.extract.netflix import NetflixExtractor
 from src.extract.netflix_scraper import NetflixWebScraper
 from src.extract.tmdb import TMDbExtractor
@@ -12,7 +13,7 @@ from src.utils.db import db_manager
 from src.utils.logger import logger
 
 
-def run_pipeline() -> None:
+def run_pipeline(include_historical: bool = True) -> None:
     """Execute the end-to-end extraction, resolution, and load process."""
     logger.info("=== Starting StreamPulse ELT Pipeline Run ===")
 
@@ -21,30 +22,58 @@ def run_pipeline() -> None:
     if not is_connected:
         logger.warning("Database unavailable; proceeding in offline/dry-run simulation mode.")
 
-    # 2. Extract from Netflix (API or Zero-Cost Web Scraper)
-    if settings.rapidapi_key:
-        logger.info("Using RapidAPI Netflix Extractor...")
+    # 2. Ingest Historical Enriched Foundation (Kaggle Dataset)
+    all_titles: List[Dict[str, Any]] = []
+    if include_historical:
+        logger.info("Loading historical enriched dataset (IMDb + TMDb)...")
+        hist_loader = HistoricalDatasetLoader()
+        historical_records = hist_loader.load_historical_records(limit=settings.batch_size)
+        logger.info(f"Loaded {len(historical_records)} historical enriched titles.")
+        all_titles.extend(historical_records)
+
+    # 3. Extract Live Incremental Additions (API or Zero-Cost Web Scraper)
+    use_rapidapi = bool(
+        settings.rapidapi_key and not settings.rapidapi_key.startswith("your_")
+    )
+    if use_rapidapi:
+        logger.info("Using RapidAPI Netflix Extractor for live deltas...")
         netflix_extractor = NetflixExtractor()
-        raw_netflix_titles = netflix_extractor.fetch_recent_additions(days_back=14, limit=settings.batch_size)
+        live_titles = netflix_extractor.fetch_recent_additions(days_back=14, limit=25)
     else:
-        logger.info("No RAPIDAPI_KEY provided; executing zero-cost live Netflix Web Scraper...")
+        logger.info("Executing zero-cost live Netflix Web Scraper for new releases...")
         scraper = NetflixWebScraper()
-        raw_netflix_titles = scraper.scrape_live_catalog(limit=settings.batch_size)
+        live_titles = scraper.scrape_live_catalog(limit=25)
 
-    logger.info(f"Ingested {len(raw_netflix_titles)} Netflix catalog items.")
+    logger.info(f"Ingested {len(live_titles)} live incremental catalog items.")
+    all_titles.extend(live_titles)
 
-    # 3. Initialize TMDb & Entity Resolution
+    # 4. Initialize TMDb & Entity Resolution
     tmdb_extractor = TMDbExtractor()
     resolver = EntityResolver(match_threshold=settings.fuzzy_match_threshold)
 
     resolved_records: List[Dict[str, Any]] = []
     unresolved_records: List[Dict[str, Any]] = []
 
-    for raw in raw_netflix_titles:
+    for raw in all_titles:
         cleaned = clean_title_record(raw)
         title = cleaned["title"]
         year = cleaned["release_year"]
         media_type = cleaned["media_type"]
+
+        # If already enriched from historical Kaggle dataset with TMDb/IMDb metrics
+        if raw.get("source") == "kaggle_historical_enriched" and raw.get("tmdb_score"):
+            record = {
+                **cleaned,
+                "tmdb_id": raw.get("imdb_id") or raw.get("netflix_id"),
+                "vote_average": raw.get("tmdb_score", 0.0),
+                "imdb_score": raw.get("imdb_score"),
+                "vote_count": raw.get("imdb_votes", 0),
+                "popularity": raw.get("tmdb_popularity", 0.0),
+                "match_confidence": 100.0,
+                "source": "kaggle_historical_enriched",
+            }
+            resolved_records.append(record)
+            continue
 
         candidates = tmdb_extractor.search_title(title=title, year=year, media_type=media_type)
         best_match, score = resolver.resolve(netflix_title=title, netflix_year=year, candidates=candidates)
@@ -67,11 +96,11 @@ def run_pipeline() -> None:
         f"{len(unresolved_records)} pending review."
     )
 
-    # 4. Display sample preview of resolved items
+    # 5. Display sample preview of resolved items
     for item in resolved_records[:3]:
         logger.info(
-            f"✓ [Match {item['match_confidence']}%] {item['title']} ({item['release_year']}) "
-            f"| Rating: {item['vote_average']} | TMDb ID: {item['tmdb_id']}"
+            f"[OK] [Match {item['match_confidence']}%] {item['title']} ({item['release_year']}) "
+            f"| Rating: {item['vote_average']} | TMDb/IMDb ID: {item['tmdb_id']}"
         )
 
     logger.info("=== StreamPulse Pipeline Run Completed Successfully ===")

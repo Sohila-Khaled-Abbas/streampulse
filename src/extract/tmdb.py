@@ -26,8 +26,8 @@ class TMDbExtractor:
         Returns:
             List of matching TMDb candidate records.
         """
-        if not self.api_key:
-            logger.debug("No TMDB_API_KEY set; returning mock TMDb results.")
+        if not self.api_key or self.api_key.startswith("your_"):
+            logger.debug("No valid TMDB_API_KEY set; returning mock TMDb results.")
             return self._get_mock_tmdb_search(title, year)
 
         endpoint = "/search/tv" if media_type == "series" or media_type == "tv" else "/search/movie"

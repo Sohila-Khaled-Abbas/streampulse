@@ -4,10 +4,12 @@ numpy>=1.26.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 
-# API & Networking
+# API & Networking & Scraping
 requests>=2.31.0
 urllib3>=2.0.0
 backoff>=2.2.1
+beautifulsoup4>=4.12.2
+lxml>=5.1.0
 
 # Database & SQL
 psycopg2-binary>=2.9.9

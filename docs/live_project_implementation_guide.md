@@ -20,20 +20,31 @@ flowchart LR
 
 ## 📋 Phase 1: Environment & API Provisioning
 
-### 1.1 API Key Acquisition
+### 1.1 Catalog Ingestion Options: API vs. Web Scraping
 
-1. **RapidAPI (Netflix UnoGS / Streaming Catalog)**:
-   - Navigate to [RapidAPI](https://rapidapi.com/) and register an account.
-   - Search for **uNoGS** (Netflix Online Global Search) or alternative Netflix Catalog API.
-   - Subscribe to the Basic/Free tier.
-   - Copy your `X-RapidAPI-Key` and `X-RapidAPI-Host`.
+You can choose either of the two ingestion approaches:
 
-2. **The Movie Database (TMDb)**:
-   - Create an account at [The Movie Database](https://www.themoviedb.org/).
-   - Go to **Settings > API** $\to$ Apply for a Developer API Key.
-   - Obtain your **API Key (v3 auth)** and **API Read Access Token (v4 auth)**.
+#### Option A: Zero-Cost Web Scraping (Recommended — No API Subscriptions)
+If you do not want to use RapidAPI or want to avoid monthly rate limits:
+- Use the built-in **`src/extract/netflix_scraper.py`** module.
+- It parses new release feeds directly from public Netflix catalog trackers (e.g. *What's on Netflix*, *Flixable*, *JustWatch*).
+- **Cost**: $0.00 / completely free.
+- **Requirements**: `beautifulsoup4` and `requests` (included in `requirements.txt`).
 
-### 1.2 Local Workspace Configuration
+#### Option B: RapidAPI (Netflix UnoGS / Streaming Catalog)
+- Navigate to [RapidAPI](https://rapidapi.com/) and register an account.
+- Search for **uNoGS** (Netflix Online Global Search) or alternative Netflix Catalog API.
+- Subscribe to the Basic/Free tier.
+- Copy your `X-RapidAPI-Key` and `X-RapidAPI-Host` into `.env`.
+
+---
+
+### 1.2 The Movie Database (TMDb) Rating API (Free)
+- Create an account at [The Movie Database](https://www.themoviedb.org/).
+- Go to **Settings > API** $\to$ Apply for a Developer API Key (Free for non-commercial).
+- Obtain your **API Key (v3 auth)** and **API Read Access Token (v4 auth)**.
+
+### 1.3 Local Workspace Configuration
 
 ```powershell
 # 1. Create a clean virtual environment

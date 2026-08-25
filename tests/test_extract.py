@@ -39,3 +39,15 @@ def test_tmdb_extractor_mock_search():
     res = extractor.search_title("Stranger Things")
     assert len(res) >= 1
     assert res[0]["id"] == 66732
+
+
+def test_netflix_web_scraper_fallback():
+    """Test Netflix web scraper fallback mechanism."""
+    from src.extract.netflix_scraper import NetflixWebScraper
+
+    scraper = NetflixWebScraper()
+    data = scraper._get_fallback_catalog()
+    assert len(data) == 3
+    assert data[0]["title"] == "Leave the World Behind"
+    assert data[0]["id"].startswith("scraped_")
+

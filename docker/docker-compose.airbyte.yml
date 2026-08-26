@@ -1,0 +1,79 @@
+# ==============================================================================
+# Standalone Lightweight Airbyte Docker Compose (No Kubernetes Required)
+# ==============================================================================
+# Run with: docker compose -f docker/docker-compose.airbyte.yml up -d
+
+services:
+  airbyte-db:
+    image: airbyte/db:0.50.36
+    container_name: airbyte-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AIRBYTE_DB_USER:-docker}
+      POSTGRES_PASSWORD: ${AIRBYTE_DB_PASSWORD:-docker}
+      POSTGRES_DB: ${AIRBYTE_DB_NAME:-airbyte}
+    volumes:
+      - airbyte_db_data:/var/lib/postgresql/data
+    networks:
+      - airbyte_network
+
+  airbyte-temporal:
+    image: temporalio/auto-setup:1.20.0
+    container_name: airbyte-temporal
+    restart: unless-stopped
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=${AIRBYTE_DB_USER:-docker}
+      - POSTGRES_PWD=${AIRBYTE_DB_PASSWORD:-docker}
+      - POSTGRES_SEEDS=airbyte-db
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml
+    depends_on:
+      - airbyte-db
+    networks:
+      - airbyte_network
+
+  airbyte-server:
+    image: airbyte/server:0.50.36
+    container_name: airbyte-server
+    restart: unless-stopped
+    environment:
+      - AIRBYTE_VERSION=0.50.36
+      - DATABASE_USER=${AIRBYTE_DB_USER:-docker}
+      - DATABASE_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
+      - DATABASE_URL=jdbc:postgresql://airbyte-db:5432/${AIRBYTE_DB_NAME:-airbyte}
+      - TEMPORAL_HOST=airbyte-temporal:7233
+      - CONFIG_ROOT=/data
+      - DATA_DOCKER_MOUNT=airbyte_workspace
+      - WORKSPACE_ROOT=/tmp/workspace
+    depends_on:
+      - airbyte-db
+      - airbyte-temporal
+    volumes:
+      - airbyte_workspace:/tmp/workspace
+      - airbyte_data:/data
+    networks:
+      - airbyte_network
+
+  airbyte-webapp:
+    image: airbyte/webapp:0.50.36
+    container_name: airbyte-webapp
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - AIRBYTE_SERVER_HOST=airbyte-server:8001
+      - API_URL=/api
+    depends_on:
+      - airbyte-server
+    networks:
+      - airbyte_network
+
+networks:
+  airbyte_network:
+    driver: bridge
+
+volumes:
+  airbyte_db_data:
+  airbyte_workspace:
+  airbyte_data:

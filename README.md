@@ -222,11 +222,20 @@ DB_PORT=5432
 ### 3. Run with Docker
 
 Start the PostgreSQL database and pgAdmin containers:
-
 ```bash
 make docker-up
 # Or: docker compose up -d
 ```
+
+*(Optional)* Start the lightweight Airbyte Web UI & Server:
+```bash
+make airbyte-up
+# Or: docker compose -f docker/docker-compose.airbyte.yml up -d
+```
+Access services:
+- **PostgreSQL**: `localhost:5432` (`streampulse`)
+- **pgAdmin**: [`http://localhost:5050`](http://localhost:5050) (`admin@admin.com` / `admin`)
+- **Airbyte Web UI**: [`http://localhost:8000`](http://localhost:8000) (`airbyte` / `password`)
 
 ### 4. Execute Pipeline
 

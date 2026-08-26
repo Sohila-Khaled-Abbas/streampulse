@@ -10,14 +10,22 @@ help:
 	@echo "  lint            Run ruff & mypy checks"
 	@echo "  format          Run black & ruff autofix"
 	@echo "  test            Run pytest suite with coverage"
-	@echo "  docker-up       Start PostgreSQL and pgAdmin via Docker Compose"
-	@echo "  docker-down     Stop and tear down Docker containers"
-	@echo "  airbyte-install Install and launch Airbyte locally in Docker"
-	@echo "  airbyte-status  Check local Airbyte cluster health"
-	@echo "  airbyte-creds   View local Airbyte login credentials"
-	@echo "  fetch-historical Download and cache 5,800+ historical enriched Netflix titles"
-	@echo "  run-pipeline    Execute the full end-to-end ELT pipeline"
-	@echo "  clean           Remove temporary caches and build artifacts"
+	@echo "  docker-up          Start PostgreSQL and pgAdmin via Docker Compose"
+	@echo "  docker-down        Stop and tear down Docker containers"
+	@echo "  airbyte-up         Start lightweight Airbyte Web UI & Server via Docker"
+	@echo "  airbyte-down       Stop standalone Airbyte containers"
+	@echo "  airbyte-install    Install Airbyte via abctl"
+	@echo "  airbyte-status     Check local Airbyte cluster health"
+	@echo "  airbyte-creds      View local Airbyte login credentials"
+	@echo "  fetch-historical   Download and cache 5,800+ historical enriched Netflix titles"
+	@echo "  run-pipeline       Execute the full end-to-end ELT pipeline"
+	@echo "  clean              Remove temporary caches and build artifacts"
+
+airbyte-up:
+	docker compose -f docker/docker-compose.airbyte.yml up -d
+
+airbyte-down:
+	docker compose -f docker/docker-compose.airbyte.yml down
 
 airbyte-install:
 	.\abctl-v0.30.4-windows-amd64\abctl.exe local install --low-resource-mode --no-browser

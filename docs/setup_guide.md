@@ -33,7 +33,7 @@ StreamPulse integrates two external APIs:
 
 1. Clone the repository and navigate into the root directory:
    ```bash
-   git clone https://github.com/your-username/streampulse.git
+   git clone https://github.com/Sohila-Khaled-Abbas/streampulse.git
    cd streampulse
    ```
 
@@ -47,7 +47,7 @@ StreamPulse integrates two external APIs:
    RAPIDAPI_KEY=your_actual_rapidapi_key
    TMDB_API_KEY=your_actual_tmdb_key
    DB_USER=postgres
-   DB_PASSWORD=your_secure_password
+   DB_PASSWORD=postgres
    DB_NAME=streampulse
    DB_HOST=localhost
    DB_PORT=5432
@@ -61,38 +61,34 @@ StreamPulse integrates two external APIs:
 # Create virtual environment
 python -m venv .venv
 
+# Activate on Windows PowerShell
+.venv\Scripts\Activate.ps1
+
 # Activate on Linux/macOS
 source .venv/bin/activate
 
-# Activate on Windows (PowerShell)
-.venv\Scripts\Activate.ps1
-
-# Install project dependencies
+# Install dependencies
 pip install -r requirements.txt
 ```
 
 ---
 
-## 5. Database Initialization (Docker)
+## 5. Starting Docker Services
 
-Spin up the local PostgreSQL database container:
+### 1. PostgreSQL & pgAdmin
 ```bash
-# Using Makefile
 make docker-up
-
-# Or using Docker Compose directly
-docker compose up -d
+# Or: docker compose up -d
 ```
+- **PostgreSQL**: `localhost:5432` (`streampulse`)
+- **pgAdmin 4**: `http://localhost:5050` (`admin@admin.com` / `admin`)
 
-The database container automatically mounts and executes the initialization scripts:
-1. `sql/00_init.sql` (Creates `staging` and `reporting` schemas)
-2. `sql/01_staging.sql` (Creates staging landing tables)
-3. `sql/02_reporting.sql` (Creates dimensional star schema & reporting views)
-
-### Inspecting with pgAdmin
-You can access the included pgAdmin web interface at `http://localhost:5050` with:
-- **Email**: `admin@streampulse.local`
-- **Password**: `admin`
+### 2. Standalone Airbyte UI & Server (Optional)
+```bash
+make airbyte-up
+# Or: docker compose -f docker/docker-compose.airbyte.yml up -d
+```
+- **Airbyte Web UI**: `http://localhost:8000` (`airbyte` / `password`)
 
 ---
 

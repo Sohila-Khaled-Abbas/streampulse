@@ -30,6 +30,7 @@ MANIFEST
 abctl*
 *.exe
 abctl-v*/
+airbyte/
 
 # Environment Variables & Secrets
 *.env

@@ -53,44 +53,48 @@ docker compose up -d
 
 ---
 
-## 🔌 Step 2: Launching Airbyte
+## 🚀 Step 2: Ingestion & ELT Options
 
-You can launch Airbyte locally using the official Airbyte installation tool:
+You have two powerful approaches for the **Extract & Load (EL)** stage:
 
-### Option A: Using Airbyte CLI (`abctl` - Recommended)
+### Option A: Native StreamPulse ELT Engine (Recommended — Zero RAM Overhead)
+Because Airbyte has deprecated standalone Docker Compose and requires a heavy nested Kubernetes cluster, StreamPulse includes a built-in, lightweight Python ELT orchestrator that handles everything in seconds:
+
 ```powershell
-# Install and start Airbyte
-abctl local install
+# 1. Fetch & Cache Historical Benchmark Dataset (5,800+ titles)
+python scripts/fetch_historical_dataset.py
+
+# 2. Run the Full Ingestion, Web Scraping, TMDb Enrichment & Entity Resolution
+python -m src.pipeline
 ```
 
-### Option B: Using Official Airbyte Docker Repo
-```powershell
-git clone https://github.com/airbytehq/airbyte.git
-cd airbyte
-docker compose up -d
-```
-
-Once running, access the **Airbyte Web UI** at:
-🌐 **`http://localhost:8000`**
-- **Default Username**: `airbyte`
-- **Default Password**: `password`
+This immediately parses, enriches, and writes clean records into `data/processed/netflix_catalog_enriched_master.csv` and loads into PostgreSQL.
 
 ---
 
-## 📥 Step 3: Configure Airbyte Source & Destination
+### Option B: Airbyte Cloud (Free Tier)
+For a complete Airbyte Web UI experience without local container bloat:
+1. Sign up for a free account at [**cloud.airbyte.com**](https://cloud.airbyte.com).
+2. Configure **Source**: `File (CSV)` with URL `https://raw.githubusercontent.com/amirtds/kaggle-netflix-tv-shows-and-movies/main/titles.csv`.
+3. Configure **Destination**: Connect to your cloud PostgreSQL database (Neon / Supabase) or local database via ngrok tunnel.
+4. Run the sync.
 
-### 1. Set Up Airbyte Destination (PostgreSQL)
-1. In Airbyte UI, go to **Destinations** $\to$ **New destination**.
-2. Select **Postgres**.
-3. Configure connection:
-   - **Host**: `host.docker.internal` *(or `localhost` if outside Docker)*
-   - **Port**: `5432`
-   - **DB Name**: `streampulse`
-   - **Default Schema**: `staging`
-   - **User**: `postgres`
-   - **Password**: `postgres`
-   - **SSL Mode**: `disable`
-4. Click **Set up destination** (Airbyte will test the connection).
+---
+
+## 📥 Step 3: Configure Database Warehouse Destination (PostgreSQL)
+
+Whether ingesting via StreamPulse Native ELT or Airbyte:
+
+1. **Host**: `localhost` *(or `host.docker.internal` from inside Docker)*
+2. **Port**: `5432`
+3. **Database Name**: `streampulse`
+4. **Default Schema**: `staging`
+5. **User**: `postgres`
+6. **Password**: `postgres`
+7. **SSL Mode**: `disable`
+
+pgAdmin is available to inspect tables directly at:
+🌐 **`http://localhost:5050`** (Login: `admin@admin.com`, Password: `admin`)
 
 ---
 

@@ -1,6 +1,7 @@
 <div align="center">
 
 # ⚡ StreamPulse
+
 ### *Live Netflix Catalog & Audience Intelligence ELT Pipeline*
 
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -51,6 +52,7 @@
 ## 🚀 Executive Summary
 
 Streaming catalogs change daily. **StreamPulse** provides streaming media intelligence by building a resilient, automated ELT pipeline that:
+
 1. **Extracts** live additions and changes from the Netflix global catalog (via RapidAPI / UnoGS).
 2. **Ingests** raw semi-structured payloads into an isolated PostgreSQL `staging` schema.
 3. **Enriches & Resolves Entities** by querying The Movie Database (TMDb) API and running Levenshtein string similarity and year-heuristic algorithms to connect disparate entities.
@@ -190,18 +192,23 @@ streampulse/
 ## ⚡ Quick Start Guide
 
 ### 1. Prerequisites
+
 - **Python 3.10+**
 - **Docker Desktop**
 - **Git**
 
 ### 2. Environment Variables
+
 Clone the repository and copy the environment template:
+
 ```bash
-git clone https://github.com/your-username/streampulse.git
+git clone https://github.com/Sohila-Khaled-Abbas/streampulse.git
 cd streampulse
 cp .env.example .env
 ```
+
 Configure your `.env` with your API keys and credentials:
+
 ```env
 RAPIDAPI_KEY=your_rapidapi_key_here
 TMDB_API_KEY=your_tmdb_api_key_here
@@ -213,14 +220,18 @@ DB_PORT=5432
 ```
 
 ### 3. Run with Docker
+
 Start the PostgreSQL database and pgAdmin containers:
+
 ```bash
 make docker-up
 # Or: docker compose up -d
 ```
 
 ### 4. Execute Pipeline
+
 Install dependencies and run the end-to-end ELT pipeline:
+
 ```bash
 # Create and activate virtual environment
 python -m venv .venv
@@ -260,6 +271,7 @@ Detailed definitions and constraints are available in the [Data Dictionary](docs
 ## 📈 Analytics & Power BI DirectQuery
 
 Connect Power BI directly to the reporting view for real-time catalog metrics:
+
 1. Open **Power BI Desktop** $\to$ **Get Data** $\to$ **PostgreSQL Database**.
 2. Server: `localhost:5432` | Database: `streampulse` | Mode: **DirectQuery**.
 3. Select `reporting.vw_powerbi_catalog_pulse`.

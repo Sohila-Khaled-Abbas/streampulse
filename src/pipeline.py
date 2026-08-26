@@ -96,11 +96,32 @@ def run_pipeline(include_historical: bool = True) -> None:
         f"{len(unresolved_records)} pending review."
     )
 
-    # 5. Display sample preview of resolved items
-    for item in resolved_records[:3]:
+    # 5. Export Master Enriched Dataset to data/processed/
+    import csv
+    import os
+
+    output_dir = os.path.join("data", "processed")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, "netflix_catalog_enriched_master.csv")
+
+    if resolved_records:
+        fieldnames = [
+            "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
+            "maturity_rating", "synopsis", "vote_average", "vote_count", "popularity",
+            "imdb_score", "tmdb_id", "match_confidence", "date_added", "source"
+        ]
+        with open(output_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+            writer.writeheader()
+            for r in resolved_records:
+                writer.writerow(r)
+        logger.info(f"Exported master enriched dataset ({len(resolved_records)} records) to {output_file}")
+
+    # 6. Display sample preview of resolved items
+    for item in resolved_records[:5]:
         logger.info(
-            f"[OK] [Match {item['match_confidence']}%] {item['title']} ({item['release_year']}) "
-            f"| Rating: {item['vote_average']} | TMDb/IMDb ID: {item['tmdb_id']}"
+            f"[OK] [Match {item.get('match_confidence', 100)}%] {item['title']} ({item.get('release_year')}) "
+            f"| Rating: {item.get('vote_average')} | TMDb/IMDb ID: {item.get('tmdb_id')}"
         )
 
     logger.info("=== StreamPulse Pipeline Run Completed Successfully ===")

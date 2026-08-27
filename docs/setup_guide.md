@@ -181,17 +181,23 @@ Processed: 30 titles | Quality: 100.0% | Export: data\processed\netflix_catalog_
 
 ---
 
-## 8. Data Validation & Profiling Artifacts
+## 8. Analytics Engineering & Data Quality Artifacts
 
-Every pipeline execution generates automated data quality artifacts in `data/processed/`:
+Every pipeline execution generates automated columnar Parquet and data quality artifacts in `data/processed/`:
 
-1. **`data/processed/netflix_catalog_enriched_master.csv`**:
+1. **`data/processed/powerbi_reporting_pulse.parquet`**:
+   - High-performance columnar Parquet file pre-modeled for Power BI Star-Schema analytics, containing `catalog_era`, `rating_tier`, `days_to_streaming`, and `is_trending`.
+
+2. **`data/processed/netflix_catalog_enriched_master.parquet`**:
+   - Master Snappy-compressed Parquet dataset with strictly enforced schema and typing for data lakehouse ingestion.
+
+3. **`data/processed/netflix_catalog_enriched_master.csv`**:
    - Master conformed catalog containing all enriched 2026 live releases, TMDb IDs, audience ratings, vote counts, popularity scores, streaming velocity (`days_to_streaming`), and source tags.
 
-2. **`data/processed/live_2026_pulse.json`**:
+4. **`data/processed/live_2026_pulse.json`**:
    - JSON structured feed of 2026 titles ready for web dashboards or API endpoints.
 
-3. **`data/processed/data_profiling_report.json`**:
+5. **`data/processed/data_profiling_report.json`**:
    - Machine-readable audit file containing:
      - Field-by-field completeness percentages (`missing_count`, `completeness_pct`).
      - Validation status (`PASSED` / `WARNING`).

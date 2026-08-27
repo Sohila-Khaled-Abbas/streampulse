@@ -200,8 +200,14 @@ The daemon polls every 60 seconds, detects delta drops, computes streaming veloc
 
 ---
 
-## 📈 Phase 7: Power BI DirectQuery Live Analytics
+## 📈 Phase 7: Analytics Engineering & Power BI Reporting
 
+### Option A: Parquet Lakehouse Columnar Import (Offline & High Performance)
+1. Open **Power BI Desktop** $\to$ **Get Data $\to$ Parquet**.
+2. Select `data/processed/powerbi_reporting_pulse.parquet` (Dimensional Star-Schema View) or `data/processed/netflix_catalog_enriched_master.parquet`.
+3. High-performance columnar layout loads instantly with strict data types.
+
+### Option B: PostgreSQL DirectQuery Live Analytics (Zero-Lag Synchronous)
 1. Open **Power BI Desktop** $\to$ **Get Data $\to$ PostgreSQL Database**.
 2. Set Server: `localhost:5432` | Database: `streampulse` | Mode: **DirectQuery**.
 3. Select `reporting.vw_powerbi_catalog_pulse`.

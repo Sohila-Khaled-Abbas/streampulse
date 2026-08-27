@@ -1,11 +1,12 @@
-"""Unit tests for warehouse loader and file exports."""
+"""Unit tests for warehouse loader, Parquet lakehouse export, and file exports."""
 
 import os
+import pandas as pd
 from src.load.warehouse_loader import WarehouseLoader
 
 
 def test_warehouse_loader_file_export(tmp_path):
-    """Test warehouse loader file export mechanism."""
+    """Test warehouse loader file and Parquet export mechanism."""
     output_dir = str(tmp_path / "processed")
     loader = WarehouseLoader(output_dir=output_dir)
 
@@ -33,3 +34,15 @@ def test_warehouse_loader_file_export(tmp_path):
     assert summary["total_records"] == 1
     assert os.path.exists(summary["exported_csv"])
     assert os.path.exists(summary["exported_json"])
+    assert os.path.exists(summary["exported_parquet"])
+    assert os.path.exists(summary["exported_powerbi_parquet"])
+
+    # Verify Parquet content
+    df_parquet = pd.read_parquet(summary["exported_parquet"])
+    assert len(df_parquet) == 1
+    assert df_parquet["title"].iloc[0] == "People We Meet on Vacation"
+
+    df_pbi = pd.read_parquet(summary["exported_powerbi_parquet"])
+    assert len(df_pbi) == 1
+    assert df_pbi["catalog_era"].iloc[0] == "2026 Live Releases"
+    assert df_pbi["rating_tier"].iloc[0] == "Good (6.5 - 7.9)"

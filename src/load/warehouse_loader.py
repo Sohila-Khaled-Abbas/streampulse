@@ -1,22 +1,26 @@
-"""PostgreSQL Data Warehouse Loader for Staging and Reporting Star Schemas."""
+"""PostgreSQL Data Warehouse Loader and Parquet/Lakehouse Exporter for Analytics Engineering."""
 
 import csv
 import json
 import os
 from typing import Any, Dict, List, Optional
+import pandas as pd
 from sqlalchemy import text
 from src.utils.db import db_manager
 from src.utils.logger import logger
 
 
 class WarehouseLoader:
-    """Loads transformed streaming records into PostgreSQL staging & Kimball dimensional model.
+    """Loads transformed streaming records into PostgreSQL staging & Kimball dimensional model,
+
+    and exports optimized columnar Parquet datasets for Power BI Analytics Engineering.
 
     Features:
     - Idempotent upserts for `staging.stg_netflix_titles` and `reporting.dim_titles`
     - Genre normalization and bridge table association
     - Snapshot logging into `reporting.fact_catalog_ratings`
-    - Seamless local export to CSV & JSON for Power BI or offline validation
+    - Columnar Parquet exports (`.parquet`) for Power BI Direct Import and Lakehouses
+    - CSV & JSON master artifact exports
     """
 
     def __init__(self, output_dir: str = os.path.join("data", "processed")) -> None:
@@ -25,14 +29,14 @@ class WarehouseLoader:
     def load_pipeline_records(
         self, records: List[Dict[str, Any]], dry_run: bool = False
     ) -> Dict[str, Any]:
-        """Load resolved and enriched catalog records into database and export files.
+        """Load resolved and enriched catalog records into database and export Parquet/CSV/JSON files.
 
         Args:
             records: Enriched title records.
             dry_run: If True, skips database writes and performs export only.
 
         Returns:
-            Dictionary summary of load statistics.
+            Dictionary summary of load and export statistics.
         """
         summary = {
             "total_records": len(records),
@@ -40,16 +44,13 @@ class WarehouseLoader:
             "staging_inserted": 0,
             "dim_titles_upserted": 0,
             "facts_recorded": 0,
+            "exported_parquet": "",
+            "exported_powerbi_parquet": "",
             "exported_csv": "",
             "exported_json": "",
         }
 
-        # 1. Always export master file artifacts
-        exported_csv, exported_json = self.export_to_files(records)
-        summary["exported_csv"] = exported_csv
-        summary["exported_json"] = exported_json
-
-        # 2. Database Ingestion if connected and not dry_run
+        # 1. Database Ingestion if connected and not dry_run
         if not dry_run and db_manager.test_connection():
             summary["db_connected"] = True
             logger.info("Connected to PostgreSQL warehouse. Starting transactional load...")
@@ -71,9 +72,11 @@ class WarehouseLoader:
             except Exception as err:
                 logger.error(f"Error during warehouse load: {err}")
         else:
-            logger.info(
-                f"Operating in offline/file export mode. Master artifacts available at: {exported_csv}"
-            )
+            logger.info("Operating in offline/file export mode.")
+
+        # 2. Export Master File Artifacts (Parquet, CSV, JSON)
+        files = self.export_to_files(records)
+        summary.update(files)
 
         return summary
 
@@ -198,31 +201,78 @@ class WarehouseLoader:
 
         return dim_count, fact_count
 
-    def export_to_files(self, records: List[Dict[str, Any]]) -> tuple[str, str]:
-        """Export master datasets to CSV and JSON."""
+    def export_to_files(self, records: List[Dict[str, Any]]) -> Dict[str, str]:
+        """Export master datasets to Parquet (for Power BI analytics), CSV, and JSON."""
         os.makedirs(self.output_dir, exist_ok=True)
         csv_file = os.path.join(self.output_dir, "netflix_catalog_enriched_master.csv")
+        parquet_file = os.path.join(self.output_dir, "netflix_catalog_enriched_master.parquet")
+        powerbi_parquet = os.path.join(self.output_dir, "powerbi_reporting_pulse.parquet")
         json_file = os.path.join(self.output_dir, "live_2026_pulse.json")
 
-        if records:
-            fieldnames = [
-                "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
-                "maturity_rating", "synopsis", "vote_average", "vote_count", "popularity",
-                "imdb_score", "imdb_votes", "tmdb_id", "match_confidence", "days_to_streaming",
-                "is_trending", "date_added", "source"
-            ]
-            with open(csv_file, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
-                writer.writeheader()
-                for r in records:
-                    writer.writerow(r)
+        result = {
+            "exported_csv": csv_file,
+            "exported_parquet": parquet_file,
+            "exported_powerbi_parquet": powerbi_parquet,
+            "exported_json": json_file,
+        }
 
-            # JSON export of 2026 & latest releases
-            latest_records = [r for r in records if (r.get("release_year") or 0) >= 2025]
-            with open(json_file, "w", encoding="utf-8") as f:
-                json.dump(latest_records if latest_records else records, f, indent=2, default=str)
+        if not records:
+            return result
 
-        return csv_file, json_file
+        fieldnames = [
+            "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
+            "maturity_rating", "synopsis", "vote_average", "vote_count", "popularity",
+            "imdb_score", "imdb_votes", "tmdb_id", "match_confidence", "days_to_streaming",
+            "is_trending", "date_added", "source"
+        ]
+
+        # 1. Master CSV Export
+        with open(csv_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+            writer.writeheader()
+            for r in records:
+                writer.writerow(r)
+
+        # 2. Master Parquet Export (Columnar, typed, compressed)
+        try:
+            df_master = pd.DataFrame(records)
+            # Ensure standard columns
+            for col in fieldnames:
+                if col not in df_master.columns:
+                    df_master[col] = None
+
+            # Calibrate data types for Parquet
+            df_master["release_year"] = pd.to_numeric(df_master["release_year"], errors="coerce").fillna(2026).astype("int32")
+            df_master["runtime_minutes"] = pd.to_numeric(df_master["runtime_minutes"], errors="coerce").fillna(90).astype("int32")
+            df_master["vote_average"] = pd.to_numeric(df_master["vote_average"], errors="coerce").fillna(0.0).astype("float32")
+            df_master["vote_count"] = pd.to_numeric(df_master["vote_count"], errors="coerce").fillna(0).astype("int32")
+            df_master["popularity"] = pd.to_numeric(df_master["popularity"], errors="coerce").fillna(0.0).astype("float32")
+            df_master["match_confidence"] = pd.to_numeric(df_master["match_confidence"], errors="coerce").fillna(100.0).astype("float32")
+            df_master["days_to_streaming"] = pd.to_numeric(df_master["days_to_streaming"], errors="coerce").fillna(30).astype("int32")
+            df_master["is_trending"] = df_master["is_trending"].fillna(False).astype("bool")
+
+            df_master.to_parquet(parquet_file, engine="pyarrow", index=False, compression="snappy")
+            logger.info(f"Master Parquet exported: {parquet_file} ({len(df_master)} rows)")
+
+            # 3. Power BI Analytics Star-Schema Parquet Export
+            df_powerbi = df_master.copy()
+            df_powerbi["catalog_era"] = df_powerbi["release_year"].apply(
+                lambda y: "2026 Live Releases" if y == 2026 else ("2024-2025 Modern" if y in (2024, 2025) else "Historical Archive (<2024)")
+            )
+            df_powerbi["rating_tier"] = df_powerbi["vote_average"].apply(
+                lambda v: "Top Rated (>= 8.0)" if v >= 8.0 else ("Good (6.5 - 7.9)" if v >= 6.5 else ("Mixed (< 6.5)" if v > 0.0 else "Unrated / Pending"))
+            )
+            df_powerbi.to_parquet(powerbi_parquet, engine="pyarrow", index=False, compression="snappy")
+            logger.info(f"Power BI Reporting Parquet exported: {powerbi_parquet} ({len(df_powerbi)} rows)")
+        except Exception as p_err:
+            logger.warning(f"Parquet export failed (fallback to CSV/JSON): {p_err}")
+
+        # 4. JSON Export of 2026 & latest releases
+        latest_records = [r for r in records if (r.get("release_year") or 0) >= 2025]
+        with open(json_file, "w", encoding="utf-8") as f:
+            json.dump(latest_records if latest_records else records, f, indent=2, default=str)
+
+        return result
 
 
 warehouse_loader = WarehouseLoader()

@@ -82,8 +82,20 @@ docker compose -f docker/docker-compose.airbyte.yml up -d
 
 ---
 
-## 📊 Step 3: Power BI DirectQuery Setup
+## 📊 Step 3: Power BI Connection & Analytics Engineering Setup
 
+You have two enterprise connection options in Power BI:
+
+### Option 1: Direct Parquet Lakehouse Import (High Performance Columnar)
+For offline reporting, ultra-fast analytics, or Azure/Fabric Lakehouse workflows:
+1. Open **Power BI Desktop**.
+2. Select **Get Data $\to$ More... $\to$ Parquet** (or File $\to$ Parquet).
+3. Browse to:
+   - `data/processed/powerbi_reporting_pulse.parquet` (Dimensional Star-Schema View with `catalog_era`, `rating_tier`, `is_trending`, and `days_to_streaming`)
+   - Or `data/processed/netflix_catalog_enriched_master.parquet` (Full master catalog)
+4. Click **Load**. All types (`int32`, `float32`, `bool`, `date`) are preserved natively without type conversion overhead!
+
+### Option 2: PostgreSQL Live DirectQuery (Real-Time Synchronous)
 1. Open **Power BI Desktop**.
 2. Select **Get Data $\to$ PostgreSQL Database**.
 3. Connection Parameters:

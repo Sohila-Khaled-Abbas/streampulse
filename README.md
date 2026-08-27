@@ -92,9 +92,10 @@ flowchart TD
         D5["reporting.vw_powerbi_catalog_pulse"]
     end
 
-    subgraph BI["5. Business Intelligence & Export"]
+    subgraph BI["5. Analytics Engineering & BI"]
         E1["Power BI Desktop (DirectQuery Mode)"]
-        E2["data/processed/netflix_catalog_enriched_master.csv"]
+        E2["Power BI Parquet Lakehouse (data/processed/*.parquet)"]
+        E3["Master CSV & JSON Feeds"]
     end
 
     A1 & A2 & A3 & A4 --> B1
@@ -104,7 +105,7 @@ flowchart TD
     D1 --> D2 & D3 & D4
     D2 & D3 & D4 --> D5
     D5 --> E1
-    B3 --> E2
+    B3 --> E2 & E3
 ```
 
 ---
@@ -277,14 +278,18 @@ Sample profiling report snippet:
 
 ---
 
-## 📈 Analytics & Power BI DirectQuery
+## 📈 Analytics Engineering & Power BI Integration
 
-Connect Power BI directly to the reporting view for zero-lag real-time metrics:
+Connect Power BI directly via PostgreSQL DirectQuery or Parquet Lakehouse mode:
 
-1. Open **Power BI Desktop** $\to$ **Get Data** $\to$ **PostgreSQL Database**.
-2. Server: `localhost:5432` | Database: `streampulse` | Mode: **DirectQuery**.
-3. Select `reporting.vw_powerbi_catalog_pulse`.
-4. Detailed setup steps and DAX measures are documented in [docs/live_project_implementation_guide.md](docs/live_project_implementation_guide.md).
+1. **Option A: Parquet Lakehouse Import**:
+   - Open **Power BI Desktop** $\to$ **Get Data $\to$ Parquet**.
+   - Select `data/processed/powerbi_reporting_pulse.parquet` for instant columnar analytics with pre-modeled dimensional attributes (`catalog_era`, `rating_tier`, `is_trending`).
+2. **Option B: PostgreSQL Live DirectQuery**:
+   - Open **Power BI Desktop** $\to$ **Get Data $\to$ PostgreSQL Database**.
+   - Server: `localhost:5432` | Database: `streampulse` | Mode: **DirectQuery**.
+   - Select `reporting.vw_powerbi_catalog_pulse`.
+3. Detailed setup steps and DAX measures are documented in [docs/live_project_implementation_guide.md](docs/live_project_implementation_guide.md) and [docs/airbyte_elt_powerbi_guide.md](docs/airbyte_elt_powerbi_guide.md).
 
 ---
 

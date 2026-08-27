@@ -188,7 +188,7 @@ def run_pipeline_step(
     logger.info(
         f"Processed: {len(resolved_records):,} titles | "
         f"Quality: {profile_report.get('quality_score', 100)}% | "
-        f"Export: {load_summary.get('exported_csv')}"
+        f"Parquet: {load_summary.get('exported_parquet')}"
     )
     logger.info("================================================================================")
 

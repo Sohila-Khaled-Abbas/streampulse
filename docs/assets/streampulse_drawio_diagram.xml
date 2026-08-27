@@ -1,0 +1,83 @@
+<mxfile host="app.diagrams.net" modified="2026-08-27T23:00:00.000Z" agent="StreamPulse Enterprise" version="21.0.0" type="device">
+  <diagram id="StreamPulse-Architecture" name="StreamPulse Enterprise Architecture">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- LAYER 1: INGESTION -->
+        <mxCell id="layer1" value="1. MULTI-SOURCE INGESTION LAYER" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#334155;fontColor=#ffffff;fontStyle=1;startSize=30;rounded=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="300" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="src1" value="Live 2026 Web Scraper&#xa;(Wikipedia 2026 Films &amp; Tudum)&#xa;BeautifulSoup4 Engine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#e50914;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer1">
+          <mxGeometry x="20" y="50" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="src2" value="TMDb / IMDb Enriched Metadata&#xa;(API v3 Discovery &amp; Popularity)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#38bdf8;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer1">
+          <mxGeometry x="20" y="160" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="src3" value="Historical Catalog Archive&#xa;(8,807 Kaggle Titles 1925-2024)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#64748b;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer1">
+          <mxGeometry x="20" y="260" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src4" value="Dirty Unmerged Datasets&#xa;• CSV: Shorthand votes '1.4M'&#xa;• Parquet: Wide monthly metrics&#xa;• JSON: Dirty currencies '$150M'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#facc15;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer1">
+          <mxGeometry x="20" y="350" width="260" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 2: TRANSFORMATION -->
+        <mxCell id="layer2" value="2. TRANSFORMATION &amp; DATA QUALITY" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#334155;fontColor=#ffffff;fontStyle=1;startSize=30;rounded=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="380" y="40" width="300" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="trans1" value="Entity Resolution Engine&#xa;• RapidFuzz Token Match (98.5%)&#xa;• NFKD Title Normalization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#38bdf8;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer2">
+          <mxGeometry x="20" y="50" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="trans2" value="Automated DQ Profiler&#xa;• 100% Quality Pass Threshold&#xa;• Zero Unhandled Null Invariants&#xa;• Catalog Era &amp; Outlier Telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#4ade80;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer2">
+          <mxGeometry x="20" y="160" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="trans3" value="Real-Time Streaming Daemon&#xa;• Continuous Cron Replication&#xa;• Days to Streaming Lag Calc&#xa;• Schema Evolution Control" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#c084fc;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer2">
+          <mxGeometry x="20" y="290" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 3: STORAGE -->
+        <mxCell id="layer3" value="3. WAREHOUSE &amp; LAKEHOUSE LAYER" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#334155;fontColor=#ffffff;fontStyle=1;startSize=30;rounded=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="720" y="40" width="360" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="wh1" value="PostgreSQL 15 Kimball Galaxy Model&#xa;• dim_titles (PK title_key, budget, era)&#xa;• dim_genres &amp; bridge_title_genre&#xa;• dim_crew &amp; bridge_title_crew&#xa;• dim_date (2,922 calendar days)&#xa;• fact_catalog_ratings (Snapshot)&#xa;• fact_streaming_performance (Hours)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#3b82f6;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="layer3">
+          <mxGeometry x="20" y="50" width="320" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="wh2" value="Airbyte 0.50.36 CDC Sync Engine&#xa;(Daily Scheduled Replication to Staging)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e1b4b;strokeColor=#4338ca;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer3">
+          <mxGeometry x="20" y="240" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wh3" value="Columnar Parquet Lakehouse (PyArrow)&#xa;• dim_titles.parquet&#xa;• dim_date.parquet&#xa;• dim_genres.parquet&#xa;• fact_catalog_ratings.parquet&#xa;• fact_streaming_performance.parquet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064e3b;strokeColor=#10b981;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="layer3">
+          <mxGeometry x="20" y="320" width="320" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 4: POWER BI -->
+        <mxCell id="layer4" value="4. POWER BI ANALYTICS &amp; DAX" style="swimlane;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#334155;fontColor=#ffffff;fontStyle=1;startSize=30;rounded=1;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="40" width="380" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="bi1" value="Power Query M ETL Engine&#xa;• Dynamic Unpivot on Monthly Hours&#xa;• Vote Shorthand Parser ('1.4M' -> Int)&#xa;• JSON Infobox &amp; Nested Record Expansion&#xa;• Non-breaking space &amp; Casing Scrubbing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#facc15;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="layer4">
+          <mxGeometry x="20" y="50" width="340" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="bi2" value="25+ Enterprise DAX Measures&#xa;• Bayesian Calibrated Audience Index&#xa;• Cost Per View Hour &amp; Budget ROI&#xa;• Pareto 80/20 Concentration Filter&#xa;• Time Intelligence &amp; QoQ Growth&#xa;• USERELATIONSHIP (Theatrical vs SVOD)&#xa;• TREATAS (Cross-Genre Affinity)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#38bdf8;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="layer4">
+          <mxGeometry x="20" y="200" width="340" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bi3" value="Executive Dashboard (DirectQuery)&#xa;• Real-time sub-second visual refresh&#xa;• Live 2026 SVOD Performance Pulse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#064e3b;strokeColor=#4ade80;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="layer4">
+          <mxGeometry x="20" y="380" width="340" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTORS -->
+        <mxCell id="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#38bdf8;strokeWidth=2;" edge="1" parent="1" source="src1" target="trans1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4ade80;strokeWidth=2;" edge="1" parent="1" source="trans2" target="wh1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#facc15;strokeWidth=2;" edge="1" parent="1" source="wh1" target="bi1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#10b981;strokeWidth=2;" edge="1" parent="1" source="wh3" target="bi2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

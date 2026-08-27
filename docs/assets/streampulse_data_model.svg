@@ -1,0 +1,234 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 850" width="100%" height="100%" style="background:#0b0f19; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="erd-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Table Header Gradients -->
+    <linearGradient id="header-dim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="header-fact" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+    <linearGradient id="header-bridge" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <linearGradient id="header-view" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="erd-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+
+    <!-- Line Markers -->
+    <marker id="crow-many" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 6 L 0 11 M 10 1 L 10 11" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+    </marker>
+    <marker id="one-bar" viewBox="0 0 12 12" refX="2" refY="6" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 4 1 L 4 11 M 8 1 L 8 11" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1300" height="850" fill="url(#erd-bg)" />
+
+  <!-- Title Header -->
+  <g transform="translate(60, 35)">
+    <text x="0" y="22" fill="#ffffff" font-size="22" font-weight="800" letter-spacing="1">STREAMPULSE KIMBALL GALAXY STAR SCHEMA</text>
+    <text x="0" y="42" fill="#94a3b8" font-size="12" font-weight="600">ENTERPRISE POWER BI DIRECTQUERY &amp; LAKEHOUSE DATA MODEL ERD</text>
+
+    <!-- Legend -->
+    <g transform="translate(750, 0)">
+      <rect x="0" y="10" width="14" height="14" rx="3" fill="#0284c7" />
+      <text x="22" y="22" fill="#cbd5e1" font-size="11">Dimension</text>
+      
+      <rect x="100" y="10" width="14" height="14" rx="3" fill="#16a34a" />
+      <text x="122" y="22" fill="#cbd5e1" font-size="11">Fact Table</text>
+
+      <rect x="200" y="10" width="14" height="14" rx="3" fill="#7c3aed" />
+      <text x="222" y="22" fill="#cbd5e1" font-size="11">Bridge Table (M:N)</text>
+
+      <rect x="340" y="10" width="14" height="14" rx="3" fill="#d97706" />
+      <text x="362" y="22" fill="#cbd5e1" font-size="11">DirectQuery View</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- TABLE 1: DIM_TITLES (Central Conformed Dimension) (X: 470, Y: 100) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(470, 100)" filter="url(#erd-shadow)">
+    <rect width="280" height="330" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+    <rect width="280" height="34" rx="8" fill="url(#header-dim)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">reporting.dim_titles</text>
+
+    <!-- Columns -->
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK title_key</text><text x="150" y="0" fill="#94a3b8">BIGINT</text>
+      <text x="0" y="18" fill="#38bdf8">UK netflix_id</text><text x="150" y="18" fill="#94a3b8">VARCHAR(50)</text>
+      <text x="0" y="36" fill="#f8fafc">   tmdb_id</text><text x="150" y="36" fill="#94a3b8">INT</text>
+      <text x="0" y="54" fill="#f8fafc">   canonical_title</text><text x="150" y="54" fill="#94a3b8">VARCHAR(500)</text>
+      <text x="0" y="72" fill="#f8fafc">   media_type</text><text x="150" y="72" fill="#94a3b8">VARCHAR(20)</text>
+      <text x="0" y="90" fill="#f8fafc">   release_year</text><text x="150" y="90" fill="#94a3b8">INT</text>
+      <text x="0" y="108" fill="#f8fafc">   release_date</text><text x="150" y="108" fill="#94a3b8">DATE</text>
+      <text x="0" y="126" fill="#f8fafc">   netflix_date_added</text><text x="150" y="126" fill="#94a3b8">DATE</text>
+      <text x="0" y="144" fill="#f8fafc">   maturity_rating</text><text x="150" y="144" fill="#94a3b8">VARCHAR(20)</text>
+      <text x="0" y="162" fill="#f8fafc">   runtime_minutes</text><text x="150" y="162" fill="#94a3b8">INT</text>
+      <text x="0" y="180" fill="#4ade80">   budget_usd</text><text x="150" y="180" fill="#94a3b8">NUMERIC(15,2)</text>
+      <text x="0" y="198" fill="#f8fafc">   original_language</text><text x="150" y="198" fill="#94a3b8">VARCHAR(20)</text>
+      <text x="0" y="216" fill="#f8fafc">   production_country</text><text x="150" y="216" fill="#94a3b8">VARCHAR(100)</text>
+      <text x="0" y="234" fill="#fde047">   catalog_era</text><text x="150" y="234" fill="#94a3b8">VARCHAR(50)</text>
+      <text x="0" y="252" fill="#f8fafc">   match_confidence</text><text x="150" y="252" fill="#94a3b8">NUMERIC(5,2)</text>
+      <text x="0" y="270" fill="#f8fafc">   is_active</text><text x="150" y="270" fill="#94a3b8">BOOLEAN</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- TABLE 2: DIM_DATE (Calendar & Streaming Windows) (X: 60, Y: 100) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(60, 100)" filter="url(#erd-shadow)">
+    <rect width="270" height="280" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+    <rect width="270" height="34" rx="8" fill="url(#header-dim)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">reporting.dim_date</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK date_key</text><text x="150" y="0" fill="#94a3b8">INT (YYYYMMDD)</text>
+      <text x="0" y="18" fill="#38bdf8">UK full_date</text><text x="150" y="18" fill="#94a3b8">DATE</text>
+      <text x="0" y="36" fill="#f8fafc">   year</text><text x="150" y="36" fill="#94a3b8">INT</text>
+      <text x="0" y="54" fill="#f8fafc">   quarter</text><text x="150" y="54" fill="#94a3b8">INT (1-4)</text>
+      <text x="0" y="72" fill="#f8fafc">   quarter_name</text><text x="150" y="72" fill="#94a3b8">VARCHAR(10)</text>
+      <text x="0" y="90" fill="#f8fafc">   month_number</text><text x="150" y="90" fill="#94a3b8">INT (1-12)</text>
+      <text x="0" y="108" fill="#f8fafc">   month_name</text><text x="150" y="108" fill="#94a3b8">VARCHAR(20)</text>
+      <text x="0" y="126" fill="#f8fafc">   week_of_year</text><text x="150" y="126" fill="#94a3b8">INT (1-53)</text>
+      <text x="0" y="144" fill="#f8fafc">   day_name</text><text x="150" y="144" fill="#94a3b8">VARCHAR(15)</text>
+      <text x="0" y="162" fill="#f8fafc">   is_weekend</text><text x="150" y="162" fill="#94a3b8">BOOLEAN</text>
+      <text x="0" y="180" fill="#f8fafc">   is_netflix_q_end</text><text x="150" y="180" fill="#94a3b8">BOOLEAN</text>
+      <text x="0" y="198" fill="#f8fafc">   fiscal_period</text><text x="150" y="198" fill="#94a3b8">VARCHAR(15)</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- TABLE 3: DIM_GENRES & BRIDGE (X: 900, Y: 100) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(900, 100)" filter="url(#erd-shadow)">
+    <rect width="240" height="130" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+    <rect width="240" height="34" rx="8" fill="url(#header-dim)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">reporting.dim_genres</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK genre_key</text><text x="130" y="0" fill="#94a3b8">SERIAL</text>
+      <text x="0" y="18" fill="#38bdf8">UK tmdb_genre_id</text><text x="130" y="18" fill="#94a3b8">INT</text>
+      <text x="0" y="36" fill="#f8fafc">   genre_name</text><text x="130" y="36" fill="#94a3b8">VARCHAR(100)</text>
+      <text x="0" y="54" fill="#f8fafc">   genre_category</text><text x="130" y="54" fill="#94a3b8">VARCHAR(50)</text>
+    </g>
+  </g>
+
+  <!-- BRIDGE TABLE: BRIDGE_TITLE_GENRE (X: 900, Y: 250) -->
+  <g transform="translate(900, 250)" filter="url(#erd-shadow)">
+    <rect width="240" height="110" rx="8" fill="#1e293b" stroke="#c084fc" stroke-width="1.5" />
+    <rect width="240" height="34" rx="8" fill="url(#header-bridge)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">bridge_title_genre</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK/FK title_key</text><text x="130" y="0" fill="#94a3b8">BIGINT</text>
+      <text x="0" y="18" fill="#facc15" font-weight="700">PK/FK genre_key</text><text x="130" y="18" fill="#94a3b8">INT</text>
+      <text x="0" y="36" fill="#f8fafc">      genre_weight</text><text x="130" y="36" fill="#94a3b8">NUMERIC(3,2)</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- FACT 1: FACT_CATALOG_RATINGS (Periodic Snapshot Fact) (X: 160, Y: 480) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(160, 480)" filter="url(#erd-shadow)">
+    <rect width="300" height="250" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="1.5" />
+    <rect width="300" height="34" rx="8" fill="url(#header-fact)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">fact_catalog_ratings (Snapshot Fact)</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK fact_rating_key</text><text x="160" y="0" fill="#94a3b8">BIGSERIAL</text>
+      <text x="0" y="20" fill="#38bdf8" font-weight="700">FK title_key</text><text x="160" y="20" fill="#94a3b8">BIGINT</text>
+      <text x="0" y="40" fill="#38bdf8" font-weight="700">FK date_key</text><text x="160" y="40" fill="#94a3b8">INT</text>
+      <text x="0" y="60" fill="#f8fafc">   snapshot_date</text><text x="160" y="60" fill="#94a3b8">DATE</text>
+      <text x="0" y="80" fill="#4ade80">   vote_average</text><text x="160" y="80" fill="#94a3b8">NUMERIC(3,1)</text>
+      <text x="0" y="100" fill="#4ade80">   vote_count</text><text x="160" y="100" fill="#94a3b8">INT</text>
+      <text x="0" y="120" fill="#4ade80">   popularity_score</text><text x="160" y="120" fill="#94a3b8">NUMERIC(10,3)</text>
+      <text x="0" y="140" fill="#fde047">   critic_score</text><text x="160" y="140" fill="#94a3b8">NUMERIC(4,1)</text>
+      <text x="0" y="160" fill="#fde047">   days_to_streaming</text><text x="160" y="160" fill="#94a3b8">INT</text>
+      <text x="0" y="180" fill="#f8fafc">   is_trending</text><text x="160" y="180" fill="#94a3b8">BOOLEAN</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- FACT 2: FACT_STREAMING_PERFORMANCE (Granular Viewership Fact) (X: 520, Y: 480) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(520, 480)" filter="url(#erd-shadow)">
+    <rect width="320" height="250" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="1.5" />
+    <rect width="320" height="34" rx="8" fill="url(#header-fact)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">fact_streaming_performance (Viewership)</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15" font-weight="700">PK performance_key</text><text x="175" y="0" fill="#94a3b8">BIGSERIAL</text>
+      <text x="0" y="20" fill="#38bdf8" font-weight="700">FK title_key</text><text x="175" y="20" fill="#94a3b8">BIGINT</text>
+      <text x="0" y="40" fill="#38bdf8" font-weight="700">FK date_key</text><text x="175" y="40" fill="#94a3b8">INT</text>
+      <text x="0" y="60" fill="#4ade80">   global_view_hours_m</text><text x="175" y="60" fill="#94a3b8">NUMERIC(8,2)</text>
+      <text x="0" y="80" fill="#4ade80">   estimated_viewers_k</text><text x="175" y="80" fill="#94a3b8">INT</text>
+      <text x="0" y="100" fill="#4ade80">   completion_rate_pct</text><text x="175" y="100" fill="#94a3b8">NUMERIC(5,2)</text>
+      <text x="0" y="120" fill="#4ade80">   retention_rate_pct</text><text x="175" y="120" fill="#94a3b8">NUMERIC(5,2)</text>
+      <text x="0" y="140" fill="#fde047">   cost_per_view_hr_usd</text><text x="175" y="140" fill="#94a3b8">NUMERIC(8,4)</text>
+      <text x="0" y="160" fill="#fde047">   budget_efficiency</text><text x="175" y="160" fill="#94a3b8">NUMERIC(6,2)</text>
+      <text x="0" y="180" fill="#f8fafc">   global_top_10_rank</text><text x="175" y="180" fill="#94a3b8">INT</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- REPORTING VIEW: VW_POWERBI_CATALOG_PULSE (X: 890, Y: 480) -->
+  <!-- ========================================================================= -->
+  <g transform="translate(890, 480)" filter="url(#erd-shadow)">
+    <rect width="340" height="250" rx="8" fill="#1e293b" stroke="#facc15" stroke-width="1.5" />
+    <rect width="340" height="34" rx="8" fill="url(#header-view)" />
+    <text x="15" y="22" fill="#ffffff" font-size="13" font-weight="700">vw_powerbi_catalog_pulse (DirectQuery)</text>
+
+    <g transform="translate(15, 52)" font-size="11" font-family="monospace">
+      <text x="0" y="0" fill="#facc15">title_key, netflix_id, title</text>
+      <text x="0" y="20" fill="#f8fafc">media_type, release_year, catalog_era</text>
+      <text x="0" y="40" fill="#f8fafc">release_date, netflix_date_added</text>
+      <text x="0" y="60" fill="#f8fafc">maturity_rating, runtime_minutes</text>
+      <text x="0" y="80" fill="#4ade80">budget_usd, original_language, country</text>
+      <text x="0" y="100" fill="#4ade80">vote_average, vote_count, popularity</text>
+      <text x="0" y="120" fill="#fde047">critic_score, days_to_streaming</text>
+      <text x="0" y="140" fill="#fde047">is_trending, rating_tier</text>
+
+      <rect x="0" y="160" width="310" height="26" rx="4" fill="#451a03" stroke="#b45309" />
+      <text x="155" y="177" fill="#fde047" font-size="10" font-weight="700" text-anchor="middle">SUB-SECOND DIRECTQUERY AGGREGATION</text>
+    </g>
+  </g>
+
+  <!-- ========================================================================= -->
+  <!-- RELATIONSHIP CONNECTING LINES (Crow's Foot Notation) -->
+  <!-- ========================================================================= -->
+  <!-- dim_titles to fact_catalog_ratings -->
+  <path d="M 520,430 L 520,455 L 310,455 L 310,480" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+
+  <!-- dim_titles to fact_streaming_performance -->
+  <path d="M 610,430 L 610,480" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+
+  <!-- dim_date to fact_catalog_ratings -->
+  <path d="M 195,380 L 195,480" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+
+  <!-- dim_date to fact_streaming_performance -->
+  <path d="M 270,380 L 270,445 L 560,445 L 560,480" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+
+  <!-- dim_titles to bridge_title_genre -->
+  <path d="M 750,260 L 900,260" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+
+  <!-- dim_genres to bridge_title_genre -->
+  <path d="M 980,230 L 980,250" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-start="url(#one-bar)" marker-end="url(#crow-many)" />
+</svg>

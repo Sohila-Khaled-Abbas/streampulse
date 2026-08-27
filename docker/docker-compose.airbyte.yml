@@ -1,7 +1,4 @@
-# ==============================================================================
-# Standalone Lightweight Airbyte Docker Compose (No Kubernetes Required)
-# ==============================================================================
-# Run with: docker compose -f docker/docker-compose.airbyte.yml up -d
+version: "3.8"
 
 services:
   airbyte-db:
@@ -9,11 +6,28 @@ services:
     container_name: airbyte-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${AIRBYTE_DB_USER:-docker}
-      POSTGRES_PASSWORD: ${AIRBYTE_DB_PASSWORD:-docker}
-      POSTGRES_DB: ${AIRBYTE_DB_NAME:-airbyte}
+      - POSTGRES_USER=${AIRBYTE_DB_USER:-docker}
+      - POSTGRES_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
+      - POSTGRES_DB=${AIRBYTE_DB_NAME:-airbyte}
     volumes:
       - airbyte_db_data:/var/lib/postgresql/data
+    networks:
+      - airbyte_network
+
+  airbyte-bootloader:
+    image: airbyte/bootloader:0.50.36
+    container_name: airbyte-bootloader
+    restart: on-failure
+    environment:
+      - AIRBYTE_VERSION=0.50.36
+      - DATABASE_USER=${AIRBYTE_DB_USER:-docker}
+      - DATABASE_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
+      - DATABASE_URL=jdbc:postgresql://airbyte-db:5432/${AIRBYTE_DB_NAME:-airbyte}
+      - CONFIG_DATABASE_USER=${AIRBYTE_DB_USER:-docker}
+      - CONFIG_DATABASE_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
+      - CONFIG_DATABASE_URL=jdbc:postgresql://airbyte-db:5432/${AIRBYTE_DB_NAME:-airbyte}
+    depends_on:
+      - airbyte-db
     networks:
       - airbyte_network
 
@@ -38,17 +52,30 @@ services:
     restart: unless-stopped
     environment:
       - AIRBYTE_VERSION=0.50.36
+      - AIRBYTE_ROLE=server
       - DATABASE_USER=${AIRBYTE_DB_USER:-docker}
       - DATABASE_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
       - DATABASE_URL=jdbc:postgresql://airbyte-db:5432/${AIRBYTE_DB_NAME:-airbyte}
+      - CONFIG_DATABASE_USER=${AIRBYTE_DB_USER:-docker}
+      - CONFIG_DATABASE_PASSWORD=${AIRBYTE_DB_PASSWORD:-docker}
+      - CONFIG_DATABASE_URL=jdbc:postgresql://airbyte-db:5432/${AIRBYTE_DB_NAME:-airbyte}
+      - CONFIGS_DATABASE_MINIMUM_FLYWAY_MIGRATION_VERSION=0.35.4.001
+      - JOBS_DATABASE_MINIMUM_FLYWAY_MIGRATION_VERSION=0.35.4.001
+      - AIRBYTE_FLYWAY_CONFIGS_MINIMUM_MIGRATION_VERSION=0.35.4.001
+      - AIRBYTE_FLYWAY_JOBS_MINIMUM_MIGRATION_VERSION=0.35.4.001
       - TEMPORAL_HOST=airbyte-temporal:7233
       - CONFIG_ROOT=/data
       - DATA_DOCKER_MOUNT=airbyte_workspace
       - WORKSPACE_ROOT=/tmp/workspace
       - TRACKING_STRATEGY=logging
+      - WEBAPP_URL=http://localhost:8000
     depends_on:
-      - airbyte-db
-      - airbyte-temporal
+      airbyte-bootloader:
+        condition: service_completed_successfully
+      airbyte-db:
+        condition: service_started
+      airbyte-temporal:
+        condition: service_started
     volumes:
       - airbyte_workspace:/tmp/workspace
       - airbyte_data:/data

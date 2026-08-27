@@ -1,4 +1,4 @@
-"""Unit tests for warehouse loader, Parquet lakehouse export, and file exports."""
+"""Unit tests for warehouse loader, Parquet lakehouse export, and multi-source file exports."""
 
 import os
 import pandas as pd
@@ -36,6 +36,8 @@ def test_warehouse_loader_file_export(tmp_path):
     assert os.path.exists(summary["exported_json"])
     assert os.path.exists(summary["exported_parquet"])
     assert os.path.exists(summary["exported_powerbi_parquet"])
+    assert os.path.exists(summary["exported_performance_parquet"])
+    assert len(summary["lakehouse_tables"]) >= 5
 
     # Verify Parquet content
     df_parquet = pd.read_parquet(summary["exported_parquet"])
@@ -46,3 +48,11 @@ def test_warehouse_loader_file_export(tmp_path):
     assert len(df_pbi) == 1
     assert df_pbi["catalog_era"].iloc[0] == "2026 Live Releases"
     assert df_pbi["rating_tier"].iloc[0] == "Good (6.5 - 7.9)"
+
+    # Verify Lakehouse tables
+    lakehouse_dir = os.path.join(output_dir, "lakehouse")
+    assert os.path.exists(os.path.join(lakehouse_dir, "dim_titles.parquet"))
+    assert os.path.exists(os.path.join(lakehouse_dir, "dim_genres.parquet"))
+    assert os.path.exists(os.path.join(lakehouse_dir, "dim_date.parquet"))
+    assert os.path.exists(os.path.join(lakehouse_dir, "fact_catalog_ratings.parquet"))
+    assert os.path.exists(os.path.join(lakehouse_dir, "fact_streaming_performance.parquet"))

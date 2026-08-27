@@ -1,9 +1,14 @@
 """Main Orchestration Pipeline for StreamPulse: Live 2026 Catalog ELT & Real-Time Intelligence."""
 
 import argparse
+import os
 import sys
 import time
 from typing import Any, Dict, List, Optional
+
+# Ensure project root is in sys.path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.extract.enricher_scraper import WebEnricher
 from src.extract.historical_loader import HistoricalDatasetLoader
 from src.extract.netflix import NetflixExtractor

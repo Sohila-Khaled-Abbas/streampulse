@@ -1,140 +1,190 @@
-# 🔄 Airbyte ELT & Native 2026 Engine to Power BI DirectQuery Guide
+# 🔄 Airbyte Automated Daily ELT Pipeline & Power BI DirectQuery Master Guide
 
-This guide walks you through using either **Airbyte** or the **Native StreamPulse 2026 Web Scraping Engine** as the Extract & Load (EL) stage, loading raw streaming catalog data into PostgreSQL, transforming it into a dimensional model, and serving real-time dashboards in **Power BI via DirectQuery**.
+This guide details how to configure **Airbyte (v0.50.36)** as an automated daily ELT orchestrator to ingest newly scraped 2026 streaming catalog records into PostgreSQL, and connect **Power BI Desktop** via **DirectQuery** for real-time reporting.
 
 ---
 
-## 🏗️ ELT Architectural Flow
+## 🏗️ Automated Daily Architecture Workflow
 
 ```mermaid
 flowchart LR
-    subgraph Extract["1. Extract & Scrape"]
-        A1["Wikipedia 2026 Netflix Originals"]
-        A2["What's on Netflix Live RSS Feed"]
-        A3["TMDb Metadata & Ratings API"]
-        A4["Kaggle 5,800+ Historical Benchmark"]
+    subgraph DailyScrape [Step 1: Automated Daily Web Scraper]
+        SCRAPER[Live 2026 Web Scraper\nWikipedia + Tudum + RSS]
+        RAW_FILES[(data/raw/ & data/processed/\nMaster CSV/Parquet Landing)]
+        SCRAPER -->|Daily Cron: 05:00 UTC| RAW_FILES
     end
 
-    subgraph Load["2. Load & Validate"]
-        B["StreamPulse / Airbyte Loader"]
-        C[("PostgreSQL: staging schema")]
-        P["Data Quality & Profiling Engine"]
+    subgraph AirbyteStack [Step 2: Airbyte Automated ELT Ingestion]
+        AB_SRC[Airbyte Source\nFile / Custom HTTP REST]
+        AB_SCHED{Airbyte Cron Scheduler\n0 6 * * * (06:00 UTC)}
+        AB_DEST[Airbyte Postgres Destination\nhost.docker.internal:5432]
+        
+        RAW_FILES --> AB_SRC
+        AB_SRC --> AB_SCHED
+        AB_SCHED -->|Incremental Sync| AB_DEST
     end
 
-    subgraph Transform["3. Transform & Model"]
-        D["Entity Resolution (RapidFuzz >= 85%)"]
-        E["Conformed Star Schema Modeler"]
-        F[("PostgreSQL: reporting schema")]
+    subgraph PostgresDWH [Step 3: PostgreSQL Star Schema Warehouse]
+        STG[(staging.stg_netflix_titles\nRaw Landing Zone)]
+        TRANSFORM[SQL / DBT / Python Daemon\nKimball Galaxy Model Upsert]
+        STAR_SCHEMA[(reporting.dim_titles\nreporting.dim_genres\nreporting.dim_date\nreporting.fact_catalog_ratings\nreporting.fact_streaming_perf)]
+        VIEW[(reporting.vw_powerbi_catalog_pulse\nReporting View)]
+
+        AB_DEST --> STG
+        STG --> TRANSFORM
+        TRANSFORM --> STAR_SCHEMA
+        STAR_SCHEMA --> VIEW
     end
 
-    subgraph Visualize["4. Real-Time BI"]
-        G["reporting.vw_powerbi_catalog_pulse"]
-        H["Power BI Desktop (DirectQuery)"]
+    subgraph PowerBI [Step 4: Power BI Live Reporting]
+        PBI_DQ[Power BI Desktop\nDirectQuery Mode]
+        DASHBOARD[Executive 2026 Dashboard\nAutomatic Page Refresh: 5 mins]
+        VIEW -. Live DirectQuery SQL .-> PBI_DQ
+        PBI_DQ --> DASHBOARD
     end
-
-    A1 & A2 & A3 & A4 --> B
-    B --> C
-    B --> P
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G -->|DirectQuery (Zero Lag)| H
 ```
 
 ---
 
-## 🚀 Step 1: Starting Your Infrastructure
+## 🚀 Step 1: Verify Airbyte Stack Health
 
-Start PostgreSQL and pgAdmin via Docker Compose:
+Airbyte is running in Docker Compose with all required containers:
+- `airbyte-server` (Micronaut backend listening on internal port 8001)
+- `airbyte-webapp` (Nginx frontend listening on `http://localhost:8000`)
+- `airbyte-temporal` (Workflow orchestration engine)
+- `airbyte-db` (PostgreSQL configs & jobs database)
 
+### Health Check Commands:
 ```powershell
-docker compose up -d
-```
+# 1. Check container statuses
+docker ps --filter "name=airbyte"
 
-- **PostgreSQL Warehouse**: `localhost:5432` | User: `postgres` | Password: `postgres` | Database: `streampulse`
-- **pgAdmin Web UI**: `http://localhost:5050` (Email: `admin@admin.com`, Password: `admin`)
+# 2. Test Airbyte API Health endpoint
+python -c "import requests; print(requests.get('http://localhost:8000/api/v1/health').json())"
+# Output: {'available': True}
+```
 
 ---
 
-## 🚀 Step 2: Ingestion & ELT Options
+## 🛠️ Step 2: Step-by-Step Airbyte Source & Destination Configuration
 
-### Option A: Native 2026 StreamPulse Engine (Recommended — Zero Cost & Live 2026 Data)
-The native Python ELT engine automatically scrapes 2026 Wikipedia originals, ongoing TV series, and live streaming RSS feeds:
-
-```powershell
-# Run Live 2026 Pipeline
-python -m src.pipeline --mode live --years 2026,2025 --limit 50
-
-# Run with Real-Time Streaming Daemon (Continuous)
-python -m src.pipeline --mode stream --years 2026 --stream-interval 60
-```
-
-### Option B: Airbyte Standalone Ingestion
-If using Airbyte for enterprise connectors:
-```powershell
-# Start Airbyte containers
-docker compose -f docker/docker-compose.airbyte.yml up -d
-```
-- Access Airbyte at `http://localhost:8000` (`airbyte` / `password`).
-- Set Source: File / Custom HTTP Connector.
-- Set Destination: PostgreSQL (`staging` schema).
+### 2.1 Access the Airbyte Web UI
+1. Open your browser and navigate to: **[http://localhost:8000](http://localhost:8000)**
+2. Default credentials:
+   - **Username**: `airbyte` (or `docker`)
+   - **Password**: `password` (or `docker`)
 
 ---
 
-## 📊 Step 3: Power BI Connection & Analytics Engineering Setup
+### 2.2 Configure the Source (Daily Catalog Landing Feed)
+1. Click on **Sources** in the left navigation sidebar $\to$ Click **+ New Source**.
+2. Search and select: **File (CSV)** (or **Custom HTTP API / Local Filesystem**).
+3. Fill in the source configuration fields:
 
-You have two enterprise connection options in Power BI:
+| Configuration Field | Value to Enter | Description |
+| :--- | :--- | :--- |
+| **Source Name** | `StreamPulse_Daily_2026_Catalog` | Descriptive identifier |
+| **Storage Provider** | `Local Filesystem` (or `HTTPS: Public Web`) | Source storage type |
+| **File Path / URL** | `data/processed/netflix_catalog_enriched_master.csv` | Scraper master output path |
+| **Format** | `csv` | Format of the file |
+| **Reader Options** | `{"encoding": "utf-8"}` | UTF-8 parser options |
 
-### Option 1: Direct Parquet Lakehouse Import (High Performance Columnar)
-For offline reporting, ultra-fast analytics, or Azure/Fabric Lakehouse workflows:
+4. Click **Set up source**. Airbyte will run a connection check to validate readability.
+
+---
+
+### 2.3 Configure the Destination (PostgreSQL Staging Warehouse)
+1. Click on **Destinations** in the left navigation sidebar $\to$ Click **+ New Destination**.
+2. Search and select: **Postgres**.
+3. Fill in the destination configuration fields:
+
+| Configuration Field | Value to Enter | Why this is needed |
+| :--- | :--- | :--- |
+| **Destination Name** | `StreamPulse_PostgreSQL_Warehouse` | Destination identifier |
+| **Host** | `host.docker.internal` | Connects from Docker container back to Windows host PostgreSQL |
+| **Port** | `5432` | PostgreSQL standard port |
+| **DB Name** | `streampulse` | Project database |
+| **Default Schema** | `staging` | Isolates raw staging from reporting schema |
+| **User** | `postgres` | Database admin user |
+| **Password** | `postgres` | Database password |
+| **SSL Mode** | `disable` | Local Docker bridge network |
+
+4. Click **Set up destination**. Airbyte will test the PostgreSQL credentials and schema permissions.
+
+---
+
+### 2.4 Create the Automated Daily Replication Connection
+1. Click on **Connections** $\to$ Click **+ New Connection**.
+2. Select Source: `StreamPulse_Daily_2026_Catalog`.
+3. Select Destination: `StreamPulse_PostgreSQL_Warehouse`.
+4. Configure Connection Settings:
+
+| Setting | Value | Rationale |
+| :--- | :--- | :--- |
+| **Connection Name** | `Daily_2026_Catalog_to_Staging` | Connection label |
+| **Schedule Type** | `Scheduled` | Automated recurring job |
+| **Cron Expression** | `0 6 * * *` (or select `Every 24 hours`) | Runs daily at 06:00 AM UTC (1 hour after scraper) |
+| **Sync Mode** | `Incremental \| Append + Deduped` | Prevents duplicate titles while appending new releases |
+| **Primary Key** | `netflix_id` | Unique title identifier |
+| **Cursor Field** | `extracted_at` (or `date_added`) | High-watermark for incremental tracking |
+| **Destination Stream Prefix** | `stg_` | Creates/updates `staging.stg_netflix_titles` |
+
+5. Click **Save connection** $\to$ Click **Sync Now** to run the initial baseline replication!
+
+---
+
+## ⚡ Step 3: Downstream Automatic Transformation Trigger
+
+When Airbyte lands raw records into `staging.stg_netflix_titles`, the StreamPulse automated pipeline triggers the Kimball Galaxy transformation:
+
+```powershell
+# Run the pipeline daemon or scheduled task
+python src/pipeline.py --mode stream --stream-interval 86400
+```
+
+### What happens automatically:
+1. `reporting.dim_titles` is updated with `catalog_era`, `budget_usd`, and clean metadata.
+2. `reporting.dim_genres` and `reporting.bridge_title_genre` map new multi-genre associations.
+3. `reporting.fact_catalog_ratings` logs daily vote and popularity snapshots.
+4. `reporting.fact_streaming_performance` logs global view hours and completion metrics.
+5. `data/processed/lakehouse/*.parquet` files are updated with fresh Snappy compression.
+
+---
+
+## 📊 Step 4: Connecting Power BI via Live DirectQuery
+
+Now connect Power BI Desktop to the PostgreSQL view so that daily Airbyte syncs instantly update the dashboard visuals:
+
+### 4.1 Step-by-Step Power BI DirectQuery Connection:
 1. Open **Power BI Desktop**.
-2. Select **Get Data $\to$ More... $\to$ Parquet** (or File $\to$ Parquet).
-3. Browse to:
-   - `data/processed/powerbi_reporting_pulse.parquet` (Dimensional Star-Schema View with `catalog_era`, `rating_tier`, `is_trending`, and `days_to_streaming`)
-   - Or `data/processed/netflix_catalog_enriched_master.parquet` (Full master catalog)
-4. Click **Load**. All types (`int32`, `float32`, `bool`, `date`) are preserved natively without type conversion overhead!
-
-### Option 2: PostgreSQL Live DirectQuery (Real-Time Synchronous)
-1. Open **Power BI Desktop**.
-2. Select **Get Data $\to$ PostgreSQL Database**.
-3. Connection Parameters:
-   - **Server**: `localhost:5432` (or your cloud host)
+2. Click **Get Data** $\to$ Select **PostgreSQL database** $\to$ Click **Connect**.
+3. In the PostgreSQL dialog:
+   - **Server**: `localhost:5432`
    - **Database**: `streampulse`
-   - **Data Connectivity Mode**: **DirectQuery**
-4. Choose View: `reporting.vw_powerbi_catalog_pulse`.
-
-### Recommended DAX Measures
-```dax
-// 1. Average Rating
-AvgAudienceScore = AVERAGE(vw_powerbi_catalog_pulse[vote_average])
-
-// 2. Total Streaming Titles
-TotalTitles = COUNTROWS(vw_powerbi_catalog_pulse)
-
-// 3. 2026 Live Catalog Additions
-Live2026Count = CALCULATE(COUNTROWS(vw_powerbi_catalog_pulse), vw_powerbi_catalog_pulse[release_year] = 2026)
-
-// 4. Average Days to Streaming
-AvgDaysToStream = AVERAGE(vw_powerbi_catalog_pulse[days_to_streaming])
-
-// 5. Top Rated Ratio (>= 8.0)
-TopRatedPct = 
-DIVIDE(
-    CALCULATE(COUNTROWS(vw_powerbi_catalog_pulse), vw_powerbi_catalog_pulse[vote_average] >= 8.0),
-    COUNTROWS(vw_powerbi_catalog_pulse),
-    0
-)
-```
+   - **Data Connectivity mode**: Select **DirectQuery** 🟢 *(Crucial for live auto-refresh!)*
+   - **Advanced options**: Leave empty or paste:
+     ```sql
+     SELECT * FROM reporting.vw_powerbi_catalog_pulse;
+     ```
+4. Click **OK** $\to$ Enter credentials: User `postgres`, Password `postgres` $\to$ Click **Connect**.
+5. Select `vw_powerbi_catalog_pulse` and click **Load**.
 
 ---
 
-## 🔍 Step 4: Data Quality & Profiling Audit
+### 4.2 Enabling Automatic Page Refresh in Power BI:
+1. Select the report canvas (click empty background).
+2. Open the **Format visual** pane $\to$ select **Page refresh**.
+3. Toggle **Page refresh** to **ON**.
+4. Set **Refresh interval**: `5 Minutes` (or `1 Minute`).
+5. **Result**: Every morning when Airbyte syncs new 2026 titles into PostgreSQL, your Power BI dashboard updates automatically without needing to republish!
 
-Verify that the pipeline produced clean, complete data:
-```powershell
-# Inspect latest data profiling JSON
-cat data/processed/data_profiling_report.json
-```
-- Quality score must be $\ge 90\%$.
-- Validation status must be `PASSED`.
+---
+
+## 💡 Troubleshooting & Production Best Practices
+
+| Symptom | Cause | Solution |
+| :--- | :--- | :--- |
+| `Cannot connect to host.docker.internal` | Docker Desktop host networking on Windows | Ensure `host.docker.internal` is used as host inside Airbyte UI instead of `localhost`. |
+| `Sync fails with table already exists` | Staging schema conflict | Set Airbyte sync mode to `Incremental \| Append + Deduped` or `Full Refresh \| Overwrite`. |
+| `Power BI prompts for dataset refresh` | Imported mode was selected instead of DirectQuery | Reconnect using **DirectQuery** connectivity mode under PostgreSQL connector. |
+| `Airbyte UI 502 Bad Gateway` | Server container still initializing Micronaut | Wait 20-30 seconds for `airbyte-server` to finish boot checks. |

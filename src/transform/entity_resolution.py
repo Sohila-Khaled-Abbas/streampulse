@@ -1,7 +1,9 @@
 """Entity resolution engine to match Netflix catalog records with TMDb entities."""
 
 from typing import Any, Dict, List, Optional, Tuple
+
 from rapidfuzz import fuzz
+
 from src.transform.cleaner import normalize_title
 from src.utils.logger import logger
 

@@ -2,7 +2,9 @@
 
 import os
 import sys
+
 from loguru import logger
+
 from src.utils.config import settings
 
 # Clear default handlers

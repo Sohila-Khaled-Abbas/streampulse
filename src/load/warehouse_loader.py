@@ -5,12 +5,12 @@ import datetime
 import json
 import os
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
+
 import pandas as pd
-from sqlalchemy import text
+
 from src.utils.db import db_manager
 from src.utils.logger import logger
-
 
 # Standard TMDB Genre Registry
 GENRE_REGISTRY = [
@@ -284,8 +284,6 @@ class WarehouseLoader:
         facts_perf_count = 0
 
         # Fetch genre dictionary for bridging
-        cursor.execute("SELECT tmdb_genre_id, genre_key, genre_name FROM reporting.dim_genres;")
-        genre_map = {row[0]: row[1] for row in cursor.fetchall()}
         cursor.execute("SELECT genre_name, genre_key FROM reporting.dim_genres;")
         genre_name_map = {row[0].lower(): row[1] for row in cursor.fetchall()}
 

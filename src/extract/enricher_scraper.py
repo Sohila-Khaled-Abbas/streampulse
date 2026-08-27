@@ -3,9 +3,9 @@
 import hashlib
 import random
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
 import requests
-from src.utils.logger import logger
 
 try:
     from bs4 import BeautifulSoup
@@ -60,7 +60,7 @@ class WebEnricher:
             "imdb_score": record.get("imdb_score") or base_rating,
             "imdb_votes": record.get("imdb_votes") or base_votes,
             "days_to_streaming": days_to_stream,
-            "is_trending": True if (release_year >= 2025 and base_pop > 100) else False,
+            "is_trending": bool(release_year >= 2025 and base_pop > 100),
             "match_confidence": record.get("match_confidence", 95.0),
             "source": record.get("source", "web_scraper_enriched"),
         }

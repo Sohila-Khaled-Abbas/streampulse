@@ -19,7 +19,6 @@ from src.transform.cleaner import clean_title_record
 from src.transform.entity_resolution import EntityResolver
 from src.transform.profiler import data_profiler
 from src.utils.config import settings
-from src.utils.db import db_manager
 from src.utils.logger import logger
 
 

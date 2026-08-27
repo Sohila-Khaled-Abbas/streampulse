@@ -4,7 +4,9 @@ import hashlib
 import re
 import time
 from typing import Any, Dict, List, Optional
+
 import requests
+
 from src.utils.logger import logger
 
 try:
@@ -395,7 +397,7 @@ class NetflixWebScraper:
                     "runtime": 105 if media_type == "movie" else 45,
                     "runtime_minutes": 105 if media_type == "movie" else 45,
                     "maturity_rating": "TV-MA" if media_type == "series" else "PG-13",
-                    "date_added": time.strftime("%Y-%m-%d"),
+                    "date_added": pub_date[:10] if len(pub_date) >= 10 else time.strftime("%Y-%m-%d"),
                     "source": "whats_on_netflix_rss",
                 })
 

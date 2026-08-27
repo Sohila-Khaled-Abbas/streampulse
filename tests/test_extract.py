@@ -1,11 +1,12 @@
 """Unit tests for extractors and TMDb resolution."""
 
 from unittest.mock import MagicMock, patch
+
+from src.extract.enricher_scraper import WebEnricher
+from src.extract.historical_loader import HistoricalDatasetLoader
 from src.extract.netflix import NetflixExtractor
 from src.extract.netflix_scraper import NetflixWebScraper
 from src.extract.tmdb import TMDbExtractor
-from src.extract.enricher_scraper import WebEnricher
-from src.extract.historical_loader import HistoricalDatasetLoader
 
 
 def test_netflix_extractor_fallback():

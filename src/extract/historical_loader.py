@@ -5,10 +5,10 @@ based on the Kaggle 'Netflix TV Shows and Movies enriched with IMDb & TMDb' data
 """
 
 import csv
-import io
 import os
 import urllib.request
 from typing import Any, Dict, List, Optional
+
 from src.utils.logger import logger
 
 KAGGLE_MIRROR_URL = (

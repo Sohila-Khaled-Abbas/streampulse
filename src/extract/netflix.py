@@ -1,7 +1,9 @@
 """RapidAPI Netflix Catalog data extractor."""
 
 from typing import Any, Dict, List, Optional
+
 import requests
+
 from src.utils.config import settings
 from src.utils.logger import logger
 

@@ -14,15 +14,14 @@ import json
 import os
 import random
 import sys
-from typing import Any, Dict, List
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import pandas as pd
+
 from src.utils.db import db_manager
 from src.utils.logger import logger
-
 
 TITLES_SEED = [
     {"netflix_id": "8001", "canonical": "Avatar: Fire and Ash", "year": 2026, "type": "movie"},
@@ -79,7 +78,7 @@ def generate_source_1_postgres_staging():
             for item in TITLES_SEED:
                 nid = item["netflix_id"]
                 t = item["canonical"]
-                
+
                 # Problem 1: Casing & whitespace quirks
                 if nid in ["8001", "8005"]:
                     dirty_title = f"  {t.upper()}  "
@@ -150,11 +149,11 @@ def generate_source_2_csv_imdb_ratings():
     """Generate CSV file with shorthand votes, dirty IDs, and duplicate snapshots."""
     logger.info("Generating Source 2: data/raw/imdb_external_ratings.csv (Dirty CSV)...")
     file_path = os.path.join("data", "raw", "imdb_external_ratings.csv")
-    
+
     rows = []
     for item in TITLES_SEED:
         nid = item["netflix_id"]
-        
+
         # Problem 1: Inconsistent ID prefixes
         if int(nid) % 3 == 0:
             imdb_id = f"tt{int(nid)*1000}"
@@ -214,10 +213,10 @@ def generate_source_3_parquet_viewership():
 
     records = []
     countries = ["USA", "US", "United States", "u.s.a.", "UK", "GBR", "Great Britain", "South Korea", "KOR", "Japan", "JPN", "Germany", "DEU", "Global"]
-    
+
     for item in TITLES_SEED:
         nid = item["netflix_id"]
-        
+
         # Problem 1: Country code inconsistencies
         c_choice = countries[int(nid) % len(countries)]
 

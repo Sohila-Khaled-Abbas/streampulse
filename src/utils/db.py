@@ -2,8 +2,10 @@
 
 from contextlib import contextmanager
 from typing import Generator
+
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection, Engine
+
 from src.utils.config import settings
 from src.utils.logger import logger
 

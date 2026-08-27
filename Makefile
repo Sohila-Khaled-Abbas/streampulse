@@ -1,4 +1,4 @@
-.PHONY: help install dev-install lint format test clean docker-up docker-down run-pipeline
+.PHONY: help install dev-install lint format test clean docker-up docker-down run-pipeline run-live run-full run-stream profile-data
 
 PYTHON ?= python
 PIP ?= pip
@@ -10,31 +10,23 @@ help:
 	@echo "  lint            Run ruff & mypy checks"
 	@echo "  format          Run black & ruff autofix"
 	@echo "  test            Run pytest suite with coverage"
-	@echo "  docker-up          Start PostgreSQL and pgAdmin via Docker Compose"
-	@echo "  docker-down        Stop and tear down Docker containers"
-	@echo "  airbyte-up         Start lightweight Airbyte Web UI & Server via Docker"
-	@echo "  airbyte-down       Stop standalone Airbyte containers"
-	@echo "  airbyte-install    Install Airbyte via abctl"
-	@echo "  airbyte-status     Check local Airbyte cluster health"
-	@echo "  airbyte-creds      View local Airbyte login credentials"
-	@echo "  fetch-historical   Download and cache 5,800+ historical enriched Netflix titles"
-	@echo "  run-pipeline       Execute the full end-to-end ELT pipeline"
-	@echo "  clean              Remove temporary caches and build artifacts"
+	@echo "  docker-up       Start PostgreSQL and pgAdmin via Docker Compose"
+	@echo "  docker-down     Stop and tear down Docker containers"
+	@echo "  airbyte-up      Start lightweight Airbyte Web UI & Server via Docker"
+	@echo "  airbyte-down    Stop standalone Airbyte containers"
+	@echo "  fetch-historical Download and cache 5,800+ historical enriched Netflix titles"
+	@echo "  run-live        Execute live 2026/2025 web scraping & enrichment pipeline"
+	@echo "  run-full        Execute full historical + 2026 live ingestion pipeline"
+	@echo "  run-stream      Start real-time continuous streaming ingestion daemon"
+	@echo "  profile-data    Run statistical catalog profiling and data quality validation"
+	@echo "  run-pipeline    Default pipeline execution (Live mode)"
+	@echo "  clean           Remove temporary caches and build artifacts"
 
 airbyte-up:
 	docker compose -f docker/docker-compose.airbyte.yml up -d
 
 airbyte-down:
 	docker compose -f docker/docker-compose.airbyte.yml down
-
-airbyte-install:
-	.\abctl-v0.30.4-windows-amd64\abctl.exe local install --low-resource-mode --no-browser
-
-airbyte-status:
-	.\abctl-v0.30.4-windows-amd64\abctl.exe local status
-
-airbyte-creds:
-	.\abctl-v0.30.4-windows-amd64\abctl.exe local credentials
 
 fetch-historical:
 	$(PYTHON) scripts/fetch_historical_dataset.py
@@ -54,7 +46,7 @@ format:
 	ruff check --fix .
 
 test:
-	pytest
+	pytest tests/ -v
 
 docker-up:
 	docker compose up -d
@@ -62,8 +54,19 @@ docker-up:
 docker-down:
 	docker compose down
 
-run-pipeline:
-	$(PYTHON) -m src.pipeline
+run-live:
+	$(PYTHON) -m src.pipeline --mode live --years 2026,2025 --limit 50
+
+run-full:
+	$(PYTHON) -m src.pipeline --mode full --include-historical --years 2026,2025
+
+run-stream:
+	$(PYTHON) -m src.pipeline --mode stream --years 2026 --stream-interval 60
+
+profile-data:
+	$(PYTHON) -m src.pipeline --mode live --limit 50 --dry-run
+
+run-pipeline: run-live
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +

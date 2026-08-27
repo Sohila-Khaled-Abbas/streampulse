@@ -27,7 +27,6 @@ services:
       - POSTGRES_USER=${AIRBYTE_DB_USER:-docker}
       - POSTGRES_PWD=${AIRBYTE_DB_PASSWORD:-docker}
       - POSTGRES_SEEDS=airbyte-db
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml
     depends_on:
       - airbyte-db
     networks:
@@ -46,6 +45,7 @@ services:
       - CONFIG_ROOT=/data
       - DATA_DOCKER_MOUNT=airbyte_workspace
       - WORKSPACE_ROOT=/tmp/workspace
+      - TRACKING_STRATEGY=logging
     depends_on:
       - airbyte-db
       - airbyte-temporal
@@ -62,7 +62,12 @@ services:
     ports:
       - "8000:80"
     environment:
+      - AIRBYTE_VERSION=0.50.36
+      - INTERNAL_API_HOST=airbyte-server:8001
       - AIRBYTE_SERVER_HOST=airbyte-server:8001
+      - CONNECTOR_BUILDER_API_HOST=airbyte-server:8001
+      - KEYCLOAK_INTERNAL_HOST=airbyte-server:8001
+      - TRACKING_STRATEGY=logging
       - API_URL=/api
     depends_on:
       - airbyte-server

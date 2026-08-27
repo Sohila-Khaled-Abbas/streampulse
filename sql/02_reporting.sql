@@ -50,18 +50,27 @@ CREATE TABLE IF NOT EXISTS reporting.fact_catalog_ratings (
 
 -- Performance Indexes for Power BI DirectQuery
 CREATE INDEX IF NOT EXISTS idx_dim_titles_media_type ON reporting.dim_titles(media_type);
+CREATE INDEX IF NOT EXISTS idx_dim_titles_release_year ON reporting.dim_titles(release_year);
 CREATE INDEX IF NOT EXISTS idx_dim_titles_date_added ON reporting.dim_titles(netflix_date_added);
 CREATE INDEX IF NOT EXISTS idx_fact_ratings_title ON reporting.fact_catalog_ratings(title_key);
 CREATE INDEX IF NOT EXISTS idx_fact_ratings_date ON reporting.fact_catalog_ratings(snapshot_date);
+CREATE INDEX IF NOT EXISTS idx_fact_ratings_trending ON reporting.fact_catalog_ratings(is_trending);
 
 -- Power BI Reporting DirectQuery View
-CREATE OR REPLACE VIEW reporting.vw_powerbi_catalog_pulse AS
+DROP VIEW IF EXISTS reporting.vw_powerbi_catalog_pulse CASCADE;
+
+CREATE VIEW reporting.vw_powerbi_catalog_pulse AS
 SELECT
     t.title_key,
     t.netflix_id,
     t.canonical_title AS title,
     t.media_type,
     t.release_year,
+    CASE
+        WHEN t.release_year = 2026 THEN '2026 Live Releases'
+        WHEN t.release_year IN (2024, 2025) THEN '2024-2025 Modern'
+        ELSE 'Historical Archive (<2024)'
+    END AS catalog_era,
     t.release_date,
     t.netflix_date_added,
     t.maturity_rating,
@@ -70,7 +79,7 @@ SELECT
     COALESCE(r.vote_average, 0.0) AS vote_average,
     COALESCE(r.vote_count, 0) AS vote_count,
     COALESCE(r.popularity_score, 0.0) AS popularity_score,
-    r.days_to_streaming,
+    COALESCE(r.days_to_streaming, 30) AS days_to_streaming,
     COALESCE(r.is_trending, FALSE) AS is_trending,
     CASE
         WHEN r.vote_average >= 8.0 THEN 'Top Rated (>= 8.0)'

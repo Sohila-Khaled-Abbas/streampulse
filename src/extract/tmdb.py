@@ -10,7 +10,7 @@ class TMDbExtractor:
     """Queries TMDb API for canonical metadata, audience ratings, and popularity metrics."""
 
     def __init__(self, api_key: Optional[str] = None) -> None:
-        self.api_key = api_key or settings.tmdb_api_key
+        self.api_key = api_key if api_key is not None else settings.tmdb_api_key
         self.base_url = "https://api.themoviedb.org/3"
 
     def search_title(
@@ -21,7 +21,7 @@ class TMDbExtractor:
         Args:
             title: Title name.
             year: Optional release year.
-            media_type: 'movie' or 'tv'.
+            media_type: 'movie' or 'tv' / 'series'.
 
         Returns:
             List of matching TMDb candidate records.
@@ -30,7 +30,7 @@ class TMDbExtractor:
             logger.debug("No valid TMDB_API_KEY set; returning mock TMDb results.")
             return self._get_mock_tmdb_search(title, year)
 
-        endpoint = "/search/tv" if media_type == "series" or media_type == "tv" else "/search/movie"
+        endpoint = "/search/tv" if media_type in ("series", "tv", "show") else "/search/movie"
         url = f"{self.base_url}{endpoint}"
         params: Dict[str, Any] = {
             "api_key": self.api_key,
@@ -47,17 +47,28 @@ class TMDbExtractor:
             response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
-            return data.get("results", [])
+            results = data.get("results", [])
+
+            # If no results found in requested endpoint, fallback to cross-media search
+            if not results:
+                alt_endpoint = "/search/movie" if endpoint == "/search/tv" else "/search/tv"
+                alt_url = f"{self.base_url}{alt_endpoint}"
+                alt_params = {"api_key": self.api_key, "query": title, "include_adult": False}
+                alt_resp = requests.get(alt_url, params=alt_params, timeout=10)
+                if alt_resp.status_code == 200:
+                    results = alt_resp.json().get("results", [])
+
+            return results
         except requests.RequestException as err:
             logger.error(f"Error querying TMDb search for '{title}': {err}")
             return []
 
     def get_details(self, tmdb_id: int, media_type: str = "movie") -> Optional[Dict[str, Any]]:
         """Fetch full details and credit metrics for a given TMDb entity."""
-        if not self.api_key:
+        if not self.api_key or self.api_key.startswith("your_"):
             return None
 
-        endpoint = f"/tv/{tmdb_id}" if media_type in ("series", "tv") else f"/movie/{tmdb_id}"
+        endpoint = f"/tv/{tmdb_id}" if media_type in ("series", "tv", "show") else f"/movie/{tmdb_id}"
         url = f"{self.base_url}{endpoint}"
         params = {"api_key": self.api_key, "append_to_response": "credits,keywords"}
 
@@ -106,6 +117,18 @@ class TMDbExtractor:
                     "vote_count": 3900,
                     "popularity": 92.1,
                     "genre_ids": [18],
+                }
+            ],
+            "people we meet on vacation": [
+                {
+                    "id": 1122334,
+                    "title": "People We Meet on Vacation",
+                    "original_title": "People We Meet on Vacation",
+                    "release_date": "2026-01-09",
+                    "vote_average": 7.6,
+                    "vote_count": 2400,
+                    "popularity": 142.5,
+                    "genre_ids": [10749, 35],
                 }
             ],
         }

@@ -1,0 +1,54 @@
+name: StreamPulse 2026 Scheduled Ingestion Pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Runs daily at 06:00 UTC
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+  push:
+    branches:
+      - main
+
+jobs:
+  run-live-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Test Suite
+        run: |
+          pytest tests/ -v
+
+      - name: Execute Live 2026 ELT Pipeline
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PORT: 5432
+        run: |
+          python -m src.pipeline --mode live --years 2026,2025 --limit 100
+
+      - name: Archive Processed Data Artifacts & Profiling Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: streampulse-2026-data-artifacts
+          path: |
+            data/processed/netflix_catalog_enriched_master.csv
+            data/processed/live_2026_pulse.json
+            data/processed/data_profiling_report.json
+          retention-days: 14

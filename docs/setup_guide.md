@@ -1,31 +1,33 @@
-# StreamPulse: Complete Setup & Deployment Guide
+# ⚡ StreamPulse: Complete Setup & Deployment Guide
 
-This guide provides end-to-end instructions for configuring your local development environment, provisioning API access, initializing the PostgreSQL database, executing the ELT pipeline, and connecting Power BI.
+This guide provides end-to-end instructions for configuring your local development environment, running the **2026 live web scraping & ELT pipeline**, verifying data quality and statistical profiling outputs, and connecting real-time streaming dashboards in Power BI.
 
 ---
 
 ## 1. Prerequisites
 
 Ensure you have the following software installed:
-- **Python**: Version 3.10 or higher
-- **Docker & Docker Compose**: Docker Desktop (v20.10+) or Docker Engine
+- **Python**: Version 3.10 or higher (Python 3.10, 3.11, 3.12, 3.14 supported)
+- **Docker Desktop**: (v20.10+) for containerized PostgreSQL and pgAdmin
 - **Git**: Version 2.30+
 - **Power BI Desktop**: (Optional, for dashboard development and DirectQuery)
 
 ---
 
-## 2. API Key Provisioning
+## 2. API Key Provisioning (Zero-Cost & Optional APIs)
 
-StreamPulse integrates two external APIs:
+StreamPulse features a **zero-cost hybrid architecture** requiring **no paid subscriptions**:
 
-1. **RapidAPI (Netflix UnoGS API)**:
-   - Sign up at [RapidAPI](https://rapidapi.com).
-   - Subscribe to the [UnoGS (uNoGS)](https://rapidapi.com/unogs/api/unogsng) or Netflix Catalog API endpoint.
-   - Note your `X-RapidAPI-Key` and `X-RapidAPI-Host`.
+1. **Zero-Cost Web Scrapers (Built-In & Default)**:
+   - Built-in multi-source scraper in `src/extract/netflix_scraper.py` extracting 2026 releases (`List of Netflix original films (since 2026)`), 2025/2024 films, active TV programming, and real-time *What's on Netflix* streaming RSS feeds.
+   - Built-in `WebEnricher` in `src/extract/enricher_scraper.py` extracting Wikipedia infoboxes (directors, cast, budget, synopsis) and calculating calibrated rating metrics.
 
-2. **The Movie Database (TMDb)**:
+2. **The Movie Database (TMDb) Rating API (Free & Optional)**:
    - Create a free account at [themoviedb.org](https://www.themoviedb.org/).
-   - Navigate to **Settings > API** to generate your API Key (v3 auth) or API Read Access Token (v4 auth).
+   - Navigate to **Settings > API** to generate your API Key (v3 auth).
+
+3. **RapidAPI Netflix UnoGS API (Optional)**:
+   - If you have an active RapidAPI subscription, configure `RAPIDAPI_KEY` in `.env`.
 
 ---
 
@@ -42,10 +44,10 @@ StreamPulse integrates two external APIs:
    cp .env.example .env
    ```
 
-3. Open `.env` in your editor and configure the variables:
+3. Configure your credentials in `.env`:
    ```env
-   RAPIDAPI_KEY=your_actual_rapidapi_key
-   TMDB_API_KEY=your_actual_tmdb_key
+   RAPIDAPI_KEY=your_actual_rapidapi_key_or_leave_empty
+   TMDB_API_KEY=your_actual_tmdb_key_or_leave_empty
    DB_USER=postgres
    DB_PASSWORD=postgres
    DB_NAME=streampulse
@@ -57,7 +59,7 @@ StreamPulse integrates two external APIs:
 
 ## 4. Virtual Environment & Dependencies
 
-```bash
+```powershell
 # Create virtual environment
 python -m venv .venv
 
@@ -67,8 +69,11 @@ python -m venv .venv
 # Activate on Linux/macOS
 source .venv/bin/activate
 
-# Install dependencies
+# Install production dependencies
 pip install -r requirements.txt
+
+# (Optional) Install development dependencies
+pip install -e .[dev]
 ```
 
 ---
@@ -83,43 +88,136 @@ make docker-up
 - **PostgreSQL**: `localhost:5432` (`streampulse`)
 - **pgAdmin 4**: `http://localhost:5050` (`admin@admin.com` / `admin`)
 
-### 2. Standalone Airbyte UI & Server (Optional)
-```bash
-make airbyte-up
-# Or: docker compose -f docker/docker-compose.airbyte.yml up -d
-```
-- **Airbyte Web UI**: `http://localhost:8000` (`airbyte` / `password`)
+The initialization scripts in `sql/` execute automatically on first start:
+- `sql/00_init.sql` (Creates `staging` and `reporting` schemas)
+- `sql/01_staging.sql` (Creates staging landing tables)
+- `sql/02_reporting.sql` (Creates dimensional star schema & DirectQuery view)
 
 ---
 
-## 6. Running the Pipeline
+## 6. Running the 2026 Pipeline: Step-by-Step Execution
 
-Execute the end-to-end ELT pipeline:
-```bash
-# Run via python module
-python -m src.pipeline
+StreamPulse supports 4 flexible execution modes:
 
-# Or using Makefile
-make run-pipeline
+### Mode A: Live 2026 Catalog Ingestion (Recommended)
+Scrapes confirmed 2026 releases, active TV series, and live streaming RSS deltas:
+```powershell
+python -m src.pipeline --mode live --years 2026,2025 --limit 50
+# Or using Makefile:
+make run-live
 ```
 
-The pipeline will:
-1. Extract recent catalog changes from RapidAPI.
-2. Ingest raw batches into `staging.stg_netflix_titles`.
-3. Query TMDb for metadata, popularity, and ratings.
-4. Execute fuzzy entity resolution matching Netflix entries against TMDb entities.
-5. Populate `reporting.dim_titles`, `reporting.dim_genres`, and `reporting.fact_catalog_ratings`.
+### Mode B: Full Historical Baseline + 2026 Live Ingestion
+Loads 5,800+ historical Kaggle titles merged with 2026 live scraped additions:
+```powershell
+python -m src.pipeline --mode full --include-historical --years 2026,2025
+# Or using Makefile:
+make run-full
+```
+
+### Mode C: Real-Time Streaming Daemon Mode
+Runs a continuous live polling loop (every 60 seconds) streaming new drops directly into PostgreSQL:
+```powershell
+python -m src.pipeline --mode stream --years 2026 --stream-interval 60
+# Or using Makefile:
+make run-stream
+```
+
+### Mode D: Data Profiling & Quality Validation Run
+Runs statistical profiling and exports validation reports without modifying the database:
+```powershell
+python -m src.pipeline --mode live --limit 50 --dry-run
+# Or using Makefile:
+make profile-data
+```
 
 ---
 
-## 7. Power BI DirectQuery Configuration
+## 7. Pipeline Output & Data Validation Logs
+
+When you execute `python -m src.pipeline --mode live --years 2026 --limit 30`, you will see structured step-by-step terminal outputs:
+
+```text
+================================================================================
+[PIPELINE] STREAMPULSE ELT RUN: [MODE=LIVE]
+Target Years: [2026] | Scrape Limit: 30 | Historical: False
+================================================================================
+--- STEP 1/5: INGESTION & LIVE 2026 WEB SCRAPING ---
+Scraping live 2026 Netflix originals, programming, and RSS feeds...
+[OK] Scraped 30 live 2025/2026 titles.
+Total raw titles collected for processing: 30
+
+--- STEP 2/5: DATA CLEANING & NORMALIZATION ---
+[OK] Standardized and deduplicated 30 title records.
+
+--- STEP 3/5: ENTITY RESOLUTION & LIVE ENRICHMENT ---
+[OK] Enriched and resolved 30 titles.
+
+--- STEP 4/5: DATA QUALITY VALIDATION & PROFILING ---
+================================================================================
+[REPORT] STREAMPULSE DATA QUALITY & CATALOG PROFILING REPORT
+================================================================================
+Validation Status: [PASSED] | Quality Score: 100.0% | Total Processed: 30 titles
+--------------------------------------------------------------------------------
+Catalog Eras: 2026 Live: 30 | 2024-2025 Modern: 0 | Historical Archive: 0
+Media Distribution: Movies: 30 | Series/Shows: 0
+Audience Metrics: Mean Rating: 6.61 / 10 | Mean Popularity: 8.81 | Mean Runtime: 110.0 mins
+Entity Resolution: High Conf (>=90%): 30 | Medium (75-89%): 0
+Top Genres: Drama (8), Comedy (7), Romance (3), Crime Thriller (2), Crime Drama (2)
+================================================================================
+
+--- STEP 5/5: WAREHOUSE LOADING & MASTER EXPORT ---
+[HIGHLIGHTS] Live 2026 Catalog Highlights Preview:
+   1. [2026-01-09] People We Meet on Vacation (MOVIE) | Rating: 6.98/10 | Pop: 9.52 | Source: wikipedia_2026_films
+   2. [2026-01-16] The Rip (MOVIE) | Rating: 7.09/10 | Pop: 22.20 | Source: wikipedia_2026_films
+   3. [2026-01-22] Cosmic Princess Kaguya! (MOVIE) | Rating: 8.3/10 | Pop: 11.47 | Source: wikipedia_2026_films
+   4. [2026-01-22] From the Ashes: The Pit (MOVIE) | Rating: 4.22/10 | Pop: 3.92 | Source: wikipedia_2026_films
+   5. [2026-01-23] The Big Fake (MOVIE) | Rating: 6.62/10 | Pop: 5.25 | Source: wikipedia_2026_films
+================================================================================
+[SUCCESS] STREAMPULSE ELT PIPELINE COMPLETED SUCCESSFULLY
+Processed: 30 titles | Quality: 100.0% | Export: data\processed\netflix_catalog_enriched_master.csv
+================================================================================
+```
+
+---
+
+## 8. Data Validation & Profiling Artifacts
+
+Every pipeline execution generates automated data quality artifacts in `data/processed/`:
+
+1. **`data/processed/netflix_catalog_enriched_master.csv`**:
+   - Master conformed catalog containing all enriched 2026 live releases, TMDb IDs, audience ratings, vote counts, popularity scores, streaming velocity (`days_to_streaming`), and source tags.
+
+2. **`data/processed/live_2026_pulse.json`**:
+   - JSON structured feed of 2026 titles ready for web dashboards or API endpoints.
+
+3. **`data/processed/data_profiling_report.json`**:
+   - Machine-readable audit file containing:
+     - Field-by-field completeness percentages (`missing_count`, `completeness_pct`).
+     - Validation status (`PASSED` / `WARNING`).
+     - Quality score ($0-100\%$).
+     - Catalog era breakdown (2026 Live vs Modern vs Historical).
+     - Rating tier and confidence distribution.
+
+---
+
+## 9. Automated Testing Suite
+
+Execute unit and integration tests across scrapers, entity resolution, and warehouse loaders:
+```powershell
+.venv\Scripts\python.exe -m pytest tests/ -v
+```
+
+---
+
+## 10. Power BI DirectQuery Configuration
 
 1. Open **Power BI Desktop**.
 2. Select **Get Data > PostgreSQL Database**.
-3. Enter Connection details:
-   - **Server**: `localhost:5432`
+3. Enter connection parameters:
+   - **Server**: `localhost:5432` (or your Neon/Supabase cloud host)
    - **Database**: `streampulse`
-   - **Data Connectivity mode**: **DirectQuery**
+   - **Data Connectivity Mode**: **DirectQuery**
 4. Enter credentials (User: `postgres`, Password from `.env`).
 5. Select the view: `reporting.vw_powerbi_catalog_pulse`.
-6. Open or reload `dashboard/streampulse_analytics.pbix` to explore real-time visual metrics.
+6. Use the `catalog_era` filter to slice by **"2026 Live Releases"** or **"2024-2025 Modern"**.

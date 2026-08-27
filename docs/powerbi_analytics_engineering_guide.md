@@ -209,19 +209,32 @@ in
 
 ---
 
-### Table 4: `Dim_Date` (Automated Dynamic Calendar Dimension)
-*Paste this M script into a **Blank Query** named `Dim_Date`.*
+### Table 4: `Dim_Date` (Fully Dynamic Dataset-Driven Calendar Dimension)
+*Paste this dynamic M script into a **Blank Query** named `Dim_Date`. It automatically reads the minimum and maximum dates from `Dim_Titles` and generates a contiguous calendar covering full fiscal years.*
 
 ```powerquery
 let
-    StartDate = #date(2020, 1, 1),
-    EndDate = #date(2027, 12, 31),
+    // 1. Dynamically fetch all date values from the Dim_Titles dimension
+    DatasetDates = List.RemoveNulls(Dim_Titles[netflix_date_added_clean]),
+
+    // 2. Compute dynamic Min and Max dates with fallback defaults
+    MinDateRaw = if List.IsEmpty(DatasetDates) then #date(2020, 1, 1) else List.Min(DatasetDates),
+    MaxDateRaw = if List.IsEmpty(DatasetDates) then #date(2026, 12, 31) else List.Max(DatasetDates),
+    CurrentDate = DateTime.Date(DateTime.LocalNow()),
+
+    // 3. Expand boundaries to full calendar years (Jan 1 of earliest year to Dec 31 of latest year / current year)
+    StartYear = Date.Year(MinDateRaw),
+    EndYear = Date.Year(List.Max({MaxDateRaw, CurrentDate})),
+    StartDate = #date(StartYear, 1, 1),
+    EndDate = #date(EndYear, 12, 31),
+
+    // 4. Generate continuous daily dates list
     NumberOfDays = Duration.Days(EndDate - StartDate) + 1,
     DateList = List.Dates(StartDate, NumberOfDays, #duration(1, 0, 0, 0)),
     DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"full_date"}, null, ExtraValues.Error),
     TypedDate = Table.TransformColumnTypes(DateTable, {{"full_date", type date}}),
 
-    // Calculated calendar fields
+    // 5. Build standard date attributes
     AddDateKey = Table.AddColumn(TypedDate, "date_key", each Date.Year([full_date]) * 10000 + Date.Month([full_date]) * 100 + Date.Day([full_date]), Int64.Type),
     AddYear = Table.AddColumn(AddDateKey, "year", each Date.Year([full_date]), Int64.Type),
     AddQuarter = Table.AddColumn(AddYear, "quarter", each Date.QuarterOfYear([full_date]), Int64.Type),
@@ -232,9 +245,25 @@ let
     AddDayOfWeek = Table.AddColumn(AddMonthShort, "day_of_week", each Date.DayOfWeek([full_date], Day.Monday) + 1, Int64.Type),
     AddDayName = Table.AddColumn(AddDayOfWeek, "day_name", each Date.DayOfWeekName([full_date]), type text),
     AddIsWeekend = Table.AddColumn(AddDayName, "is_weekend", each if [day_of_week] >= 6 then true else false, type logical),
-    AddFiscalPeriod = Table.AddColumn(AddIsWeekend, "fiscal_period", each "FY" & Text.From([year]) & "-Q" & Text.From([quarter]), type text)
+    AddFiscalPeriod = Table.AddColumn(AddIsWeekend, "fiscal_period", each "FY" & Text.From([year]) & "-Q" & Text.From([quarter]), type text),
+
+    // 6. Dynamic streaming and relative offsets
+    AddIsCurrentYear = Table.AddColumn(AddFiscalPeriod, "is_current_year", each Date.Year([full_date]) = Date.Year(CurrentDate), type logical),
+    AddIsPastOrCurrent = Table.AddColumn(AddIsCurrentYear, "is_past_or_current", each [full_date] <= CurrentDate, type logical),
+    AddYearOffset = Table.AddColumn(AddIsPastOrCurrent, "relative_year_offset", each Date.Year([full_date]) - Date.Year(CurrentDate), Int64.Type),
+    AddMonthOffset = Table.AddColumn(AddYearOffset, "relative_month_offset", each 
+        ((Date.Year([full_date]) - Date.Year(CurrentDate)) * 12) + (Date.Month([full_date]) - Date.Month(CurrentDate)),
+        Int64.Type
+    ),
+    AddNetflixQuarterEnd = Table.AddColumn(AddMonthOffset, "is_netflix_quarter_end", each 
+        (Date.Month([full_date]) = 3 and Date.Day([full_date]) = 31) or
+        (Date.Month([full_date]) = 6 and Date.Day([full_date]) = 30) or
+        (Date.Month([full_date]) = 9 and Date.Day([full_date]) = 30) or
+        (Date.Month([full_date]) = 12 and Date.Day([full_date]) = 31),
+        type logical
+    )
 in
-    AddFiscalPeriod
+    AddNetflixQuarterEnd
 ```
 
 ---

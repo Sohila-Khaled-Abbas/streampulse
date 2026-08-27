@@ -1,9 +1,9 @@
 # 📊 Power BI Analytics Engineering & Multi-Source Kimball Galaxy Masterclass
 
 Welcome to the **StreamPulse 2026 Enterprise Analytics Engineering Guide**. This document is a comprehensive, click-by-click training masterclass that guides you through:
-1. Ingesting **4 distinct unmerged raw sources** (PostgreSQL, CSV, Parquet, JSON) into Power BI.
+1. Ingesting **5 distinct unmerged raw sources** (PostgreSQL Live Staging, 5,800+ Historical Catalog CSV, External IMDb Ratings CSV, Wide Parquet Telemetry, and Production Budget JSON) into Power BI.
 2. Solving **real-world data quality and cleaning challenges** in Power Query using the **M Language**.
-3. Building a **Kimball Galaxy Star Schema** with multi-fact tables and many-to-many bridge dimensions.
+3. Building a **Kimball Galaxy Star Schema** that unifies live 2026 releases and the historical catalog archive with multi-fact tables and many-to-many bridge dimensions.
 4. Writing **25+ Enterprise DAX Measures** for streaming velocity, Bayesian quality scoring, budget ROI, and Pareto concentration.
 5. Configuring **PostgreSQL DirectQuery** with 5-minute live automatic visual refresh.
 
@@ -27,61 +27,45 @@ Welcome to the **StreamPulse 2026 Enterprise Analytics Engineering Guide**. This
 
 ---
 
-## 📂 Step 1: Importing the 4 Distinct Sources into Power BI
+## 📂 Step 1: Importing the 5 Distinct Sources into Power BI
 
-Open **Power BI Desktop** $\to$ click **Get Data** for each of the following 4 independent sources (**do not merge them in python or pre-combine them**):
+Open **Power BI Desktop** $\to$ click **Get Data** for each of the following 5 independent sources (**do not merge them in python or pre-combine them**):
 
-### Source 1: PostgreSQL Live Staging
-1. Click **Get Data** $\to$ **PostgreSQL database** $\to$ **Connect**.
-2. **Server**: `localhost:5432` | **Database**: `streampulse`.
-3. **Data Connectivity mode**: Choose **Import** (or **DirectQuery** if testing real-time SQL execution).
-4. Navigator: Select `staging.stg_netflix_titles` $\to$ click **Transform Data** (opens Power Query Editor).
+| # | Source Name | Connector Type | Location / Connection String | Purpose & Data Volume |
+| :- | :--- | :--- | :--- | :--- |
+| **1** | `stg_netflix_titles` | **PostgreSQL Database** | Server: `localhost:5432`<br>Database: `streampulse`<br>Table: `staging.stg_netflix_titles` | Live 2026/2025 scraped releases & daily Airbyte sync |
+| **2** | `Raw_Historical_Archive` | **Text/CSV** | Path: `data/raw/netflix_enriched_historical.csv` | Historical benchmark catalog (5,800+ titles, 1945–2024) |
+| **3** | `Raw_IMDb_Ratings` | **Text/CSV** | Path: `data/raw/imdb_external_ratings.csv` | Live periodic audience ratings snapshot |
+| **4** | `Raw_Viewership_Parquet` | **Parquet** | Path: `data/raw/streaming_viewership_wide.parquet` | Granular telemetry & viewership metrics lakehouse |
+| **5** | `Raw_Budget_JSON` | **JSON** | Path: `data/raw/boxoffice_budget_feed.json` | Production budget, box office, and talent feeds |
 
----
-
-### Source 2: External IMDb Ratings Flat File
-1. In Power Query Editor $\to$ Click **New Source** $\to$ **Text/CSV**.
-2. Browse to: `D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\imdb_external_ratings.csv`.
-3. Click **OK** $\to$ Rename query in left sidebar to: `Raw_IMDb_Ratings`.
-
----
-
-### Source 3: Wide Parquet Telemetry Lakehouse
-1. In Power Query Editor $\to$ Click **New Source** $\to$ **Parquet**.
-2. Browse to: `D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\streaming_viewership_wide.parquet`.
-3. Click **OK** $\to$ Rename query in left sidebar to: `Raw_Viewership_Parquet`.
-
----
-
-### Source 4: Production Budget & Box Office JSON Feed
-1. In Power Query Editor $\to$ Click **New Source** $\to$ **JSON**.
-2. Browse to: `D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json`.
-3. Click **OK** $\to$ Rename query in left sidebar to: `Raw_Budget_JSON`.
+Click **Transform Data** on any source to open the **Power Query Editor**.
 
 ---
 
 ## 🧪 Step 2: Data Cleaning in Power Query (M Language)
 
-Here is the exact M code to transform the 4 dirty sources into the **6 clean Kimball Galaxy Tables**:
+Here is the exact M code to transform the 5 dirty sources into the **6 clean Kimball Galaxy Tables**:
 
 ---
 
-### Table 1: `Dim_Titles` (Conformed Title Dimension)
-*Extracted and cleaned from `stg_netflix_titles` + `Raw_Budget_JSON`.*
+### Table 1: `Dim_Titles` (Unified Conformed Title Dimension)
+*Appends Live 2026/2025 titles (`stg_netflix_titles`) with 5,800+ historical records from `Raw_Historical_Archive`, cleans text whitespace, non-breaking spaces `\xa0`, parses heterogeneous dates, standardizes runtime minutes, and adds surrogate key `title_key`.*
 
 ```powerquery
 let
-    Source = PostgreSQL.Database("localhost:5432", "streampulse"),
-    stg_data = Source{[Schema="staging", Item="stg_netflix_titles"]}[Data],
+    // -------------------------------------------------------------
+    // Part A: Extract & Clean Live 2026/2025 Scraped Releases
+    // -------------------------------------------------------------
+    SourceLive = PostgreSQL.Database("localhost:5432", "streampulse"),
+    stg_data = SourceLive{[Schema="staging", Item="stg_netflix_titles"]}[Data],
 
-    // 1. Text scrubbing: Strip leading/trailing whitespace & non-breaking spaces (\xa0)
-    ScrubText = Table.TransformColumns(stg_data, {
+    ScrubLive = Table.TransformColumns(stg_data, {
         {"title", each Text.Proper(Text.Trim(Text.Replace(Text.From(_), Character.FromNumber(160), " "))), type text},
         {"netflix_id", each Text.Trim(Text.From(_)), type text}
     }),
 
-    // 2. Parse heterogeneous date strings with resilient try/otherwise ladder
-    AddCleanDate = Table.AddColumn(ScrubText, "netflix_date_added_clean", each
+    AddCleanDateLive = Table.AddColumn(ScrubLive, "netflix_date_added_clean", each
         try Date.From(DateTimeZone.From([date_added]))
         otherwise try Date.FromText([date_added], "en-US")
         otherwise try Date.FromText([date_added], "en-GB")
@@ -89,8 +73,7 @@ let
         type date
     ),
 
-    // 3. Normalize runtime string text into clean integer minutes
-    AddCleanRuntime = Table.AddColumn(AddCleanDate, "runtime_minutes_clean", each
+    AddCleanRuntimeLive = Table.AddColumn(AddCleanDateLive, "runtime_minutes_clean", each
         let
             txt = Text.Lower(Text.From([runtime_seconds])),
             mins = if Text.Contains(txt, "mins") or Text.Contains(txt, "min") then
@@ -111,29 +94,60 @@ let
         Int64.Type
     ),
 
-    // 4. Standardize Maturity Rating
-    CleanRating = Table.TransformColumns(AddCleanRuntime, {
+    CleanRatingLive = Table.TransformColumns(AddCleanRuntimeLive, {
         {"maturity_rating", each Text.Upper(Text.Trim(Text.Replace(Text.From(_), " ", "-"))), type text}
     }),
 
-    // 5. Add Surrogate Title Key
-    AddTitleKey = Table.AddIndexColumn(CleanRating, "title_key", 1, 1, Int64.Type),
+    SelectLiveCols = Table.SelectColumns(CleanRatingLive, {
+        "netflix_id", "title", "title_type", "release_year", "netflix_date_added_clean", "runtime_minutes_clean", "maturity_rating"
+    }),
 
-    // 6. Add Catalog Era Segmentation
+    // -------------------------------------------------------------
+    // Part B: Extract & Clean 5,800+ Historical Benchmark Records
+    // -------------------------------------------------------------
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    PromotedHeadersHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+
+    ScrubHist = Table.TransformColumns(PromotedHeadersHist, {
+        {"id", each Text.Trim(Text.From(_)), type text},
+        {"title", each Text.Proper(Text.Trim(Text.Replace(Text.From(_), Character.FromNumber(160), " "))), type text},
+        {"type", each if Text.Upper(Text.From(_)) = "MOVIE" then "Movie" else "TV Show", type text},
+        {"release_year", each try Number.FromText(Text.From(_)) otherwise 2020, Int64.Type},
+        {"runtime", each try Number.FromText(Text.From(_)) otherwise 90, Int64.Type},
+        {"age_certification", each if _ = null or _ = "" then "TV-MA" else Text.Upper(Text.Trim(Text.From(_))), type text}
+    }),
+
+    AddCleanDateHist = Table.AddColumn(ScrubHist, "netflix_date_added_clean", each #date([release_year], 1, 1), type date),
+
+    RenameHist = Table.RenameColumns(AddCleanDateHist, {
+        {"id", "netflix_id"},
+        {"type", "title_type"},
+        {"runtime", "runtime_minutes_clean"},
+        {"age_certification", "maturity_rating"}
+    }),
+
+    SelectHistCols = Table.SelectColumns(RenameHist, {
+        "netflix_id", "title", "title_type", "release_year", "netflix_date_added_clean", "runtime_minutes_clean", "maturity_rating"
+    }),
+
+    // -------------------------------------------------------------
+    // Part C: Combine Live 2026/2025 & Historical Catalog Records
+    // -------------------------------------------------------------
+    Combined = Table.Combine({SelectLiveCols, SelectHistCols}),
+    Deduplicated = Table.Distinct(Combined, {"netflix_id"}),
+
+    // Add Surrogate Title Key
+    AddTitleKey = Table.AddIndexColumn(Deduplicated, "title_key", 1, 1, Int64.Type),
+
+    // Add Era Segmentation
     AddEra = Table.AddColumn(AddTitleKey, "catalog_era", each
         if [release_year] = 2026 then "2026 Live Releases"
         else if [release_year] >= 2024 then "2024-2025 Modern"
         else "Historical Archive (<2024)",
         type text
-    ),
-
-    // 7. Select & Reorder Final Dimension Columns
-    SelectCols = Table.SelectColumns(AddEra, {
-        "title_key", "netflix_id", "title", "title_type", "release_year",
-        "netflix_date_added_clean", "runtime_minutes_clean", "maturity_rating", "catalog_era"
-    })
+    )
 in
-    SelectCols
+    AddEra
 ```
 
 ---
@@ -141,7 +155,6 @@ in
 ### Table 2: `Dim_Genres` (Standardized Genre Dimension)
 ```powerquery
 let
-    // Create static conformed genre dimension table
     GenreList = {
         [genre_key = 1, tmdb_genre_id = 28, genre_name = "Action", genre_category = "Mainstream"],
         [genre_key = 2, tmdb_genre_id = 12, genre_name = "Adventure", genre_category = "Mainstream"],
@@ -168,40 +181,56 @@ in
 ---
 
 ### Table 3: `Bridge_Title_Genre` (Many-to-Many Multi-Genre Bridge)
-*Extracted from `Raw_Budget_JSON` by expanding pipe strings (`"Action|Sci-Fi"`) and nested arrays.*
+*Maps multiple genres per title from both `Raw_Budget_JSON` and `Raw_Historical_Archive`.*
 
 ```powerquery
 let
-    Source = Json.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json")),
-    Data = Source[data],
-    ConvertedToTable = Table.FromList(Data, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
-    ExpandedRecord = Table.ExpandRecordColumn(ConvertedToTable, "Column1", {"stream_id", "categorization"}, {"netflix_id", "categorization"}),
-    ExpandedCat = Table.ExpandRecordColumn(ExpandedRecord, "categorization", {"genres"}, {"genres_raw"}),
+    // 1. JSON Source Genres
+    SourceJSON = Json.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json")),
+    DataJSON = SourceJSON[data],
+    TableJSON = Table.FromList(DataJSON, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    ExpandedJSON = Table.ExpandRecordColumn(TableJSON, "Column1", {"stream_id", "categorization"}, {"netflix_id", "categorization"}),
+    ExpandedCat = Table.ExpandRecordColumn(ExpandedJSON, "categorization", {"genres"}, {"genres_raw"}),
 
-    // 1. Convert pipe-delimited string or list into standardized list
-    AddList = Table.AddColumn(ExpandedCat, "Genre_List", each
+    AddListJSON = Table.AddColumn(ExpandedCat, "Genre_List", each
         if Value.Is([genres_raw], type list) then [genres_raw]
         else Text.Split(Text.From([genres_raw]), "|"),
         type list
     ),
-
-    // 2. Expand list to multiple rows
-    ExpandedRows = Table.ExpandListColumn(AddList, "Genre_List"),
-    CleanGenreName = Table.TransformColumns(ExpandedRows, {
+    ExpandedRowsJSON = Table.ExpandListColumn(AddListJSON, "Genre_List"),
+    CleanGenreNameJSON = Table.TransformColumns(ExpandedRowsJSON, {
         {"Genre_List", each Text.Trim(Text.From(_)), type text}
     }),
+    SelectJSONBridge = Table.SelectColumns(CleanGenreNameJSON, {"netflix_id", "Genre_List"}),
 
-    // 3. Join with Dim_Titles to retrieve surrogate title_key
-    MergedTitles = Table.NestedJoin(CleanGenreName, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+    // 2. Historical CSV Source Genres
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+    CleanHistGenres = Table.AddColumn(PromotedHist, "Genre_List", each
+        let
+            raw = Text.Replace(Text.Replace(Text.Replace(Text.From([genres]), "[", ""), "]", ""), "'", ""),
+            items = Text.Split(raw, ",")
+        in
+            List.Transform(items, each Text.Proper(Text.Trim(_))),
+        type list
+    ),
+    ExpandedHistRows = Table.ExpandListColumn(CleanHistGenres, "Genre_List"),
+    RenameHistBridge = Table.RenameColumns(ExpandedHistRows, {{"id", "netflix_id"}}),
+    SelectHistBridge = Table.SelectColumns(RenameHistBridge, {"netflix_id", "Genre_List"}),
+
+    // 3. Combine Bridges
+    CombinedBridges = Table.Combine({SelectJSONBridge, SelectHistBridge}),
+    FilteredEmpty = Table.SelectRows(CombinedBridges, each [Genre_List] <> "" and [Genre_List] <> null),
+
+    // 4. Map surrogate keys
+    MergedTitles = Table.NestedJoin(FilteredEmpty, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
     ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
 
-    // 4. Join with Dim_Genres to retrieve surrogate genre_key
     MergedGenres = Table.NestedJoin(ExpandedTitleKey, {"Genre_List"}, Dim_Genres, {"genre_name"}, "Dim_Genres", JoinKind.Inner),
     ExpandedGenreKey = Table.ExpandTableColumn(MergedGenres, "Dim_Genres", {"genre_key"}, {"genre_key"}),
 
-    // 5. Select Final Bridge Columns & Add Weight
-    SelectBridge = Table.SelectColumns(ExpandedGenreKey, {"title_key", "genre_key"}),
-    AddWeight = Table.AddColumn(SelectBridge, "genre_weight", each 1.0, type number),
+    SelectFinal = Table.SelectColumns(ExpandedGenreKey, {"title_key", "genre_key"}),
+    AddWeight = Table.AddColumn(SelectFinal, "genre_weight", each 1.0, type number),
     Deduplicated = Table.Distinct(AddWeight)
 in
     Deduplicated
@@ -209,12 +238,12 @@ in
 
 ---
 
-### Table 4: `Dim_Date` (Fully Dynamic Dataset-Driven Calendar Dimension)
-*Paste this dynamic M script into a **Blank Query** named `Dim_Date`. It automatically reads the minimum and maximum dates from `Dim_Titles` and generates a contiguous calendar covering full fiscal years.*
+### Table 4: `Dim_Date` (Dynamic Dataset-Driven Calendar Dimension)
+*Paste this dynamic M script into a **Blank Query** named `Dim_Date`. It automatically detects the earliest historical year (e.g. 1945) up to current/future release years (2026/2027).*
 
 ```powerquery
 let
-    // 1. Dynamically fetch all date values from the Dim_Titles dimension
+    // 1. Dynamically fetch all dates from Dim_Titles
     DatasetDates = List.RemoveNulls(Dim_Titles[netflix_date_added_clean]),
 
     // 2. Compute dynamic Min and Max dates with fallback defaults
@@ -222,7 +251,7 @@ let
     MaxDateRaw = if List.IsEmpty(DatasetDates) then #date(2026, 12, 31) else List.Max(DatasetDates),
     CurrentDate = DateTime.Date(DateTime.LocalNow()),
 
-    // 3. Expand boundaries to full calendar years (Jan 1 of earliest year to Dec 31 of latest year / current year)
+    // 3. Expand boundaries to full calendar years
     StartYear = Date.Year(MinDateRaw),
     EndYear = Date.Year(List.Max({MaxDateRaw, CurrentDate})),
     StartDate = #date(StartYear, 1, 1),
@@ -234,7 +263,7 @@ let
     DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"full_date"}, null, ExtraValues.Error),
     TypedDate = Table.TransformColumnTypes(DateTable, {{"full_date", type date}}),
 
-    // 5. Build standard date attributes
+    // 5. Standard Calendar Attributes
     AddDateKey = Table.AddColumn(TypedDate, "date_key", each Date.Year([full_date]) * 10000 + Date.Month([full_date]) * 100 + Date.Day([full_date]), Int64.Type),
     AddYear = Table.AddColumn(AddDateKey, "year", each Date.Year([full_date]), Int64.Type),
     AddQuarter = Table.AddColumn(AddYear, "quarter", each Date.QuarterOfYear([full_date]), Int64.Type),
@@ -247,7 +276,7 @@ let
     AddIsWeekend = Table.AddColumn(AddDayName, "is_weekend", each if [day_of_week] >= 6 then true else false, type logical),
     AddFiscalPeriod = Table.AddColumn(AddIsWeekend, "fiscal_period", each "FY" & Text.From([year]) & "-Q" & Text.From([quarter]), type text),
 
-    // 6. Dynamic streaming and relative offsets
+    // 6. Dynamic Streaming & Time-Intelligence Offsets
     AddIsCurrentYear = Table.AddColumn(AddFiscalPeriod, "is_current_year", each Date.Year([full_date]) = Date.Year(CurrentDate), type logical),
     AddIsPastOrCurrent = Table.AddColumn(AddIsCurrentYear, "is_past_or_current", each [full_date] <= CurrentDate, type logical),
     AddYearOffset = Table.AddColumn(AddIsPastOrCurrent, "relative_year_offset", each Date.Year([full_date]) - Date.Year(CurrentDate), Int64.Type),
@@ -268,15 +297,17 @@ in
 
 ---
 
-### Table 5: `Fact_Catalog_Ratings` (Periodic Snapshot Ratings Fact)
-*Cleaned from `Raw_IMDb_Ratings`.*
+### Table 5: `Fact_Catalog_Ratings` (Unified Ratings Snapshot Fact)
+*Combines live rating snapshots from `Raw_IMDb_Ratings` and historical ratings from `Raw_Historical_Archive`.*
 
 ```powerquery
 let
-    Source = Raw_IMDb_Ratings,
+    // -------------------------------------------------------------
+    // Part A: Live Snapshot Ratings (from Raw_IMDb_Ratings)
+    // -------------------------------------------------------------
+    SourceLive = Raw_IMDb_Ratings,
 
-    // 1. Clean shorthand votes ("1.4M" -> 1400000, "850K" -> 850000)
-    ParseVotes = Table.AddColumn(Source, "vote_count_clean", each
+    ParseLiveVotes = Table.AddColumn(SourceLive, "vote_count_clean", each
         let
             v = Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
             num = if Text.EndsWith(v, "M") then
@@ -290,8 +321,7 @@ let
         Int64.Type
     ),
 
-    // 2. Normalize user score (0.0 - 10.0 scale)
-    ParseScore = Table.AddColumn(ParseVotes, "vote_average_clean", each
+    ParseLiveScore = Table.AddColumn(ParseLiveVotes, "vote_average_clean", each
         let
             raw = Text.Trim(Text.From([user_score])),
             score = if Text.Contains(raw, "/10") then
@@ -305,16 +335,10 @@ let
         type number
     ),
 
-    // 3. Deduplicate: Keep latest snapshot row per title
-    Sorted = Table.Sort(ParseScore, {{"title_id", Order.Ascending}, {"snapshot_timestamp", Order.Descending}}),
-    Deduplicated = Table.Distinct(Sorted, {"title_id"}),
+    SortedLive = Table.Sort(ParseLiveScore, {{"title_id", Order.Ascending}, {"snapshot_timestamp", Order.Descending}}),
+    DeduplicatedLive = Table.Distinct(SortedLive, {"title_id"}),
 
-    // 4. Join with Dim_Titles to map surrogate title_key
-    MergedTitles = Table.NestedJoin(Deduplicated, {"title_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
-    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
-
-    // 5. Add Date Key (Snapshot Date Key)
-    AddDateKey = Table.AddColumn(ExpandedTitleKey, "date_key", each
+    AddLiveDateKey = Table.AddColumn(DeduplicatedLive, "date_key", each
         let
             d = try Date.From(DateTimeZone.From([snapshot_timestamp])) otherwise #date(2026, 2, 1)
         in
@@ -322,17 +346,52 @@ let
         Int64.Type
     ),
 
-    // 6. Select Fact Columns
-    SelectFactCols = Table.SelectColumns(AddDateKey, {
-        "title_key", "date_key", "vote_average_clean", "vote_count_clean", "critic_metascore"
-    }),
-    RenameCols = Table.RenameColumns(SelectFactCols, {
+    RenameLiveFact = Table.RenameColumns(AddLiveDateKey, {
+        {"title_id", "netflix_id"},
         {"vote_average_clean", "vote_average"},
         {"vote_count_clean", "vote_count"},
         {"critic_metascore", "critic_score"}
+    }),
+
+    SelectLiveFact = Table.SelectColumns(RenameLiveFact, {
+        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
+    }),
+
+    // -------------------------------------------------------------
+    // Part B: Historical Ratings (from Raw_Historical_Archive)
+    // -------------------------------------------------------------
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+
+    AddHistDateKey = Table.AddColumn(PromotedHist, "date_key", each
+        let
+            y = try Number.FromText(Text.From([release_year])) otherwise 2020
+        in
+            y * 10000 + 101,
+        Int64.Type
+    ),
+
+    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each try Number.FromText(Text.From([imdb_score])) otherwise 7.0, type number),
+    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000, Int64.Type),
+    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70, type number),
+
+    RenameHistFact = Table.RenameColumns(CleanHistMetascore, {{"id", "netflix_id"}}),
+    SelectHistFact = Table.SelectColumns(RenameHistFact, {
+        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
+    }),
+
+    // -------------------------------------------------------------
+    // Part C: Combine & Map Surrogate Title Key
+    // -------------------------------------------------------------
+    CombinedFacts = Table.Combine({SelectLiveFact, SelectHistFact}),
+    MergedTitles = Table.NestedJoin(CombinedFacts, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+
+    FinalFact = Table.SelectColumns(ExpandedTitleKey, {
+        "title_key", "date_key", "vote_average", "vote_count", "critic_score"
     })
 in
-    RenameCols
+    FinalFact
 ```
 
 ---
@@ -352,7 +411,7 @@ let
         {"global_view_hours_millions", each if _ < 0 then 0.0 else _, type number}
     }),
 
-    // 3. Extract Clean Date Key (e.g., "Hours_2026_01" -> 20260101)
+    // 3. Extract Clean Date Key (e.g. "Hours_2026_01" -> 20260101)
     AddDateKey = Table.AddColumn(CleanHours, "date_key", each
         let
             m_str = Text.AfterDelimiter([Month_Col], "Hours_"),
@@ -376,7 +435,7 @@ let
         type text
     ),
 
-    // 5. Join with Dim_Titles to map surrogate title_key
+    // 5. Map surrogate title_key
     MergedTitles = Table.NestedJoin(StandardizeCountry, {"catalog_ref_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
     ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
 
@@ -392,11 +451,13 @@ in
 
 ---
 
-## 🏛️ Step 3: Configuring Model View Relationships
+## 🏛️ Step 3: Configure Model View Relationships in Power BI
 
-Click **Close & Apply** in Power Query Editor $\to$ switch to **Model View** in Power BI Desktop. Configure the relationships exactly as listed below:
+1. In Power Query Editor $\to$ Click **Close & Apply**.
+2. Switch to **Model View** (the 3rd icon on the left navigation bar).
+3. Connect the relationships as follows:
 
-| From Table | Column | To Table | Column | Cardinality | Cross Filter | State |
+| From Dimension | Column | To Fact / Bridge | Column | Cardinality | Filter Direction | State |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `Dim_Titles` | `title_key` | `Fact_Catalog_Ratings` | `title_key` | `1 : *` (One-to-Many) | Single | **Active** |
 | `Dim_Titles` | `title_key` | `Fact_Streaming_Performance` | `title_key` | `1 : *` (One-to-Many) | Single | **Active** |
@@ -408,11 +469,10 @@ Click **Close & Apply** in Power Query Editor $\to$ switch to **Model View** in 
 
 ---
 
-## 🧮 Step 4: Writing Enterprise DAX Measures
+## 🧮 Step 4: Key DAX Measures to Add
 
-Create a dedicated `_Measures` table (Click **Enter Data** $\to$ Name table `_Measures` $\to$ Click **Load**). Add the following production measures:
+Create a dedicated `_Measures` table (Click **Enter Data** $\to$ Name table `_Measures` $\to$ Click **Load**). Add these core measures:
 
-### 1. Viewership & Quality Measures
 ```dax
 // 1. Total Global View Hours (Millions)
 Total Global View Hours = 
@@ -422,8 +482,7 @@ SUM(Fact_Streaming_Performance[global_view_hours_millions])
 Avg Completion Rate % = 
 AVERAGE(Fact_Streaming_Performance[avg_completion_pct]) / 100
 
-// 3. Bayesian Weighted Rating (Solves Small Sample Bias)
-// Formula: (v / (v + m)) * R + (m / (v + m)) * C
+// 3. Bayesian Weighted Rating (Solves Small Sample Bias across 5,800+ Catalog Titles)
 Bayesian Weighted Rating = 
 VAR TitleVotes = SUM(Fact_Catalog_Ratings[vote_count])
 VAR TitleAvg = AVERAGE(Fact_Catalog_Ratings[vote_average])
@@ -436,38 +495,8 @@ IF(
     DIVIDE(M_Threshold, TitleVotes + M_Threshold) * CatalogAvg,
     CatalogAvg
 )
-```
 
----
-
-### 2. Financial ROI & Budget Measures
-```dax
-// 4. Total Production Budget ($M)
-Total Budget ($M) = 
-COUNTROWS(Dim_Titles) * 35.0  // Default $35M baseline per original
-
-// 5. Effective Cost Per View Hour ($/Hour)
-Cost Per View Hour = 
-DIVIDE(
-    [Total Budget ($M)] * 1000000,
-    [Total Global View Hours] * 1000000,
-    0
-)
-
-// 6. Budget Efficiency Multiplier
-Budget Efficiency Ratio = 
-DIVIDE(
-    [Total Global View Hours],
-    [Total Budget ($M)],
-    0
-)
-```
-
----
-
-### 3. Pareto 80/20 & Time Intelligence Measures
-```dax
-// 7. Cumulative Viewership Share %
+// 4. Pareto 80/20 Concentration Flag
 Cumulative Viewership Share % = 
 VAR CurrentHours = [Total Global View Hours]
 VAR AllHours = CALCULATE([Total Global View Hours], ALLSELECTED(Dim_Titles))
@@ -482,25 +511,16 @@ VAR HigherRankingHours =
 RETURN
 DIVIDE(HigherRankingHours, AllHours, 0)
 
-// 8. Pareto Driver Flag
 Is Pareto Driver = 
 IF([Cumulative Viewership Share %] <= 0.80, "Core Driver (Top 80% Hours)", "Long-Tail Catalog")
-
-// 9. YTD View Hours (Time Intelligence)
-YTD View Hours = 
-CALCULATE(
-    [Total Global View Hours],
-    DATESYTD(Dim_Date[full_date])
-)
 ```
 
 ---
 
-## ⚡ Step 5: Power BI DirectQuery Live Auto-Refresh
+## 🔄 Step 5: Live DirectQuery Auto-Refresh Setup
 
-If using the **PostgreSQL DirectQuery** connection mode on `reporting.vw_powerbi_catalog_pulse`:
-1. Click the blank canvas area on your report page.
+If using DirectQuery against PostgreSQL:
+1. Select the blank report canvas.
 2. In the right-hand **Format visual** pane $\to$ Select **Page refresh**.
-3. Toggle **Page refresh** to **ON**.
-4. Set **Refresh interval**: `5 Minutes` (or `1 Minute`).
-5. **Outcome**: Every time the daily Airbyte scraper ELT runs and inserts new 2026 streaming drops, the visuals refresh on your screen in real time!
+3. Toggle **Page refresh** to **ON** and set interval to **5 Minutes**.
+4. Power BI will execute live DirectQuery SQL queries against your warehouse to stream real-time updates!

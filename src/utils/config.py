@@ -36,6 +36,17 @@ class Settings(BaseSettings):
     batch_size: int = Field(default=100, alias="BATCH_SIZE")
     fuzzy_match_threshold: float = Field(default=85.0, alias="FUZZY_MATCH_THRESHOLD")
 
+    # Airbyte Configuration
+    airbyte_host: str = Field(default="localhost", alias="AIRBYTE_HOST")
+    airbyte_port: int = Field(default=8000, alias="AIRBYTE_PORT")
+    airbyte_username: str = Field(default="airbyte", alias="AIRBYTE_USERNAME")
+    airbyte_password: str = Field(default="password", alias="AIRBYTE_PASSWORD")
+
+    @property
+    def airbyte_api_url(self) -> str:
+        """Construct Airbyte REST API base URL."""
+        return f"http://{self.airbyte_host}:{self.airbyte_port}/api/v1"
+
     @property
     def database_url(self) -> str:
         """Construct SQLAlchemy PostgreSQL connection string."""

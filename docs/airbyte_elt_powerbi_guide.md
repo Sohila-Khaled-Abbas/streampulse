@@ -133,6 +133,60 @@ python -c "import requests; print(requests.get('http://localhost:8000/api/v1/hea
 
 ---
 
+### 2.5 Programmatic Airbyte Execution via Code (Python REST API Client)
+
+You can also manage, test, and trigger the Airbyte replication connection entirely through code using StreamPulse's programmatic Python API client:
+
+#### Run via CLI Runner:
+```powershell
+# Trigger immediate replication and wait for sync completion
+python scripts/run_airbyte_connection.py --sync-now
+
+# Or using Makefile:
+make airbyte-sync
+```
+
+#### Programmatic Python Scripting Example:
+```python
+from src.load.airbyte_client import airbyte_client
+
+# 1. Check Airbyte stack health
+health = airbyte_client.check_health()
+print(f"Airbyte Online: {health['available']}")
+
+# 2. Get or create Workspace
+workspace_id = airbyte_client.get_or_create_workspace(workspace_name="StreamPulse")
+
+# 3. Discover/provision File CSV Source & PostgreSQL Destination
+source_id = airbyte_client.get_or_create_source(
+    workspace_id=workspace_id,
+    source_name="StreamPulse_Daily_2026_Catalog",
+    file_path="data/processed/netflix_catalog_enriched_master.csv",
+)
+dest_id = airbyte_client.get_or_create_destination(
+    workspace_id=workspace_id,
+    dest_name="StreamPulse_PostgreSQL_Warehouse",
+    db_host="host.docker.internal",
+    db_port=5432,
+    db_name="streampulse",
+    default_schema="staging",
+)
+
+# 4. Provision Replication Connection
+conn_id = airbyte_client.get_or_create_connection(
+    workspace_id=workspace_id,
+    source_id=source_id,
+    destination_id=dest_id,
+    connection_name="Daily_2026_Catalog_to_Staging",
+)
+
+# 5. Trigger replication and block until completion
+sync_result = airbyte_client.sync_and_wait(connection_id=conn_id, timeout_seconds=180)
+print(f"Sync Result: {sync_result['success']}")
+```
+
+---
+
 ## ⚡ Step 3: Downstream Automatic Transformation Trigger
 
 When Airbyte lands raw records into `staging.stg_netflix_titles`, the StreamPulse automated pipeline triggers the Kimball Galaxy transformation:

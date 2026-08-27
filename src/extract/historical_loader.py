@@ -93,6 +93,57 @@ class HistoricalDatasetLoader:
         logger.info(f"Loaded {len(records)} enriched historical titles from cache.")
         return records
 
+    def validate_integrity(self) -> Dict[str, Any]:
+        """Validate historical CSV file presence, row count, headers, and quality metrics."""
+        if not os.path.exists(self.cache_path):
+            self.download_dataset()
+
+        file_size_bytes = os.path.getsize(self.cache_path)
+        required_headers = [
+            "id", "title", "type", "description", "release_year",
+            "age_certification", "runtime", "genres", "imdb_id",
+            "imdb_score", "imdb_votes", "tmdb_popularity", "tmdb_score"
+        ]
+
+        total_rows = 0
+        min_year = 9999
+        max_year = 0
+        scored_imdb = 0
+        scored_tmdb = 0
+
+        with open(self.cache_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            headers = reader.fieldnames or []
+            missing_headers = [h for h in required_headers if h not in headers]
+
+            for row in reader:
+                total_rows += 1
+                year = self._safe_int(row.get("release_year"))
+                if year:
+                    min_year = min(min_year, year)
+                    max_year = max(max_year, year)
+                if self._safe_float(row.get("imdb_score")) is not None:
+                    scored_imdb += 1
+                if self._safe_float(row.get("tmdb_score")) is not None:
+                    scored_tmdb += 1
+
+        validation = {
+            "cache_path": self.cache_path,
+            "file_size_mb": round(file_size_bytes / (1024 * 1024), 2),
+            "total_records": total_rows,
+            "min_release_year": min_year if min_year != 9999 else None,
+            "max_release_year": max_year if max_year != 0 else None,
+            "imdb_scored_titles": scored_imdb,
+            "tmdb_scored_titles": scored_tmdb,
+            "missing_headers": missing_headers,
+            "is_valid": total_rows >= 5000 and len(missing_headers) == 0,
+        }
+        logger.info(
+            f"Historical Dataset Integrity: {total_rows:,} records ({min_year}-{max_year}) | "
+            f"IMDb Coverage: {scored_imdb:,} | Valid: {validation['is_valid']}"
+        )
+        return validation
+
     @staticmethod
     def _safe_float(val: Any) -> Optional[float]:
         try:
@@ -106,3 +157,4 @@ class HistoricalDatasetLoader:
             return int(float(val)) if val and str(val).strip() else None
         except (ValueError, TypeError):
             return None
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "streamplus_report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9c4ba0ef-eb13-4304-9655-31348a1f4462"
+  }
+}

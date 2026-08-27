@@ -93,7 +93,10 @@ cover/
 Thumbs.db
 desktop.ini
 
-# Power BI temp files & user state
+# Power BI temp files, user state & PBIP local cache
 *.pbix.backup
 *.pbit
 auto-recovery/
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/cache.abf

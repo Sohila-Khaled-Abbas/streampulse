@@ -74,14 +74,15 @@ Streaming entertainment platforms release hundreds of original titles every mont
 
 ## 🧩 Multi-Source Data Ingestion & Power Query Training
 
-StreamPulse ships with **4 distinct unmerged raw sources** containing deliberate real-world data quality issues for Power BI Power Query (M Language) training:
+StreamPulse ships with **5 distinct unmerged raw sources** containing deliberate real-world data quality issues for Power BI Power Query (M Language) training:
 
-| Source # | Storage Format | Raw Path | Real-World Cleaning Challenges |
-| :--- | :--- | :--- | :--- |
-| **Source 1** | PostgreSQL Table | `staging.stg_netflix_titles` | Mixed date formats (`"January 15, 2026"`, `"15/01/2026"`), non-breaking spaces (`\xa0`), uppercase titles, JSON strings |
-| **Source 2** | CSV Flat File | `data/raw/imdb_external_ratings.csv` | Shorthand vote counts (`"1.4M"`, `"850K"`), dirty ID prefixes (`"tt8001000"`, `"IMDB_8001000"`), duplicate snapshot rows |
-| **Source 3** | Wide Parquet Lakehouse | `data/raw/streaming_viewership_wide.parquet` | Unpivoted wide monthly columns (`Hours_2026_01`), country variations (`"USA"`, `"US"`, `"u.s.a."`), sentinel values (`-999.0`) |
-| **Source 4** | JSON Feed | `data/raw/boxoffice_budget_feed.json` | Dirty currency strings (`"$150M"`, `"€45 million"`), pipe-delimited genres (`"Action\|Sci-Fi"`), nested JSON records |
+| Source # | Source Name | Storage Format | Location / Path | Real-World Cleaning Challenges |
+| :--- | :--- | :--- | :--- | :--- |
+| **Source 1** | `stg_netflix_titles` | PostgreSQL Table | `localhost:5432` / `staging.stg_netflix_titles` | Mixed date formats (`"January 15, 2026"`, `"15/01/2026"`), non-breaking spaces (`\xa0`), uppercase titles, JSON strings |
+| **Source 2** | `Raw_Historical_Archive` | CSV Flat File | `data/raw/netflix_enriched_historical.csv` | **5,800+ historical titles (1945–2024)**, genre string arrays (`"['drama', 'crime']"`), floating-point IMDb/TMDb scores |
+| **Source 3** | `Raw_IMDb_Ratings` | CSV Flat File | `data/raw/imdb_external_ratings.csv` | Shorthand vote counts (`"1.4M"`, `"850K"`), dirty ID prefixes (`"tt8001000"`, `"IMDB_8001000"`), duplicate snapshot rows |
+| **Source 4** | `Raw_Viewership_Parquet` | Wide Parquet Lakehouse | `data/raw/streaming_viewership_wide.parquet` | Unpivoted wide monthly columns (`Hours_2026_01`), country variations (`"USA"`, `"US"`, `"u.s.a."`), sentinel values (`-999.0`) |
+| **Source 5** | `Raw_Budget_JSON` | JSON Feed | `data/raw/boxoffice_budget_feed.json` | Dirty currency strings (`"$150M"`, `"€45 million"`), pipe-delimited genres (`"Action\|Sci-Fi"`), nested JSON records |
 
 > 📘 *See the full step-by-step M Language cleaning recipes in [`docs/powerbi_analytics_engineering_guide.md`](docs/powerbi_analytics_engineering_guide.md).*
 
@@ -103,13 +104,19 @@ The PostgreSQL reporting layer and Parquet Lakehouse (`data/processed/lakehouse/
 
 ---
 
-## 🔄 Airbyte Automated Daily ELT Pipeline
+## 🔄 Airbyte Automated Daily ELT Pipeline & Code Execution
 
-Airbyte (v0.50.36) orchestrates daily automated replication:
+Airbyte (v0.50.36) orchestrates daily automated replication with full programmatic Python control:
 
-1. **Airbyte Web UI**: Accessible at [http://localhost:8000](http://localhost:8000).
-2. **Replication Schedule**: Configured on a **24-hour Cron** (`0 6 * * *`) to automatically replicate newly scraped catalog landing files into PostgreSQL `staging.stg_netflix_titles`.
-3. **Sync Mode**: `Incremental | Append + Deduped` using `netflix_id` as primary key and `extracted_at` as cursor.
+1. **Airbyte Web UI**: Accessible at [http://localhost:8000](http://localhost:8000) (Username: `airbyte`, Password: `password`).
+2. **Programmatic Python API Client**: Use `AirbyteClient` in [`src/load/airbyte_client.py`](src/load/airbyte_client.py) to check stack health, provision workspaces, File sources, PostgreSQL destinations, and trigger sync jobs directly from code.
+3. **CLI Connection Runner**: Execute replication anytime via CLI:
+   ```bash
+   python scripts/run_airbyte_connection.py --sync-now
+   # or: make airbyte-sync
+   ```
+4. **Replication Schedule**: Configured on a **24-hour Cron** (`0 6 * * *`) replicating newly scraped catalog landing files into PostgreSQL `staging.stg_netflix_titles`.
+5. **Sync Mode**: `Incremental | Append + Deduped` using `netflix_id` as primary key and `extracted_at` as cursor.
 
 ---
 
@@ -150,13 +157,19 @@ docker compose up -d
 docker compose -f docker/docker-compose.airbyte.yml up -d
 ```
 
-### 3. Run the Live 2026 Pipeline
+### 3. Prepare All 5 Power BI Sources & Run Airbyte Sync
+```powershell
+# Prepare, validate, and conform all 5 Power BI sources (including 5,800+ historical archive)
+python scripts/prepare_powerbi_sources.py
+
+# Programmatically trigger the Airbyte replication connection via code
+python scripts/run_airbyte_connection.py --sync-now
+```
+
+### 4. Run the Live 2026 Pipeline
 ```powershell
 # Execute live scraper, entity resolution, profiler, and warehouse loader
 python src/pipeline.py --mode live --limit 50
-
-# Generate the 4 distinct dirty datasets for Power BI training
-python -m src.extract.generate_dirty_training_datasets
 ```
 
 ---
@@ -171,12 +184,14 @@ pytest -v
 
 ```text
 ============================= test session starts =============================
-tests/test_db.py .............. PASSED
-tests/test_extract.py ......... PASSED
-tests/test_scraper_2026.py .... PASSED
-tests/test_transform.py ....... PASSED
-tests/test_warehouse_loader.py  PASSED
-============================= 15 passed in 25.41s =============================
+tests/test_airbyte_client.py ...... PASSED
+tests/test_db.py .................. PASSED
+tests/test_extract.py ............. PASSED
+tests/test_powerbi_sources.py ..... PASSED
+tests/test_scraper_2026.py ........ PASSED
+tests/test_transform.py ........... PASSED
+tests/test_warehouse_loader.py .... PASSED
+============================= 22 passed in 28.12s =============================
 ```
 
 ---

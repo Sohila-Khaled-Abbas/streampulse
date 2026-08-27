@@ -14,7 +14,9 @@ help:
 	@echo "  docker-down     Stop and tear down Docker containers"
 	@echo "  airbyte-up      Start lightweight Airbyte Web UI & Server via Docker"
 	@echo "  airbyte-down    Stop standalone Airbyte containers"
+	@echo "  airbyte-sync    Run Airbyte connection and ELT replication via code"
 	@echo "  fetch-historical Download and cache 5,800+ historical enriched Netflix titles"
+	@echo "  prepare-powerbi Prepare, validate, and verify all 5 Power BI sources"
 	@echo "  run-live        Execute live 2026/2025 web scraping & enrichment pipeline"
 	@echo "  run-full        Execute full historical + 2026 live ingestion pipeline"
 	@echo "  run-stream      Start real-time continuous streaming ingestion daemon"
@@ -27,6 +29,12 @@ airbyte-up:
 
 airbyte-down:
 	docker compose -f docker/docker-compose.airbyte.yml down
+
+airbyte-sync:
+	$(PYTHON) scripts/run_airbyte_connection.py --sync-now
+
+prepare-powerbi:
+	$(PYTHON) scripts/prepare_powerbi_sources.py
 
 fetch-historical:
 	$(PYTHON) scripts/fetch_historical_dataset.py

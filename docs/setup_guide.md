@@ -131,6 +131,22 @@ python -m src.pipeline --mode live --limit 50 --dry-run
 make profile-data
 ```
 
+### Mode E: Prepare & Validate all 5 Power BI Multi-Source Datasets
+Fetches the 5,800+ historical benchmark archive, generates dirty training datasets, and validates schemas against Power Query M specifications:
+```powershell
+python scripts/prepare_powerbi_sources.py
+# Or using Makefile:
+make prepare-powerbi
+```
+
+### Mode F: Programmatic Airbyte ELT Replication
+Tests Airbyte health, provisions File Source and PostgreSQL Destination, and triggers replication sync via code:
+```powershell
+python scripts/run_airbyte_connection.py --sync-now
+# Or using Makefile:
+make airbyte-sync
+```
+
 ---
 
 ## 7. Pipeline Output & Data Validation Logs

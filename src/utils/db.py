@@ -49,7 +49,9 @@ class DatabaseManager:
         try:
             with self.connect() as conn:
                 result = conn.execute(text("SELECT 1")).scalar()
-                logger.info(f"Database connection verified successfully (result={result}).")
+                logger.info(
+                    f"Database connection verified successfully (result={result})."
+                )
                 return result == 1
         except Exception as err:
             logger.warning(f"Database connection test failed: {err}")

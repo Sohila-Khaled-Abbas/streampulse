@@ -53,7 +53,7 @@ def test_data_profiler_statistics():
             "match_confidence": 100.0,
             "date_added": "2026-05-20",
             "source": "wikipedia_tv_series",
-        }
+        },
     ]
 
     report = profiler.profile_dataset(sample_records)

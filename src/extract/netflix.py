@@ -11,7 +11,9 @@ from src.utils.logger import logger
 class NetflixExtractor:
     """Extracts recent catalog additions and details from RapidAPI Netflix endpoints."""
 
-    def __init__(self, api_key: Optional[str] = None, host: Optional[str] = None) -> None:
+    def __init__(
+        self, api_key: Optional[str] = None, host: Optional[str] = None
+    ) -> None:
         self.api_key = api_key or settings.rapidapi_key
         self.host = host or settings.rapidapi_host
         self.base_url = f"https://{self.host}"
@@ -50,8 +52,12 @@ class NetflixExtractor:
         }
 
         try:
-            logger.info(f"Extracting Netflix titles from {url} (days_back={days_back}, limit={limit})...")
-            response = requests.get(url, headers=self.headers, params=params, timeout=15)
+            logger.info(
+                f"Extracting Netflix titles from {url} (days_back={days_back}, limit={limit})..."
+            )
+            response = requests.get(
+                url, headers=self.headers, params=params, timeout=15
+            )
             response.raise_for_status()
             payload = response.json()
             results = payload.get("results", [])

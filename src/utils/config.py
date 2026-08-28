@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     rapidapi_key: Optional[str] = Field(default=None, alias="RAPIDAPI_KEY")
     rapidapi_host: str = Field(default="unogsng.p.rapidapi.com", alias="RAPIDAPI_HOST")
     tmdb_api_key: Optional[str] = Field(default=None, alias="TMDB_API_KEY")
-    tmdb_read_access_token: Optional[str] = Field(default=None, alias="TMDB_READ_ACCESS_TOKEN")
+    tmdb_read_access_token: Optional[str] = Field(
+        default=None, alias="TMDB_READ_ACCESS_TOKEN"
+    )
 
     # PostgreSQL Database
     db_host: str = Field(default="localhost", alias="DB_HOST")

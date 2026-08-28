@@ -10,6 +10,7 @@ from src.utils.config import settings
 # Clear default handlers
 logger.remove()
 
+
 def _safe_sink(msg: str) -> None:
     """Safe console sink that encodes to current stdout encoding with error replacement."""
     try:
@@ -21,6 +22,7 @@ def _safe_sink(msg: str) -> None:
         clean_bytes = msg.encode(enc, errors="replace")
         sys.stdout.write(clean_bytes.decode(enc, errors="replace"))
         sys.stdout.flush()
+
 
 # Add safe console handler
 logger.add(

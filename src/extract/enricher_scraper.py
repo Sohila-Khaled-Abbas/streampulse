@@ -28,12 +28,16 @@ class WebEnricher:
     def __init__(self, timeout: int = 4) -> None:
         self.timeout = timeout
         self.session = requests.Session()
-        self.session.headers.update({
-            "User-Agent": self.USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": self.USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            }
+        )
 
-    def enrich_title(self, record: Dict[str, Any], fetch_wiki_infobox: bool = False) -> Dict[str, Any]:
+    def enrich_title(
+        self, record: Dict[str, Any], fetch_wiki_infobox: bool = False
+    ) -> Dict[str, Any]:
         """Enrich a title record with audience rating, popularity, and detailed attributes."""
         title = record.get("title", "")
         release_year = record.get("release_year") or record.get("year") or 2026
@@ -45,8 +49,16 @@ class WebEnricher:
 
         # Baseline rating between 6.4 and 8.8
         base_rating = round(rng.uniform(6.4, 8.8), 1)
-        base_votes = rng.randint(1200, 35000) if release_year >= 2025 else rng.randint(15000, 150000)
-        base_pop = round(rng.uniform(45.0, 320.0), 1) if release_year == 2026 else round(rng.uniform(20.0, 120.0), 1)
+        base_votes = (
+            rng.randint(1200, 35000)
+            if release_year >= 2025
+            else rng.randint(15000, 150000)
+        )
+        base_pop = (
+            round(rng.uniform(45.0, 320.0), 1)
+            if release_year == 2026
+            else round(rng.uniform(20.0, 120.0), 1)
+        )
 
         # Compute catalog velocity: days from release to streaming date
         date_added = record.get("date_added") or f"{release_year}-01-01"
@@ -75,12 +87,16 @@ class WebEnricher:
                     enriched["cast"] = wiki_details["cast"]
                 if wiki_details.get("budget"):
                     enriched["budget"] = wiki_details["budget"]
-                if wiki_details.get("synopsis") and len(wiki_details["synopsis"]) > len(enriched.get("synopsis", "")):
+                if wiki_details.get("synopsis") and len(wiki_details["synopsis"]) > len(
+                    enriched.get("synopsis", "")
+                ):
                     enriched["synopsis"] = wiki_details["synopsis"]
 
         return enriched
 
-    def scrape_wikipedia_infobox(self, title: str, media_type: str = "movie") -> Dict[str, Any]:
+    def scrape_wikipedia_infobox(
+        self, title: str, media_type: str = "movie"
+    ) -> Dict[str, Any]:
         """Scrape Wikipedia infobox for director, cast, budget, and synopsis."""
         suffix = "_(film)" if media_type == "movie" else "_(TV_series)"
         formatted_title = title.replace(" ", "_")
@@ -111,12 +127,18 @@ class WebEnricher:
                     if "directed by" in label:
                         details["director"] = value
                     elif "starring" in label:
-                        details["cast"] = [c.strip() for c in re.split(r",|\n", value) if c.strip()][:5]
+                        details["cast"] = [
+                            c.strip() for c in re.split(r",|\n", value) if c.strip()
+                        ][:5]
                     elif "budget" in label:
                         details["budget"] = value
 
             # Extract synopsis lead
-            paragraphs = [p.get_text(strip=True) for p in soup.find_all("p") if len(p.get_text(strip=True)) > 60]
+            paragraphs = [
+                p.get_text(strip=True)
+                for p in soup.find_all("p")
+                if len(p.get_text(strip=True)) > 60
+            ]
             if paragraphs:
                 details["synopsis"] = re.sub(r"\[.*?\]", "", paragraphs[0]).strip()
 

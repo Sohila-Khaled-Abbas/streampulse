@@ -9,7 +9,9 @@ from src.load.airbyte_client import AirbyteClient
 
 @pytest.fixture
 def client():
-    return AirbyteClient(host="localhost", port=8000, username="airbyte", password="password")
+    return AirbyteClient(
+        host="localhost", port=8000, username="airbyte", password="password"
+    )
 
 
 def test_airbyte_client_init(client):
@@ -79,7 +81,9 @@ def test_get_or_create_destination(mock_post, client):
     mock_resp = MagicMock()
     mock_resp.status_code = 200
     mock_resp.json.return_value = {
-        "destinations": [{"destinationId": "dst-8888", "name": "StreamPulse_PostgreSQL_Warehouse"}]
+        "destinations": [
+            {"destinationId": "dst-8888", "name": "StreamPulse_PostgreSQL_Warehouse"}
+        ]
     }
     mock_post.return_value = mock_resp
 
@@ -96,7 +100,9 @@ def test_get_or_create_connection(mock_post, client):
     mock_resp = MagicMock()
     mock_resp.status_code = 200
     mock_resp.json.return_value = {
-        "connections": [{"connectionId": "conn-7777", "name": "Daily_2026_Catalog_to_Staging"}]
+        "connections": [
+            {"connectionId": "conn-7777", "name": "Daily_2026_Catalog_to_Staging"}
+        ]
     }
     mock_post.return_value = mock_resp
 
@@ -114,9 +120,7 @@ def test_trigger_sync(mock_post, client):
     """Test triggering a sync job."""
     mock_resp = MagicMock()
     mock_resp.status_code = 200
-    mock_resp.json.return_value = {
-        "job": {"id": 101, "status": "running"}
-    }
+    mock_resp.json.return_value = {"job": {"id": 101, "status": "running"}}
     mock_post.return_value = mock_resp
 
     res = client.trigger_sync(connection_id="conn-7777")

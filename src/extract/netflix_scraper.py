@@ -34,11 +34,13 @@ class NetflixWebScraper:
     def __init__(self, timeout: int = 15) -> None:
         self.timeout = timeout
         self.session = requests.Session()
-        self.session.headers.update({
-            "User-Agent": self.USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": self.USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+            }
+        )
 
     def scrape_live_catalog(
         self,
@@ -76,7 +78,9 @@ class NetflixWebScraper:
         # 2. Scrape other requested years (2025, 2024)
         for yr in years:
             if yr != 2026 and len(all_titles) < limit:
-                films_yr = self.scrape_wikipedia_netflix_films(year=yr, limit=limit - len(all_titles))
+                films_yr = self.scrape_wikipedia_netflix_films(
+                    year=yr, limit=limit - len(all_titles)
+                )
                 for f in films_yr:
                     key = f["title"].lower().strip()
                     if key not in seen_titles:
@@ -85,7 +89,9 @@ class NetflixWebScraper:
 
         # 3. Scrape ongoing & 2025-2026 series programming
         if include_series and len(all_titles) < limit:
-            series_list = self.scrape_wikipedia_series(target_years=years, limit=limit - len(all_titles))
+            series_list = self.scrape_wikipedia_series(
+                target_years=years, limit=limit - len(all_titles)
+            )
             for s in series_list:
                 key = s["title"].lower().strip()
                 if key not in seen_titles:
@@ -94,7 +100,9 @@ class NetflixWebScraper:
 
         # 4. Ingest real-time What's on Netflix RSS feed
         if include_feed and len(all_titles) < limit:
-            feed_titles = self.scrape_whats_on_netflix_feed(limit=min(30, limit - len(all_titles)))
+            feed_titles = self.scrape_whats_on_netflix_feed(
+                limit=min(30, limit - len(all_titles))
+            )
             for f in feed_titles:
                 key = f["title"].lower().strip()
                 if key not in seen_titles:
@@ -102,10 +110,14 @@ class NetflixWebScraper:
                     all_titles.append(f)
 
         if not all_titles:
-            logger.warning("Web scrapers returned 0 items; falling back to 2026 benchmark catalog.")
+            logger.warning(
+                "Web scrapers returned 0 items; falling back to 2026 benchmark catalog."
+            )
             return self._get_fallback_catalog()
 
-        logger.info(f"Successfully scraped {len(all_titles)} live 2025-2026 Netflix catalog titles.")
+        logger.info(
+            f"Successfully scraped {len(all_titles)} live 2025-2026 Netflix catalog titles."
+        )
         return all_titles[:limit]
 
     def scrape_wikipedia_2026_films(self, limit: int = 60) -> List[Dict[str, Any]]:
@@ -113,7 +125,9 @@ class NetflixWebScraper:
 
         Extracts 2026 titles, confirmed premiere dates, genres, runtime, languages, and directors.
         """
-        url = "https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(since_2026)"
+        url = (
+            "https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(since_2026)"
+        )
         logger.info(f"Scraping 2026 Netflix Original Films from {url}...")
         results: List[Dict[str, Any]] = []
 
@@ -130,7 +144,9 @@ class NetflixWebScraper:
             for table in tables:
                 rows = table.find_all("tr")[1:]  # skip header row
                 for row in rows:
-                    cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                    cols = [
+                        td.get_text(strip=True) for td in row.find_all(["td", "th"])
+                    ]
                     if not cols or len(cols) < 3:
                         continue
 
@@ -139,13 +155,19 @@ class NetflixWebScraper:
                     if not title or len(title) < 2 or title.lower() in ("title", "tba"):
                         continue
 
-                    release_date_str = re.sub(r"\[.*?\]", "", cols[1]).strip() if len(cols) > 1 else "2026"
+                    release_date_str = (
+                        re.sub(r"\[.*?\]", "", cols[1]).strip()
+                        if len(cols) > 1
+                        else "2026"
+                    )
                     genre = "Feature Film"
                     runtime_str = ""
                     language = "English"
 
                     if len(cols) >= 5:
-                        genre = re.sub(r"\[.*?\]", "", cols[2]).strip() or "Feature Film"
+                        genre = (
+                            re.sub(r"\[.*?\]", "", cols[2]).strip() or "Feature Film"
+                        )
                         runtime_str = cols[3]
                         language = cols[4]
                     elif len(cols) == 4:
@@ -154,26 +176,32 @@ class NetflixWebScraper:
                         genre = "Documentary / Special"
 
                     runtime_minutes = self._parse_runtime(runtime_str)
-                    formatted_date = self._format_date(release_date_str, default_year=2026)
+                    formatted_date = self._format_date(
+                        release_date_str, default_year=2026
+                    )
 
-                    netflix_id = "wiki_2026_" + hashlib.md5(title.encode()).hexdigest()[:8]
+                    netflix_id = (
+                        "wiki_2026_" + hashlib.md5(title.encode()).hexdigest()[:8]
+                    )
 
-                    results.append({
-                        "id": netflix_id,
-                        "netflix_id": netflix_id,
-                        "title": title,
-                        "type": "movie",
-                        "synopsis": f"2026 Netflix Original Film ({genre}) in {language}. Premiered {release_date_str}.",
-                        "genre": genre,
-                        "year": 2026,
-                        "release_year": 2026,
-                        "runtime": runtime_minutes,
-                        "runtime_minutes": runtime_minutes,
-                        "language": language,
-                        "maturity_rating": "PG-13",
-                        "date_added": formatted_date,
-                        "source": "wikipedia_2026_films",
-                    })
+                    results.append(
+                        {
+                            "id": netflix_id,
+                            "netflix_id": netflix_id,
+                            "title": title,
+                            "type": "movie",
+                            "synopsis": f"2026 Netflix Original Film ({genre}) in {language}. Premiered {release_date_str}.",
+                            "genre": genre,
+                            "year": 2026,
+                            "release_year": 2026,
+                            "runtime": runtime_minutes,
+                            "runtime_minutes": runtime_minutes,
+                            "language": language,
+                            "maturity_rating": "PG-13",
+                            "date_added": formatted_date,
+                            "source": "wikipedia_2026_films",
+                        }
+                    )
 
                     if len(results) >= limit:
                         break
@@ -181,14 +209,18 @@ class NetflixWebScraper:
                 if len(results) >= limit:
                     break
 
-            logger.info(f"Extracted {len(results)} confirmed 2026 Netflix films from Wikipedia.")
+            logger.info(
+                f"Extracted {len(results)} confirmed 2026 Netflix films from Wikipedia."
+            )
             return results
 
         except requests.RequestException as err:
             logger.error(f"Error scraping 2026 Wikipedia films: {err}")
             return []
 
-    def scrape_wikipedia_netflix_films(self, year: int = 2025, limit: int = 50) -> List[Dict[str, Any]]:
+    def scrape_wikipedia_netflix_films(
+        self, year: int = 2025, limit: int = 50
+    ) -> List[Dict[str, Any]]:
         """Scrapes Wikipedia catalog of Netflix original releases for a given year."""
         url = f"https://en.wikipedia.org/wiki/List_of_Netflix_original_films_({year})"
         logger.info(f"Scraping Wikipedia Netflix catalog for year {year} from {url}...")
@@ -207,37 +239,54 @@ class NetflixWebScraper:
             for table in tables:
                 rows = table.find_all("tr")[1:]
                 for row in rows:
-                    cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                    cols = [
+                        td.get_text(strip=True) for td in row.find_all(["td", "th"])
+                    ]
                     if len(cols) >= 3:
                         raw_title = cols[0]
                         title = re.sub(r"\[.*?\]", "", raw_title).strip()
-                        if not title or len(title) < 2 or title.lower() in ("title", "tba"):
+                        if (
+                            not title
+                            or len(title) < 2
+                            or title.lower() in ("title", "tba")
+                        ):
                             continue
 
                         release_date_str = re.sub(r"\[.*?\]", "", cols[1]).strip()
-                        genre = re.sub(r"\[.*?\]", "", cols[2]).strip() if len(cols) > 2 else "Film"
+                        genre = (
+                            re.sub(r"\[.*?\]", "", cols[2]).strip()
+                            if len(cols) > 2
+                            else "Film"
+                        )
                         runtime_str = cols[3] if len(cols) > 3 else ""
 
                         runtime_minutes = self._parse_runtime(runtime_str)
-                        formatted_date = self._format_date(release_date_str, default_year=year)
+                        formatted_date = self._format_date(
+                            release_date_str, default_year=year
+                        )
 
-                        netflix_id = f"wiki_{year}_" + hashlib.md5(title.encode()).hexdigest()[:8]
+                        netflix_id = (
+                            f"wiki_{year}_"
+                            + hashlib.md5(title.encode()).hexdigest()[:8]
+                        )
 
-                        results.append({
-                            "id": netflix_id,
-                            "netflix_id": netflix_id,
-                            "title": title,
-                            "type": "movie",
-                            "synopsis": f"Netflix Original Film ({genre}) released {release_date_str}.",
-                            "genre": genre,
-                            "year": year,
-                            "release_year": year,
-                            "runtime": runtime_minutes,
-                            "runtime_minutes": runtime_minutes,
-                            "maturity_rating": "PG-13",
-                            "date_added": formatted_date,
-                            "source": f"wikipedia_{year}_films",
-                        })
+                        results.append(
+                            {
+                                "id": netflix_id,
+                                "netflix_id": netflix_id,
+                                "title": title,
+                                "type": "movie",
+                                "synopsis": f"Netflix Original Film ({genre}) released {release_date_str}.",
+                                "genre": genre,
+                                "year": year,
+                                "release_year": year,
+                                "runtime": runtime_minutes,
+                                "runtime_minutes": runtime_minutes,
+                                "maturity_rating": "PG-13",
+                                "date_added": formatted_date,
+                                "source": f"wikipedia_{year}_films",
+                            }
+                        )
 
                         if len(results) >= limit:
                             break
@@ -256,7 +305,9 @@ class NetflixWebScraper:
     ) -> List[Dict[str, Any]]:
         """Scrapes 'List of Netflix original programming' for active 2025/2026 series."""
         url = "https://en.wikipedia.org/wiki/List_of_Netflix_original_programming"
-        logger.info(f"Scraping Netflix original TV series and programming from {url}...")
+        logger.info(
+            f"Scraping Netflix original TV series and programming from {url}..."
+        )
         results: List[Dict[str, Any]] = []
         if target_years is None:
             target_years = [2025, 2026]
@@ -274,7 +325,9 @@ class NetflixWebScraper:
             for table in tables:
                 rows = table.find_all("tr")[1:]
                 for row in rows:
-                    cols = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                    cols = [
+                        td.get_text(strip=True) for td in row.find_all(["td", "th"])
+                    ]
                     if len(cols) < 3:
                         continue
 
@@ -282,9 +335,21 @@ class NetflixWebScraper:
                     if not title or len(title) < 2 or title.lower() in ("title", "tba"):
                         continue
 
-                    genre = re.sub(r"\[.*?\]", "", cols[1]).strip() if len(cols) > 1 else "Series"
-                    premiere = re.sub(r"\[.*?\]", "", cols[2]).strip() if len(cols) > 2 else "2024"
-                    status = re.sub(r"\[.*?\]", "", cols[-1]).strip() if len(cols) >= 4 else ""
+                    genre = (
+                        re.sub(r"\[.*?\]", "", cols[1]).strip()
+                        if len(cols) > 1
+                        else "Series"
+                    )
+                    premiere = (
+                        re.sub(r"\[.*?\]", "", cols[2]).strip()
+                        if len(cols) > 2
+                        else "2024"
+                    )
+                    status = (
+                        re.sub(r"\[.*?\]", "", cols[-1]).strip()
+                        if len(cols) >= 4
+                        else ""
+                    )
 
                     # Filter for target years in premiere or status renewal
                     full_text = f"{premiere} {status}"
@@ -299,25 +364,32 @@ class NetflixWebScraper:
 
                     runtime_str = cols[4] if len(cols) >= 5 else "45 min"
                     runtime_minutes = self._parse_runtime(runtime_str) or 45
-                    formatted_date = self._format_date(premiere, default_year=matched_year)
+                    formatted_date = self._format_date(
+                        premiere, default_year=matched_year
+                    )
 
-                    netflix_id = f"wiki_tv_{matched_year}_" + hashlib.md5(title.encode()).hexdigest()[:8]
+                    netflix_id = (
+                        f"wiki_tv_{matched_year}_"
+                        + hashlib.md5(title.encode()).hexdigest()[:8]
+                    )
 
-                    results.append({
-                        "id": netflix_id,
-                        "netflix_id": netflix_id,
-                        "title": title,
-                        "type": "series",
-                        "synopsis": f"Netflix Original Series ({genre}). Status: {status or 'Active'}.",
-                        "genre": genre,
-                        "year": matched_year,
-                        "release_year": matched_year,
-                        "runtime": runtime_minutes,
-                        "runtime_minutes": runtime_minutes,
-                        "maturity_rating": "TV-MA",
-                        "date_added": formatted_date,
-                        "source": "wikipedia_tv_series",
-                    })
+                    results.append(
+                        {
+                            "id": netflix_id,
+                            "netflix_id": netflix_id,
+                            "title": title,
+                            "type": "series",
+                            "synopsis": f"Netflix Original Series ({genre}). Status: {status or 'Active'}.",
+                            "genre": genre,
+                            "year": matched_year,
+                            "release_year": matched_year,
+                            "runtime": runtime_minutes,
+                            "runtime_minutes": runtime_minutes,
+                            "maturity_rating": "TV-MA",
+                            "date_added": formatted_date,
+                            "source": "wikipedia_tv_series",
+                        }
+                    )
 
                     if len(results) >= limit:
                         break
@@ -325,7 +397,9 @@ class NetflixWebScraper:
                 if len(results) >= limit:
                     break
 
-            logger.info(f"Extracted {len(results)} active 2025/2026 Netflix series from Wikipedia.")
+            logger.info(
+                f"Extracted {len(results)} active 2025/2026 Netflix series from Wikipedia."
+            )
             return results
 
         except requests.RequestException as err:
@@ -345,7 +419,9 @@ class NetflixWebScraper:
             if BeautifulSoup is None:
                 return []
 
-            soup = BeautifulSoup(resp.text, "xml" if "xml" in BeautifulSoup.__doc__ else "html.parser")
+            soup = BeautifulSoup(
+                resp.text, "xml" if "xml" in BeautifulSoup.__doc__ else "html.parser"
+            )
             items = soup.find_all("item")
 
             for item in items[:limit]:
@@ -373,35 +449,60 @@ class NetflixWebScraper:
                     .split("Movie")[0]
                     .strip(" '\"-:")
                 )
-                clean_name = re.sub(r"^(Watch|First Look:|Review:|Trailer:)\s*", "", clean_name, flags=re.I).strip()
+                clean_name = re.sub(
+                    r"^(Watch|First Look:|Review:|Trailer:)\s*",
+                    "",
+                    clean_name,
+                    flags=re.I,
+                ).strip()
 
                 if len(clean_name) < 2:
                     continue
 
-                media_type = "series" if "season" in raw_title.lower() or "series" in raw_title.lower() else "movie"
-                pub_date = pubdate_tag.get_text(strip=True) if pubdate_tag else time.strftime("%Y-%m-%d")
-                synopsis = desc_tag.get_text(strip=True)[:300] if desc_tag else clean_title
+                media_type = (
+                    "series"
+                    if "season" in raw_title.lower() or "series" in raw_title.lower()
+                    else "movie"
+                )
+                pub_date = (
+                    pubdate_tag.get_text(strip=True)
+                    if pubdate_tag
+                    else time.strftime("%Y-%m-%d")
+                )
+                synopsis = (
+                    desc_tag.get_text(strip=True)[:300] if desc_tag else clean_title
+                )
                 synopsis = re.sub(r"<[^>]+>", "", synopsis)
 
                 netflix_id = "won_" + hashlib.md5(clean_name.encode()).hexdigest()[:8]
 
-                results.append({
-                    "id": netflix_id,
-                    "netflix_id": netflix_id,
-                    "title": clean_name,
-                    "type": media_type,
-                    "synopsis": synopsis or f"Live Netflix addition: {clean_name}",
-                    "genre": "Trending / Live Addition",
-                    "year": 2026,
-                    "release_year": 2026,
-                    "runtime": 105 if media_type == "movie" else 45,
-                    "runtime_minutes": 105 if media_type == "movie" else 45,
-                    "maturity_rating": "TV-MA" if media_type == "series" else "PG-13",
-                    "date_added": pub_date[:10] if len(pub_date) >= 10 else time.strftime("%Y-%m-%d"),
-                    "source": "whats_on_netflix_rss",
-                })
+                results.append(
+                    {
+                        "id": netflix_id,
+                        "netflix_id": netflix_id,
+                        "title": clean_name,
+                        "type": media_type,
+                        "synopsis": synopsis or f"Live Netflix addition: {clean_name}",
+                        "genre": "Trending / Live Addition",
+                        "year": 2026,
+                        "release_year": 2026,
+                        "runtime": 105 if media_type == "movie" else 45,
+                        "runtime_minutes": 105 if media_type == "movie" else 45,
+                        "maturity_rating": (
+                            "TV-MA" if media_type == "series" else "PG-13"
+                        ),
+                        "date_added": (
+                            pub_date[:10]
+                            if len(pub_date) >= 10
+                            else time.strftime("%Y-%m-%d")
+                        ),
+                        "source": "whats_on_netflix_rss",
+                    }
+                )
 
-            logger.info(f"Ingested {len(results)} live streaming releases from What's on Netflix RSS feed.")
+            logger.info(
+                f"Ingested {len(results)} live streaming releases from What's on Netflix RSS feed."
+            )
             return results
 
         except requests.RequestException as err:
@@ -433,9 +534,18 @@ class NetflixWebScraper:
             return f"{default_year}-01-01"
 
         month_map = {
-            "january": "01", "february": "02", "march": "03", "april": "04",
-            "may": "05", "june": "06", "july": "07", "august": "08",
-            "september": "09", "october": "10", "november": "11", "december": "12",
+            "january": "01",
+            "february": "02",
+            "march": "03",
+            "april": "04",
+            "may": "05",
+            "june": "06",
+            "july": "07",
+            "august": "08",
+            "september": "09",
+            "october": "10",
+            "november": "11",
+            "december": "12",
         }
 
         # Check for 4-digit year in date_str

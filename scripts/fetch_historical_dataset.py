@@ -16,7 +16,9 @@ def main() -> None:
     logger.info(f"Successfully cached dataset to: {file_path}")
     logger.info(f"Sample records loaded: {len(records)}")
     for r in records[:3]:
-        logger.info(f" - {r['title']} ({r['release_year']}) | IMDb: {r['imdb_score']} | TMDb: {r['tmdb_score']}")
+        logger.info(
+            f" - {r['title']} ({r['release_year']}) | IMDb: {r['imdb_score']} | TMDb: {r['tmdb_score']}"
+        )
 
 
 if __name__ == "__main__":

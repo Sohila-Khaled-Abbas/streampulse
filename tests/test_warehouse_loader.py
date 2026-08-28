@@ -57,4 +57,6 @@ def test_warehouse_loader_file_export(tmp_path):
     assert os.path.exists(os.path.join(lakehouse_dir, "dim_genres.parquet"))
     assert os.path.exists(os.path.join(lakehouse_dir, "dim_date.parquet"))
     assert os.path.exists(os.path.join(lakehouse_dir, "fact_catalog_ratings.parquet"))
-    assert os.path.exists(os.path.join(lakehouse_dir, "fact_streaming_performance.parquet"))
+    assert os.path.exists(
+        os.path.join(lakehouse_dir, "fact_streaming_performance.parquet")
+    )

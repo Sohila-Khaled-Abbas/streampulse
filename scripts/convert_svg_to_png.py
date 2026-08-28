@@ -6,11 +6,12 @@ Supports:
 - CairoSVG (if installed)
 """
 
+import contextlib
 import os
 import shutil
 import subprocess
 import sys
-from typing import List, Optional
+from typing import Optional
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -85,7 +86,9 @@ def convert_svg_to_png_browser(
 """)
 
     wrapper_url = f"file:///{os.path.abspath(wrapper_html_path).replace(chr(92), '/')}"
-    temp_user_data = os.path.abspath(os.path.join(os.path.dirname(abs_png), ".browser_temp_profile"))
+    temp_user_data = os.path.abspath(
+        os.path.join(os.path.dirname(abs_png), ".browser_temp_profile")
+    )
     os.makedirs(temp_user_data, exist_ok=True)
 
     cmd = [
@@ -105,23 +108,23 @@ def convert_svg_to_png_browser(
         logger.info(f"Rendering {svg_path} -> {png_path} ({width}x{height}px)...")
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         if os.path.exists(abs_png) and os.path.getsize(abs_png) > 1000:
-            logger.info(f"[SUCCESS] Generated high-res PNG: {png_path} ({os.path.getsize(abs_png):,} bytes)")
+            logger.info(
+                f"[SUCCESS] Generated high-res PNG: {png_path} ({os.path.getsize(abs_png):,} bytes)"
+            )
             return True
         else:
-            logger.warning(f"Browser screenshot failed: {result.stderr or result.stdout}")
+            logger.warning(
+                f"Browser screenshot failed: {result.stderr or result.stdout}"
+            )
     except Exception as e:
         logger.error(f"Error running browser renderer: {e}")
     finally:
         if os.path.exists(wrapper_html_path):
-            try:
+            with contextlib.suppress(OSError):
                 os.remove(wrapper_html_path)
-            except OSError:
-                pass
         if os.path.exists(temp_user_data):
-            try:
+            with contextlib.suppress(OSError):
                 shutil.rmtree(temp_user_data, ignore_errors=True)
-            except OSError:
-                pass
 
     return False
 
@@ -146,7 +149,9 @@ def convert_all_diagrams() -> None:
 
     browser_exe = find_browser_executable()
     if not browser_exe:
-        logger.error("No compatible browser (Edge/Chrome) found for rendering SVG to PNG.")
+        logger.error(
+            "No compatible browser (Edge/Chrome) found for rendering SVG to PNG."
+        )
         return
 
     logger.info(f"Using browser renderer: {browser_exe}")

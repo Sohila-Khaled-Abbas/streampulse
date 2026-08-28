@@ -13,7 +13,7 @@ import sys
 # Ensure root is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.load.airbyte_client import airbyte_client, AirbyteClient
+from src.load.airbyte_client import AirbyteClient, airbyte_client
 from src.utils.logger import logger
 
 
@@ -27,9 +27,13 @@ def run_airbyte_automation(
     use_fallback: bool = True,
 ) -> int:
     """Execute complete Airbyte connection lifecycle via code."""
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
     logger.info("[AIRBYTE] STREAMPULSE AIRBYTE CONNECTION ORCHESTRATOR")
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
 
     client = AirbyteClient(host=host, port=port) if (host or port) else airbyte_client
 
@@ -47,10 +51,14 @@ def run_airbyte_automation(
             logger.info("Engaging Direct PostgreSQL Staging Sync Fallback...")
             fallback_res = client.run_direct_sync(source_csv_path=source_file)
             if fallback_res.get("success"):
-                logger.info(f"[SUCCESS] Synced {fallback_res.get('records_synced')} titles via staging fallback engine.")
+                logger.info(
+                    f"[SUCCESS] Synced {fallback_res.get('records_synced')} titles via staging fallback engine."
+                )
                 return 0
             else:
-                logger.error(f"[ERROR] Direct staging sync failed: {fallback_res.get('error')}")
+                logger.error(
+                    f"[ERROR] Direct staging sync failed: {fallback_res.get('error')}"
+                )
                 return 1
         return 1
 
@@ -59,6 +67,8 @@ def run_airbyte_automation(
     workspace_id = client.get_or_create_workspace(workspace_name="StreamPulse")
     if not workspace_id:
         logger.error("Failed to obtain Airbyte workspace ID.")
+        if use_fallback:
+            return _execute_fallback(client, source_file)
         return 1
     logger.info(f"[OK] Workspace ID: {workspace_id}")
 
@@ -71,6 +81,8 @@ def run_airbyte_automation(
     )
     if not source_id:
         logger.error("Failed to obtain Airbyte source ID.")
+        if use_fallback:
+            return _execute_fallback(client, source_file)
         return 1
     logger.info(f"[OK] Source ID: {source_id}")
 
@@ -88,6 +100,8 @@ def run_airbyte_automation(
     )
     if not dest_id:
         logger.error("Failed to obtain Airbyte destination ID.")
+        if use_fallback:
+            return _execute_fallback(client, source_file)
         return 1
     logger.info(f"[OK] Destination ID: {dest_id}")
 
@@ -101,6 +115,8 @@ def run_airbyte_automation(
     )
     if not conn_id:
         logger.error("Failed to obtain Airbyte connection ID.")
+        if use_fallback:
+            return _execute_fallback(client, source_file)
         return 1
     logger.info(f"[OK] Connection ID: {conn_id}")
 
@@ -110,33 +126,83 @@ def run_airbyte_automation(
         if wait_for_completion:
             res = client.sync_and_wait(connection_id=conn_id, timeout_seconds=timeout)
             if res.get("success"):
-                logger.info("[SUCCESS] Airbyte replication cycle completed successfully via code!")
+                logger.info(
+                    "[SUCCESS] Airbyte replication cycle completed successfully via code!"
+                )
                 return 0
             else:
-                logger.error(f"[ERROR] Airbyte replication cycle failed or timed out: {res}")
+                logger.warning(
+                    f"[REPLICATION NOTICE] Airbyte container sync issue: {res}"
+                )
+                if use_fallback:
+                    return _execute_fallback(client, source_file)
                 return 1
         else:
             res = client.trigger_sync(connection_id=conn_id)
             if res.get("success"):
-                logger.info(f"[OK] Airbyte sync triggered (Job ID: {res.get('job_id')}). Running in background.")
+                logger.info(
+                    f"[OK] Airbyte sync triggered (Job ID: {res.get('job_id')}). Running in background."
+                )
                 return 0
             else:
                 logger.error(f"[ERROR] Failed to trigger sync: {res}")
+                if use_fallback:
+                    return _execute_fallback(client, source_file)
                 return 1
 
-    logger.info("[SUCCESS] Airbyte setup completed. Connection is ready for automated syncs.")
+    logger.info(
+        "[SUCCESS] Airbyte setup completed. Connection is ready for automated syncs."
+    )
     return 0
 
 
+def _execute_fallback(client: AirbyteClient, source_file: str) -> int:
+    """Execute direct PostgreSQL staging sync fallback engine."""
+    logger.info("Engaging Direct PostgreSQL Staging Sync Fallback...")
+    fallback_res = client.run_direct_sync(source_csv_path=source_file)
+    if fallback_res.get("success"):
+        logger.info(
+            f"[SUCCESS] Synced {fallback_res.get('records_synced')} titles via staging fallback engine."
+        )
+        return 0
+    else:
+        logger.error(f"[ERROR] Direct staging sync failed: {fallback_res.get('error')}")
+        return 1
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Programmatically run Airbyte ELT Connection")
-    parser.add_argument("--host", type=str, default=None, help="Airbyte server host (default: localhost)")
-    parser.add_argument("--port", type=int, default=None, help="Airbyte server port (default: 8000)")
-    parser.add_argument("--sync-now", action="store_true", default=True, help="Trigger immediate sync")
-    parser.add_argument("--no-wait", action="store_true", help="Do not wait for sync completion")
-    parser.add_argument("--timeout", type=int, default=180, help="Sync timeout in seconds")
-    parser.add_argument("--source-file", type=str, default="data/processed/netflix_catalog_enriched_master.csv", help="Source CSV file path")
-    parser.add_argument("--test", action="store_true", help="Test mode (health check + direct sync validation)")
+    parser = argparse.ArgumentParser(
+        description="Programmatically run Airbyte ELT Connection"
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default=None,
+        help="Airbyte server host (default: localhost)",
+    )
+    parser.add_argument(
+        "--port", type=int, default=None, help="Airbyte server port (default: 8000)"
+    )
+    parser.add_argument(
+        "--sync-now", action="store_true", default=True, help="Trigger immediate sync"
+    )
+    parser.add_argument(
+        "--no-wait", action="store_true", help="Do not wait for sync completion"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=180, help="Sync timeout in seconds"
+    )
+    parser.add_argument(
+        "--source-file",
+        type=str,
+        default="data/processed/netflix_catalog_enriched_master.csv",
+        help="Source CSV file path",
+    )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Test mode (health check + direct sync validation)",
+    )
 
     args = parser.parse_args()
 

@@ -32,7 +32,9 @@ class TMDbExtractor:
             logger.debug("No valid TMDB_API_KEY set; returning mock TMDb results.")
             return self._get_mock_tmdb_search(title, year)
 
-        endpoint = "/search/tv" if media_type in ("series", "tv", "show") else "/search/movie"
+        endpoint = (
+            "/search/tv" if media_type in ("series", "tv", "show") else "/search/movie"
+        )
         url = f"{self.base_url}{endpoint}"
         params: Dict[str, Any] = {
             "api_key": self.api_key,
@@ -53,9 +55,15 @@ class TMDbExtractor:
 
             # If no results found in requested endpoint, fallback to cross-media search
             if not results:
-                alt_endpoint = "/search/movie" if endpoint == "/search/tv" else "/search/tv"
+                alt_endpoint = (
+                    "/search/movie" if endpoint == "/search/tv" else "/search/tv"
+                )
                 alt_url = f"{self.base_url}{alt_endpoint}"
-                alt_params = {"api_key": self.api_key, "query": title, "include_adult": False}
+                alt_params = {
+                    "api_key": self.api_key,
+                    "query": title,
+                    "include_adult": False,
+                }
                 alt_resp = requests.get(alt_url, params=alt_params, timeout=10)
                 if alt_resp.status_code == 200:
                     results = alt_resp.json().get("results", [])
@@ -65,12 +73,18 @@ class TMDbExtractor:
             logger.error(f"Error querying TMDb search for '{title}': {err}")
             return []
 
-    def get_details(self, tmdb_id: int, media_type: str = "movie") -> Optional[Dict[str, Any]]:
+    def get_details(
+        self, tmdb_id: int, media_type: str = "movie"
+    ) -> Optional[Dict[str, Any]]:
         """Fetch full details and credit metrics for a given TMDb entity."""
         if not self.api_key or self.api_key.startswith("your_"):
             return None
 
-        endpoint = f"/tv/{tmdb_id}" if media_type in ("series", "tv", "show") else f"/movie/{tmdb_id}"
+        endpoint = (
+            f"/tv/{tmdb_id}"
+            if media_type in ("series", "tv", "show")
+            else f"/movie/{tmdb_id}"
+        )
         url = f"{self.base_url}{endpoint}"
         params = {"api_key": self.api_key, "append_to_response": "credits,keywords"}
 
@@ -82,7 +96,9 @@ class TMDbExtractor:
             logger.error(f"Error querying TMDb details for id={tmdb_id}: {err}")
             return None
 
-    def _get_mock_tmdb_search(self, title: str, year: Optional[int]) -> List[Dict[str, Any]]:
+    def _get_mock_tmdb_search(
+        self, title: str, year: Optional[int]
+    ) -> List[Dict[str, Any]]:
         """Mock fallback TMDb data for local offline testing."""
         mock_db = {
             "stranger things": [

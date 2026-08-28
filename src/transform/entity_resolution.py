@@ -42,8 +42,14 @@ class EntityResolver:
             similarity = max(ratio, token_sort)
 
             # Year penalty or boost
-            cand_date = candidate.get("release_date") or candidate.get("first_air_date") or ""
-            cand_year = int(cand_date[:4]) if len(cand_date) >= 4 and cand_date[:4].isdigit() else None
+            cand_date = (
+                candidate.get("release_date") or candidate.get("first_air_date") or ""
+            )
+            cand_year = (
+                int(cand_date[:4])
+                if len(cand_date) >= 4 and cand_date[:4].isdigit()
+                else None
+            )
 
             confidence = similarity
             if netflix_year and cand_year:
@@ -65,5 +71,7 @@ class EntityResolver:
             )
             return best_candidate, best_score
 
-        logger.debug(f"No confident match for '{netflix_title}' (best score: {best_score:.1f})")
+        logger.debug(
+            f"No confident match for '{netflix_title}' (best score: {best_score:.1f})"
+        )
         return None, best_score

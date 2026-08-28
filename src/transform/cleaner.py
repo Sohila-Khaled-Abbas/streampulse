@@ -37,7 +37,11 @@ def clean_title_record(raw: Dict[str, Any]) -> Dict[str, Any]:
         "netflix_id": str(raw.get("id") or raw.get("netflix_id")),
         "title": str(raw.get("title", "")).strip(),
         "normalized_title": normalize_title(str(raw.get("title", ""))),
-        "media_type": "series" if str(raw.get("type", "")).lower() in ("series", "tv", "show") else "movie",
+        "media_type": (
+            "series"
+            if str(raw.get("type", "")).lower() in ("series", "tv", "show")
+            else "movie"
+        ),
         "synopsis": raw.get("synopsis") or raw.get("overview") or "",
         "release_year": year_int,
         "runtime_minutes": runtime_mins,

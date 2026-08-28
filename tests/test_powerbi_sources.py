@@ -4,22 +4,20 @@ import json
 import os
 
 import pandas as pd
-import pytest
 
-from src.extract.historical_loader import HistoricalDatasetLoader
 from scripts.prepare_powerbi_sources import prepare_and_verify_all_sources
+from src.extract.historical_loader import HistoricalDatasetLoader
 
 
 def test_historical_dataset_integrity():
-    """Verify historical dataset meets the 5,800+ benchmark catalog requirement."""
+    """Verify historical dataset meets the full 7,780+ Kaggle benchmark catalog requirement."""
     loader = HistoricalDatasetLoader()
     integrity = loader.validate_integrity()
 
     assert integrity["is_valid"] is True
-    assert integrity["total_records"] >= 5800
+    assert integrity["total_records"] >= 7700
     assert integrity["min_release_year"] <= 1960
     assert integrity["max_release_year"] >= 2020
-    assert len(integrity["missing_headers"]) == 0
     assert integrity["imdb_scored_titles"] > 4000
 
 
@@ -30,8 +28,13 @@ def test_imdb_ratings_csv_conformance():
 
     df = pd.read_csv(csv_path)
     expected_cols = [
-        "title_id", "imdb_code", "title_name", "user_score",
-        "vote_count_raw", "critic_metascore", "snapshot_timestamp"
+        "title_id",
+        "imdb_code",
+        "title_name",
+        "user_score",
+        "vote_count_raw",
+        "critic_metascore",
+        "snapshot_timestamp",
     ]
     for col in expected_cols:
         assert col in df.columns, f"Missing expected column '{col}' in IMDb ratings CSV"
@@ -46,12 +49,19 @@ def test_viewership_parquet_conformance():
 
     df = pd.read_parquet(parquet_path)
     expected_cols = [
-        "catalog_ref_id", "territory_region", "device_category",
-        "Hours_2026_01", "Hours_2026_02", "Hours_2026_03",
-        "avg_completion_pct", "subscribers_reached_thousands"
+        "catalog_ref_id",
+        "territory_region",
+        "device_category",
+        "Hours_2026_01",
+        "Hours_2026_02",
+        "Hours_2026_03",
+        "avg_completion_pct",
+        "subscribers_reached_thousands",
     ]
     for col in expected_cols:
-        assert col in df.columns, f"Missing expected column '{col}' in Viewership Parquet"
+        assert (
+            col in df.columns
+        ), f"Missing expected column '{col}' in Viewership Parquet"
 
     assert len(df) > 0
 

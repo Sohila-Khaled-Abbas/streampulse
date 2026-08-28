@@ -7,7 +7,10 @@ from src.transform.entity_resolution import EntityResolver
 def test_normalize_title():
     """Test standardizing title text."""
     assert normalize_title("The Godfather: Part II") == "the godfather part 2"
-    assert normalize_title("Spider-Man: No Way Home (2021)") == "spider man no way home 2021"
+    assert (
+        normalize_title("Spider-Man: No Way Home (2021)")
+        == "spider man no way home 2021"
+    )
     assert normalize_title("  Stranger   Things! ") == "stranger things"
 
 
@@ -49,7 +52,11 @@ def test_entity_resolver_no_match():
     """Test filtering out irrelevant candidates."""
     resolver = EntityResolver(match_threshold=85.0)
     candidates = [
-        {"id": 999, "name": "Completely Unrelated Movie", "first_air_date": "1990-01-01"}
+        {
+            "id": 999,
+            "name": "Completely Unrelated Movie",
+            "first_air_date": "1990-01-01",
+        }
     ]
     match, score = resolver.resolve(
         netflix_title="Stranger Things",

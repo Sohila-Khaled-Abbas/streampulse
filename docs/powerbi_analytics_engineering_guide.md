@@ -34,7 +34,7 @@ Open **Power BI Desktop** $\to$ click **Get Data** for each of the following 5 i
 | # | Source Name | Connector Type | Location / Connection String | Purpose & Data Volume |
 | :- | :--- | :--- | :--- | :--- |
 | **1** | `stg_netflix_titles` | **PostgreSQL Database** | Server: `localhost:5432`<br>Database: `streampulse`<br>Table: `staging.stg_netflix_titles` | Live 2026/2025 scraped releases & daily Airbyte sync |
-| **2** | `Raw_Historical_Archive` | **Text/CSV** | Path: `data/raw/netflix_enriched_historical.csv` | Historical benchmark catalog (5,800+ titles, 1945–2024) |
+| **2** | `Raw_Historical_Archive` | **Text/CSV** | Path: `data/raw/netflix_enriched_historical.csv` | Full Kaggle benchmark catalog (7,786 titles from `zohairbaloch/netflix-titles-enriched-with-imdb-and-tmdb`) |
 | **3** | `Raw_IMDb_Ratings` | **Text/CSV** | Path: `data/raw/imdb_external_ratings.csv` | Live periodic audience ratings snapshot |
 | **4** | `Raw_Viewership_Parquet` | **Parquet** | Path: `data/raw/streaming_viewership_wide.parquet` | Granular telemetry & viewership metrics lakehouse |
 | **5** | `Raw_Budget_JSON` | **JSON** | Path: `data/raw/boxoffice_budget_feed.json` | Production budget, box office, and talent feeds |
@@ -50,7 +50,7 @@ Here is the exact M code to transform the 5 dirty sources into the **6 clean Kim
 ---
 
 ### Table 1: `Dim_Titles` (Unified Conformed Title Dimension)
-*Appends Live 2026/2025 titles (`stg_netflix_titles`) with 5,800+ historical records from `Raw_Historical_Archive`, cleans text whitespace, non-breaking spaces `\xa0`, parses heterogeneous dates, standardizes runtime minutes, and adds surrogate key `title_key`.*
+*Appends Live 2026/2025 titles (`stg_netflix_titles`) with 7,786 historical records from `Raw_Historical_Archive` (`zohairbaloch/netflix-titles-enriched-with-imdb-and-tmdb`), cleans text whitespace, non-breaking spaces `\xa0`, parses heterogeneous dates, standardizes runtime minutes, and adds surrogate key `title_key`.*
 
 ```powerquery
 let
@@ -103,9 +103,9 @@ let
     }),
 
     // -------------------------------------------------------------
-    // Part B: Extract & Clean 5,800+ Historical Benchmark Records
+    // Part B: Extract & Clean 7,786 Historical Benchmark Records
     // -------------------------------------------------------------
-    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
     PromotedHeadersHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
 
     ScrubHist = Table.TransformColumns(PromotedHeadersHist, {
@@ -203,8 +203,8 @@ let
     }),
     SelectJSONBridge = Table.SelectColumns(CleanGenreNameJSON, {"netflix_id", "Genre_List"}),
 
-    // 2. Historical CSV Source Genres
-    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    // 2. Historical CSV Source Genres (7,786 Kaggle records)
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
     PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
     CleanHistGenres = Table.AddColumn(PromotedHist, "Genre_List", each
         let
@@ -358,9 +358,9 @@ let
     }),
 
     // -------------------------------------------------------------
-    // Part B: Historical Ratings (from Raw_Historical_Archive)
+    // Part B: Historical Ratings (from Raw_Historical_Archive, 7,786 records)
     // -------------------------------------------------------------
-    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
     PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
 
     AddHistDateKey = Table.AddColumn(PromotedHist, "date_key", each

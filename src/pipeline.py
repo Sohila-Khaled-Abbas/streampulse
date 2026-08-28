@@ -44,10 +44,16 @@ def run_pipeline_step(
     if years is None:
         years = [2026, 2025]
 
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
     logger.info(f"[PIPELINE] STREAMPULSE ELT RUN: [MODE={mode.upper()}]")
-    logger.info(f"Target Years: {years} | Scrape Limit: {limit} | Historical: {include_historical}")
-    logger.info("================================================================================")
+    logger.info(
+        f"Target Years: {years} | Scrape Limit: {limit} | Historical: {include_historical}"
+    )
+    logger.info(
+        "================================================================================"
+    )
 
     # -------------------------------------------------------------------------
     # STEP 1: Ingestion & Live 2026 Web Scraping
@@ -57,9 +63,11 @@ def run_pipeline_step(
 
     # 1.1 Historical Baseline (if requested)
     if include_historical or mode == "full":
-        logger.info("Loading historical Kaggle enriched benchmark dataset...")
+        logger.info(
+            "Loading historical Kaggle enriched benchmark dataset (full catalog)..."
+        )
         hist_loader = HistoricalDatasetLoader()
-        hist_records = hist_loader.load_historical_records(limit=settings.batch_size)
+        hist_records = hist_loader.load_historical_records(limit=None)
         logger.info(f"[OK] Ingested {len(hist_records):,} historical baseline titles.")
         all_raw_titles.extend(hist_records)
 
@@ -70,7 +78,9 @@ def run_pipeline_step(
     if use_rapidapi:
         logger.info("Extracting live catalog additions from RapidAPI Netflix...")
         netflix_extractor = NetflixExtractor()
-        rapid_titles = netflix_extractor.fetch_recent_additions(days_back=14, limit=limit)
+        rapid_titles = netflix_extractor.fetch_recent_additions(
+            days_back=14, limit=limit
+        )
         logger.info(f"[OK] Ingested {len(rapid_titles)} titles from RapidAPI.")
         all_raw_titles.extend(rapid_titles)
 
@@ -108,7 +118,9 @@ def run_pipeline_step(
                 cleaned["genre"] = raw["genre"]
             cleaned_records.append(cleaned)
 
-    logger.info(f"[OK] Standardized and deduplicated {len(cleaned_records):,} title records.")
+    logger.info(
+        f"[OK] Standardized and deduplicated {len(cleaned_records):,} title records."
+    )
 
     # -------------------------------------------------------------------------
     # STEP 3: Entity Resolution & Audience Metrics Enrichment
@@ -129,7 +141,9 @@ def run_pipeline_step(
         media_type = record["media_type"]
 
         # If already enriched from Kaggle historical dataset
-        if record.get("source") == "kaggle_historical_enriched" and record.get("tmdb_score"):
+        if record.get("source") == "kaggle_historical_enriched" and record.get(
+            "tmdb_score"
+        ):
             enriched = {
                 **record,
                 "tmdb_id": record.get("imdb_id") or record.get("netflix_id"),
@@ -145,7 +159,9 @@ def run_pipeline_step(
         matched_candidate = None
         match_score = 0.0
         if has_tmdb_key:
-            candidates = tmdb_extractor.search_title(title=title, year=year, media_type=media_type)
+            candidates = tmdb_extractor.search_title(
+                title=title, year=year, media_type=media_type
+            )
             matched_candidate, match_score = resolver.resolve(
                 netflix_title=title, netflix_year=year, candidates=candidates
             )
@@ -173,10 +189,14 @@ def run_pipeline_step(
     # STEP 5: Warehouse Loading & Artifact Export
     # -------------------------------------------------------------------------
     logger.info("--- STEP 5/5: WAREHOUSE LOADING & MASTER EXPORT ---")
-    load_summary = warehouse_loader.load_pipeline_records(resolved_records, dry_run=dry_run)
+    load_summary = warehouse_loader.load_pipeline_records(
+        resolved_records, dry_run=dry_run
+    )
 
     # Print 2026 Sample Highlights
-    sample_2026 = [r for r in resolved_records if (r.get("release_year") or 0) == 2026][:5]
+    sample_2026 = [r for r in resolved_records if (r.get("release_year") or 0) == 2026][
+        :5
+    ]
     if sample_2026:
         logger.info("[HIGHLIGHTS] Live 2026 Catalog Highlights Preview:")
         for idx, item in enumerate(sample_2026, 1):
@@ -187,14 +207,18 @@ def run_pipeline_step(
                 f"Source: {item.get('source')}"
             )
 
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
     logger.info("[SUCCESS] STREAMPULSE ELT PIPELINE COMPLETED SUCCESSFULLY")
     logger.info(
         f"Processed: {len(resolved_records):,} titles | "
         f"Quality: {profile_report.get('quality_score', 100)}% | "
         f"Parquet: {load_summary.get('exported_parquet')}"
     )
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
 
     return {
         "records_count": len(resolved_records),
@@ -203,17 +227,27 @@ def run_pipeline_step(
     }
 
 
-def start_streaming_daemon(interval_seconds: int = 60, years: Optional[List[int]] = None) -> None:
+def start_streaming_daemon(
+    interval_seconds: int = 60, years: Optional[List[int]] = None
+) -> None:
     """Run real-time continuous streaming ingestion daemon."""
-    logger.info("================================================================================")
-    logger.info(f"[STREAM] STARTING REAL-TIME STREAMING DAEMON (Polling every {interval_seconds}s)")
+    logger.info(
+        "================================================================================"
+    )
+    logger.info(
+        f"[STREAM] STARTING REAL-TIME STREAMING DAEMON (Polling every {interval_seconds}s)"
+    )
     logger.info("Press Ctrl+C to terminate streaming daemon.")
-    logger.info("================================================================================")
+    logger.info(
+        "================================================================================"
+    )
 
     cycle = 1
     try:
         while True:
-            logger.info(f"\n[STREAM CYCLE #{cycle}] Polling live stream feeds at {time.strftime('%Y-%m-%d %H:%M:%S')}...")
+            logger.info(
+                f"\n[STREAM CYCLE #{cycle}] Polling live stream feeds at {time.strftime('%Y-%m-%d %H:%M:%S')}..."
+            )
             run_pipeline_step(
                 mode="live",
                 years=years or [2026],
@@ -222,7 +256,9 @@ def start_streaming_daemon(interval_seconds: int = 60, years: Optional[List[int]
                 dry_run=False,
             )
             cycle += 1
-            logger.info(f"Sleeping for {interval_seconds} seconds until next real-time poll...")
+            logger.info(
+                f"Sleeping for {interval_seconds} seconds until next real-time poll..."
+            )
             time.sleep(interval_seconds)
     except KeyboardInterrupt:
         logger.info("[STREAM] Real-time streaming daemon stopped by user.")
@@ -273,10 +309,14 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     """CLI Entry Point."""
     args = parse_args()
-    parsed_years = [int(y.strip()) for y in args.years.split(",") if y.strip().isdigit()]
+    parsed_years = [
+        int(y.strip()) for y in args.years.split(",") if y.strip().isdigit()
+    ]
 
     if args.mode == "stream":
-        start_streaming_daemon(interval_seconds=args.stream_interval, years=parsed_years)
+        start_streaming_daemon(
+            interval_seconds=args.stream_interval, years=parsed_years
+        )
     else:
         run_pipeline_step(
             mode=args.mode,

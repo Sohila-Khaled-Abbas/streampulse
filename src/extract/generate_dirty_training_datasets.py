@@ -16,7 +16,9 @@ import random
 import sys
 
 # Ensure project root is in sys.path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 import pandas as pd
 
@@ -24,24 +26,104 @@ from src.utils.db import db_manager
 from src.utils.logger import logger
 
 TITLES_SEED = [
-    {"netflix_id": "8001", "canonical": "Avatar: Fire and Ash", "year": 2026, "type": "movie"},
-    {"netflix_id": "8002", "canonical": "Stranger Things: The Final Season", "year": 2026, "type": "tv"},
-    {"netflix_id": "8003", "canonical": "Avengers: Doomsday", "year": 2026, "type": "movie"},
-    {"netflix_id": "8004", "canonical": "Wednesday: Season 2", "year": 2026, "type": "tv"},
-    {"netflix_id": "8005", "canonical": "Peaky Blinders: The Immortal Man", "year": 2026, "type": "movie"},
-    {"netflix_id": "8006", "canonical": "The Batman Part II", "year": 2026, "type": "movie"},
-    {"netflix_id": "8007", "canonical": "Squid Game: The Final Game", "year": 2026, "type": "tv"},
-    {"netflix_id": "8008", "canonical": "Dune: Part Three (Messiah)", "year": 2026, "type": "movie"},
-    {"netflix_id": "8009", "canonical": "Bridgerton: Season 4", "year": 2026, "type": "tv"},
-    {"netflix_id": "8010", "canonical": "Spider-Man: Beyond the Spider-Verse", "year": 2026, "type": "movie"},
-    {"netflix_id": "8011", "canonical": "The Mandalorian & Grogu", "year": 2026, "type": "movie"},
-    {"netflix_id": "8012", "canonical": "One Piece: Season 2", "year": 2026, "type": "tv"},
-    {"netflix_id": "8013", "canonical": "Blade Runner 2099", "year": 2026, "type": "tv"},
+    {
+        "netflix_id": "8001",
+        "canonical": "Avatar: Fire and Ash",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8002",
+        "canonical": "Stranger Things: The Final Season",
+        "year": 2026,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8003",
+        "canonical": "Avengers: Doomsday",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8004",
+        "canonical": "Wednesday: Season 2",
+        "year": 2026,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8005",
+        "canonical": "Peaky Blinders: The Immortal Man",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8006",
+        "canonical": "The Batman Part II",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8007",
+        "canonical": "Squid Game: The Final Game",
+        "year": 2026,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8008",
+        "canonical": "Dune: Part Three (Messiah)",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8009",
+        "canonical": "Bridgerton: Season 4",
+        "year": 2026,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8010",
+        "canonical": "Spider-Man: Beyond the Spider-Verse",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8011",
+        "canonical": "The Mandalorian & Grogu",
+        "year": 2026,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8012",
+        "canonical": "One Piece: Season 2",
+        "year": 2026,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8013",
+        "canonical": "Blade Runner 2099",
+        "year": 2026,
+        "type": "tv",
+    },
     {"netflix_id": "8014", "canonical": "BioShock", "year": 2026, "type": "movie"},
     {"netflix_id": "8015", "canonical": "Gears of War", "year": 2026, "type": "movie"},
-    {"netflix_id": "8016", "canonical": "The Witcher: Sirens of the Deep", "year": 2025, "type": "movie"},
-    {"netflix_id": "8017", "canonical": "Squid Game: Season 2", "year": 2024, "type": "tv"},
-    {"netflix_id": "8018", "canonical": "Dune: Part Two", "year": 2024, "type": "movie"},
+    {
+        "netflix_id": "8016",
+        "canonical": "The Witcher: Sirens of the Deep",
+        "year": 2025,
+        "type": "movie",
+    },
+    {
+        "netflix_id": "8017",
+        "canonical": "Squid Game: Season 2",
+        "year": 2024,
+        "type": "tv",
+    },
+    {
+        "netflix_id": "8018",
+        "canonical": "Dune: Part Two",
+        "year": 2024,
+        "type": "movie",
+    },
     {"netflix_id": "8019", "canonical": "Oppenheimer", "year": 2023, "type": "movie"},
     {"netflix_id": "8020", "canonical": "Red Notice", "year": 2021, "type": "movie"},
 ]
@@ -49,7 +131,9 @@ TITLES_SEED = [
 
 def generate_source_1_postgres_staging():
     """Seed PostgreSQL staging table with realistic dirty data (text casing, spaces, date formats)."""
-    logger.info("Generating Source 1: PostgreSQL staging.stg_netflix_titles (Dirty staging table)...")
+    logger.info(
+        "Generating Source 1: PostgreSQL staging.stg_netflix_titles (Dirty staging table)..."
+    )
     if not db_manager.test_connection():
         logger.warning("PostgreSQL offline; skipping direct DB seed.")
         return
@@ -95,36 +179,60 @@ def generate_source_1_postgres_staging():
                     "2026.02.01",
                     "2026-03-10",
                     "Invalid Date",
-                    "null"
+                    "null",
                 ]
                 dirty_date = date_variations[int(nid) % len(date_variations)]
 
                 # Problem 3: Dirty runtime formats
                 runtime_variations = [
-                    "5400", "90 mins", "1h 45m", "7200s", "-1", "Unknown", "125 min"
+                    "5400",
+                    "90 mins",
+                    "1h 45m",
+                    "7200s",
+                    "-1",
+                    "Unknown",
+                    "125 min",
                 ]
                 dirty_runtime = runtime_variations[int(nid) % len(runtime_variations)]
 
                 # Problem 4: Dirty maturity rating
-                rating_variations = ["TV-MA", "tv ma", "R", "PG-13", "pg 13", "18+", "N/A"]
+                rating_variations = [
+                    "TV-MA",
+                    "tv ma",
+                    "R",
+                    "PG-13",
+                    "pg 13",
+                    "18+",
+                    "N/A",
+                ]
                 dirty_rating = rating_variations[int(nid) % len(rating_variations)]
 
-                raw_json = json.dumps({
-                    "stream_provider": "Netflix Originals Global",
-                    "source_feed": "WebScraper_2026_Live",
-                    "ingestion_batch_id": f"BATCH_{nid}_2026",
-                    "metadata": {
-                        "director_note": "Awaiting final theatrical drop",
-                        "audio_tracks": ["en-US", "es-ES", "ja-JP"],
-                        "hdr_format": "Dolby Vision"
+                raw_json = json.dumps(
+                    {
+                        "stream_provider": "Netflix Originals Global",
+                        "source_feed": "WebScraper_2026_Live",
+                        "ingestion_batch_id": f"BATCH_{nid}_2026",
+                        "metadata": {
+                            "director_note": "Awaiting final theatrical drop",
+                            "audio_tracks": ["en-US", "es-ES", "ja-JP"],
+                            "hdr_format": "Dolby Vision",
+                        },
                     }
-                })
+                )
 
-                dirty_staging_rows.append((
-                    nid, dirty_title, item["type"],
-                    f"Official synopsis for {t}. Contains high stakes drama and streaming excitement.",
-                    item["year"], dirty_date, dirty_runtime, dirty_rating, raw_json
-                ))
+                dirty_staging_rows.append(
+                    (
+                        nid,
+                        dirty_title,
+                        item["type"],
+                        f"Official synopsis for {t}. Contains high stakes drama and streaming excitement.",
+                        item["year"],
+                        dirty_date,
+                        dirty_runtime,
+                        dirty_rating,
+                        raw_json,
+                    )
+                )
 
             insert_stmt = """
                 INSERT INTO staging.stg_netflix_titles (
@@ -147,7 +255,9 @@ def generate_source_1_postgres_staging():
 
 def generate_source_2_csv_imdb_ratings():
     """Generate CSV file with shorthand votes, dirty IDs, and duplicate snapshots."""
-    logger.info("Generating Source 2: data/raw/imdb_external_ratings.csv (Dirty CSV)...")
+    logger.info(
+        "Generating Source 2: data/raw/imdb_external_ratings.csv (Dirty CSV)..."
+    )
     file_path = os.path.join("data", "raw", "imdb_external_ratings.csv")
 
     rows = []
@@ -163,40 +273,69 @@ def generate_source_2_csv_imdb_ratings():
             imdb_id = f"{int(nid)*1000}"
 
         # Problem 2: Shorthand string votes ('1.2M', '450K', '85,420')
-        vote_shorthands = ["1.4M", "850K", "45.2K", "120,400", "950", "N/A", "2.1M", "15K"]
+        vote_shorthands = [
+            "1.4M",
+            "850K",
+            "45.2K",
+            "120,400",
+            "950",
+            "N/A",
+            "2.1M",
+            "15K",
+        ]
         votes = vote_shorthands[int(nid) % len(vote_shorthands)]
 
         # Problem 3: Out-of-bounds or text ratings ('8.4', '12.5/10', '92%', 'null')
-        ratings_dirty = ["8.4", "7.8", "9.1", "12.5/10", "88%", "6.5", "null", "7.9", "8.9"]
+        ratings_dirty = [
+            "8.4",
+            "7.8",
+            "9.1",
+            "12.5/10",
+            "88%",
+            "6.5",
+            "null",
+            "7.9",
+            "8.9",
+        ]
         rating = ratings_dirty[int(nid) % len(ratings_dirty)]
 
         # Problem 4: Match Title with slightly different naming
-        matched_title = item["canonical"].replace(":", " -") if ":" in item["canonical"] else item["canonical"]
+        matched_title = (
+            item["canonical"].replace(":", " -")
+            if ":" in item["canonical"]
+            else item["canonical"]
+        )
 
         # Snapshot 1
-        rows.append({
-            "title_id": nid,
-            "imdb_code": imdb_id,
-            "title_name": matched_title,
-            "user_score": rating,
-            "vote_count_raw": votes,
-            "critic_metascore": random.randint(55, 95),
-            "review_sentiment": random.choice(["Overwhelmingly Positive", "Positive", "Mixed", "N/A"]),
-            "snapshot_timestamp": "2026-02-01 10:00:00"
-        })
-
-        # Problem 5: Duplicate Snapshot row with newer timestamp (requires deduplication in Power Query)
-        if int(nid) in [8001, 8002, 8003, 8008]:
-            rows.append({
+        rows.append(
+            {
                 "title_id": nid,
                 "imdb_code": imdb_id,
                 "title_name": matched_title,
-                "user_score": "8.8",
-                "vote_count_raw": "1.6M",
-                "critic_metascore": 94,
-                "review_sentiment": "Universal Acclaim",
-                "snapshot_timestamp": "2026-02-15 18:30:00"  # Newer snapshot
-            })
+                "user_score": rating,
+                "vote_count_raw": votes,
+                "critic_metascore": random.randint(55, 95),
+                "review_sentiment": random.choice(
+                    ["Overwhelmingly Positive", "Positive", "Mixed", "N/A"]
+                ),
+                "snapshot_timestamp": "2026-02-01 10:00:00",
+            }
+        )
+
+        # Problem 5: Duplicate Snapshot row with newer timestamp (requires deduplication in Power Query)
+        if int(nid) in [8001, 8002, 8003, 8008]:
+            rows.append(
+                {
+                    "title_id": nid,
+                    "imdb_code": imdb_id,
+                    "title_name": matched_title,
+                    "user_score": "8.8",
+                    "vote_count_raw": "1.6M",
+                    "critic_metascore": 94,
+                    "review_sentiment": "Universal Acclaim",
+                    "snapshot_timestamp": "2026-02-15 18:30:00",  # Newer snapshot
+                }
+            )
 
     with open(file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
@@ -208,11 +347,28 @@ def generate_source_2_csv_imdb_ratings():
 
 def generate_source_3_parquet_viewership():
     """Generate Parquet file in wide unpivoted format with country anomalies and sentinel values."""
-    logger.info("Generating Source 3: data/raw/streaming_viewership_wide.parquet (Dirty Wide Parquet)...")
+    logger.info(
+        "Generating Source 3: data/raw/streaming_viewership_wide.parquet (Dirty Wide Parquet)..."
+    )
     file_path = os.path.join("data", "raw", "streaming_viewership_wide.parquet")
 
     records = []
-    countries = ["USA", "US", "United States", "u.s.a.", "UK", "GBR", "Great Britain", "South Korea", "KOR", "Japan", "JPN", "Germany", "DEU", "Global"]
+    countries = [
+        "USA",
+        "US",
+        "United States",
+        "u.s.a.",
+        "UK",
+        "GBR",
+        "Great Britain",
+        "South Korea",
+        "KOR",
+        "Japan",
+        "JPN",
+        "Germany",
+        "DEU",
+        "Global",
+    ]
 
     for item in TITLES_SEED:
         nid = item["netflix_id"]
@@ -226,20 +382,26 @@ def generate_source_3_parquet_viewership():
         feb_hours = round(random.uniform(8.0, 60.0), 2) if int(nid) != 8009 else -1.0
         mar_hours = round(random.uniform(10.0, 75.0), 2)
 
-        completion_pct = round(random.uniform(60.0, 95.0), 1) if int(nid) != 8014 else 150.0  # Out of range 150%
+        completion_pct = (
+            round(random.uniform(60.0, 95.0), 1) if int(nid) != 8014 else 150.0
+        )  # Out of range 150%
 
-        records.append({
-            "catalog_ref_id": nid,
-            "title_alias": item["canonical"],
-            "territory_region": c_choice,
-            "device_category": random.choice(["Smart TV", "Mobile", "Web Browser", "Console", "Tablet"]),
-            "Hours_2026_01": jan_hours,
-            "Hours_2026_02": feb_hours,
-            "Hours_2026_03": mar_hours,
-            "avg_completion_pct": completion_pct,
-            "subscribers_reached_thousands": random.randint(500, 15000),
-            "data_quality_flag": "RAW_TELEMETRY"
-        })
+        records.append(
+            {
+                "catalog_ref_id": nid,
+                "title_alias": item["canonical"],
+                "territory_region": c_choice,
+                "device_category": random.choice(
+                    ["Smart TV", "Mobile", "Web Browser", "Console", "Tablet"]
+                ),
+                "Hours_2026_01": jan_hours,
+                "Hours_2026_02": feb_hours,
+                "Hours_2026_03": mar_hours,
+                "avg_completion_pct": completion_pct,
+                "subscribers_reached_thousands": random.randint(500, 15000),
+                "data_quality_flag": "RAW_TELEMETRY",
+            }
+        )
 
     df = pd.DataFrame(records)
     df.to_parquet(file_path, engine="pyarrow", index=False, compression="snappy")
@@ -248,7 +410,9 @@ def generate_source_3_parquet_viewership():
 
 def generate_source_4_json_budget_feed():
     """Generate JSON file with dirty currency formats, pipe-delimited genres, and nested structures."""
-    logger.info("Generating Source 4: data/raw/boxoffice_budget_feed.json (Dirty JSON Feed)...")
+    logger.info(
+        "Generating Source 4: data/raw/boxoffice_budget_feed.json (Dirty JSON Feed)..."
+    )
     file_path = os.path.join("data", "raw", "boxoffice_budget_feed.json")
 
     feed_data = []
@@ -266,7 +430,7 @@ def generate_source_4_json_budget_feed():
             "Unknown",
             "N/A",
             "$80 million",
-            "$300M"
+            "$300M",
         ]
         dirty_budget = budget_strings[int(nid) % len(budget_strings)]
 
@@ -278,29 +442,69 @@ def generate_source_4_json_budget_feed():
 
         # Problem 3: Dirty worldwide box office / SVOD revenue
         revenue_values = [
-            "$1.2 Billion", "$450,000,000", "€120M", "N/A - Direct to SVOD", "$850.5M", "TBD"
+            "$1.2 Billion",
+            "$450,000,000",
+            "€120M",
+            "N/A - Direct to SVOD",
+            "$850.5M",
+            "TBD",
         ]
         dirty_rev = revenue_values[int(nid) % len(revenue_values)]
 
-        feed_data.append({
-            "stream_id": nid,
-            "production_info": {
-                "title": t,
-                "studio": random.choice(["Warner Bros.", "Paramount", "Netflix Studios", "A24", "Universal", "Sony Pictures"]),
-                "producer": random.choice(["Jerry Bruckheimer", "Kathleen Kennedy", "Jason Blum", "Emma Thomas", "Kevin Feige"]),
-                "production_budget_raw": dirty_budget,
-                "worldwide_gross_raw": dirty_rev,
-            },
-            "categorization": {
-                "genres": genres_obj,
-                "content_warnings": ["Violence", "Language", "Flashing Lights"] if int(nid) % 3 == 0 else []
-            },
-            "financial_roi_tier": random.choice(["Blockbuster Hit", "Profitable", "Break Even", "Underperformer", "Unreported"]),
-            "last_synced_utc": "2026-02-27T19:00:00Z"
-        })
+        feed_data.append(
+            {
+                "stream_id": nid,
+                "production_info": {
+                    "title": t,
+                    "studio": random.choice(
+                        [
+                            "Warner Bros.",
+                            "Paramount",
+                            "Netflix Studios",
+                            "A24",
+                            "Universal",
+                            "Sony Pictures",
+                        ]
+                    ),
+                    "producer": random.choice(
+                        [
+                            "Jerry Bruckheimer",
+                            "Kathleen Kennedy",
+                            "Jason Blum",
+                            "Emma Thomas",
+                            "Kevin Feige",
+                        ]
+                    ),
+                    "production_budget_raw": dirty_budget,
+                    "worldwide_gross_raw": dirty_rev,
+                },
+                "categorization": {
+                    "genres": genres_obj,
+                    "content_warnings": (
+                        ["Violence", "Language", "Flashing Lights"]
+                        if int(nid) % 3 == 0
+                        else []
+                    ),
+                },
+                "financial_roi_tier": random.choice(
+                    [
+                        "Blockbuster Hit",
+                        "Profitable",
+                        "Break Even",
+                        "Underperformer",
+                        "Unreported",
+                    ]
+                ),
+                "last_synced_utc": "2026-02-27T19:00:00Z",
+            }
+        )
 
     with open(file_path, "w", encoding="utf-8") as f:
-        json.dump({"api_version": "v2.6", "total_records": len(feed_data), "data": feed_data}, f, indent=2)
+        json.dump(
+            {"api_version": "v2.6", "total_records": len(feed_data), "data": feed_data},
+            f,
+            indent=2,
+        )
 
     logger.info(f"Source 4 JSON generated at {file_path} ({len(feed_data)} items).")
 

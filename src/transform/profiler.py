@@ -30,13 +30,26 @@ class DataProfiler:
         # 1. Null / Completeness Audit
         field_stats: Dict[str, Dict[str, Any]] = {}
         target_fields = [
-            "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
-            "maturity_rating", "vote_average", "vote_count", "popularity",
-            "match_confidence", "date_added", "source"
+            "netflix_id",
+            "title",
+            "media_type",
+            "release_year",
+            "runtime_minutes",
+            "maturity_rating",
+            "vote_average",
+            "vote_count",
+            "popularity",
+            "match_confidence",
+            "date_added",
+            "source",
         ]
 
         for field in target_fields:
-            non_null_count = sum(1 for r in records if r.get(field) is not None and str(r.get(field)).strip() != "")
+            non_null_count = sum(
+                1
+                for r in records
+                if r.get(field) is not None and str(r.get(field)).strip() != ""
+            )
             completeness_pct = round((non_null_count / total_count) * 100, 2)
             field_stats[field] = {
                 "present_count": non_null_count,
@@ -48,7 +61,11 @@ class DataProfiler:
         era_counts = {"2026_live": 0, "2024_2025_modern": 0, "historical_archive": 0}
         type_counts = {"movie": 0, "series": 0}
         ratings_tiers = {"top_rated": 0, "good": 0, "mixed": 0, "unrated": 0}
-        match_confidence_tiers = {"high_confidence_ge_90": 0, "medium_confidence_75_89": 0, "low_confidence_lt_75": 0}
+        match_confidence_tiers = {
+            "high_confidence_ge_90": 0,
+            "medium_confidence_75_89": 0,
+            "low_confidence_lt_75": 0,
+        }
 
         ratings_list: List[float] = []
         popularity_list: List[float] = []
@@ -71,7 +88,11 @@ class DataProfiler:
 
             # Rating
             vote_avg = r.get("vote_average")
-            if vote_avg is not None and isinstance(vote_avg, (int, float)) and vote_avg > 0:
+            if (
+                vote_avg is not None
+                and isinstance(vote_avg, (int, float))
+                and vote_avg > 0
+            ):
                 ratings_list.append(float(vote_avg))
                 if vote_avg >= 8.0:
                     ratings_tiers["top_rated"] += 1
@@ -113,24 +134,40 @@ class DataProfiler:
                     if g_clean:
                         genre_freq[g_clean] = genre_freq.get(g_clean, 0) + 1
 
-        avg_rating = round(sum(ratings_list) / len(ratings_list), 2) if ratings_list else 0.0
-        avg_pop = round(sum(popularity_list) / len(popularity_list), 2) if popularity_list else 0.0
-        avg_runtime = round(sum(runtime_list) / len(runtime_list), 1) if runtime_list else 0.0
+        avg_rating = (
+            round(sum(ratings_list) / len(ratings_list), 2) if ratings_list else 0.0
+        )
+        avg_pop = (
+            round(sum(popularity_list) / len(popularity_list), 2)
+            if popularity_list
+            else 0.0
+        )
+        avg_runtime = (
+            round(sum(runtime_list) / len(runtime_list), 1) if runtime_list else 0.0
+        )
 
-        top_genres = dict(sorted(genre_freq.items(), key=lambda item: item[1], reverse=True)[:8])
+        top_genres = dict(
+            sorted(genre_freq.items(), key=lambda item: item[1], reverse=True)[:8]
+        )
 
         # 3. Overall Data Quality Score (0 - 100)
         title_completeness = field_stats.get("title", {}).get("completeness_pct", 100.0)
-        id_completeness = field_stats.get("netflix_id", {}).get("completeness_pct", 100.0)
-        year_completeness = field_stats.get("release_year", {}).get("completeness_pct", 100.0)
-        rating_completeness = field_stats.get("vote_average", {}).get("completeness_pct", 100.0)
+        id_completeness = field_stats.get("netflix_id", {}).get(
+            "completeness_pct", 100.0
+        )
+        year_completeness = field_stats.get("release_year", {}).get(
+            "completeness_pct", 100.0
+        )
+        rating_completeness = field_stats.get("vote_average", {}).get(
+            "completeness_pct", 100.0
+        )
 
         quality_score = round(
             (title_completeness * 0.35)
             + (id_completeness * 0.25)
             + (year_completeness * 0.20)
             + (rating_completeness * 0.20),
-            1
+            1,
         )
 
         validation_passed = bool(quality_score >= 85.0 and total_count > 0)
@@ -163,15 +200,21 @@ class DataProfiler:
 
     def _print_console_summary(self, report: Dict[str, Any]) -> None:
         """Prints a clean ASCII data profiling dashboard in the terminal logs."""
-        logger.info("================================================================================")
+        logger.info(
+            "================================================================================"
+        )
         logger.info("[REPORT] STREAMPULSE DATA QUALITY & CATALOG PROFILING REPORT")
-        logger.info("================================================================================")
+        logger.info(
+            "================================================================================"
+        )
         logger.info(
             f"Validation Status: [{report['validation_status']}] | "
             f"Quality Score: {report['quality_score']}% | "
             f"Total Processed: {report['total_records']:,} titles"
         )
-        logger.info("--------------------------------------------------------------------------------")
+        logger.info(
+            "--------------------------------------------------------------------------------"
+        )
         logger.info(
             f"Catalog Eras: 2026 Live: {report['era_breakdown']['2026_live']:,} | "
             f"2024-2025 Modern: {report['era_breakdown']['2024_2025_modern']:,} | "
@@ -193,7 +236,9 @@ class DataProfiler:
         logger.info(
             f"Top Genres: {', '.join([f'{k} ({v})' for k, v in list(report['top_genres'].items())[:5]])}"
         )
-        logger.info("================================================================================")
+        logger.info(
+            "================================================================================"
+        )
 
 
 data_profiler = DataProfiler()

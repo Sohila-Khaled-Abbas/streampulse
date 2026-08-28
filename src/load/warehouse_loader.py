@@ -86,7 +86,9 @@ class WarehouseLoader:
         # 1. Database Ingestion if connected and not dry_run
         if not dry_run and db_manager.test_connection():
             summary["db_connected"] = True
-            logger.info("Connected to PostgreSQL warehouse. Starting transactional load...")
+            logger.info(
+                "Connected to PostgreSQL warehouse. Starting transactional load..."
+            )
             try:
                 raw_conn = db_manager.engine.raw_connection()
                 try:
@@ -98,10 +100,14 @@ class WarehouseLoader:
                         summary["dim_genres_seeded"] = self._seed_dim_genres(cursor)
 
                         # 3. Load Staging
-                        summary["staging_inserted"] = self._load_staging(cursor, records)
+                        summary["staging_inserted"] = self._load_staging(
+                            cursor, records
+                        )
 
                         # 4. Load Dimensional Galaxy Model & Facts
-                        dim_t, dim_c, f_rat, f_perf = self._load_galaxy_schema(cursor, records)
+                        dim_t, dim_c, f_rat, f_perf = self._load_galaxy_schema(
+                            cursor, records
+                        )
                         summary["dim_titles_upserted"] = dim_t
                         summary["dim_crew_upserted"] = dim_c
                         summary["facts_ratings_recorded"] = f_rat
@@ -159,11 +165,25 @@ class WarehouseLoader:
             )
             fiscal_period = f"FY{year}-Q{quarter}"
 
-            date_rows.append((
-                date_key, curr, year, quarter, quarter_name, month_num, month_name,
-                month_short, week_of_year, day_of_month, day_of_week, day_name,
-                is_weekend, is_q_end, fiscal_period
-            ))
+            date_rows.append(
+                (
+                    date_key,
+                    curr,
+                    year,
+                    quarter,
+                    quarter_name,
+                    month_num,
+                    month_name,
+                    month_short,
+                    week_of_year,
+                    day_of_month,
+                    day_of_week,
+                    day_name,
+                    is_weekend,
+                    is_q_end,
+                    fiscal_period,
+                )
+            )
             curr += datetime.timedelta(days=1)
 
         insert_sql = """
@@ -291,7 +311,9 @@ class WarehouseLoader:
             netflix_id = str(r.get("netflix_id"))
             raw_tmdb = r.get("tmdb_id")
             try:
-                tmdb_id = int(raw_tmdb) if raw_tmdb and str(raw_tmdb).isdigit() else None
+                tmdb_id = (
+                    int(raw_tmdb) if raw_tmdb and str(raw_tmdb).isdigit() else None
+                )
             except Exception:
                 tmdb_id = None
 
@@ -326,7 +348,15 @@ class WarehouseLoader:
             budget_usd = round(base_budget * 1_000_000, 2)
 
             lang = random.choice(["en", "en", "en", "es", "ko", "ja", "fr"])
-            country = "United States" if lang == "en" else ("Spain" if lang == "es" else ("South Korea" if lang == "ko" else "Japan"))
+            country = (
+                "United States"
+                if lang == "en"
+                else (
+                    "Spain"
+                    if lang == "es"
+                    else ("South Korea" if lang == "ko" else "Japan")
+                )
+            )
 
             dim_params = (
                 netflix_id,
@@ -359,15 +389,30 @@ class WarehouseLoader:
             synopsis_lower = str(r.get("synopsis", "")).lower()
 
             matched_genres = []
-            if any(w in title_lower or w in synopsis_lower for w in ["action", "spy", "agent", "war", "fight"]):
+            if any(
+                w in title_lower or w in synopsis_lower
+                for w in ["action", "spy", "agent", "war", "fight"]
+            ):
                 matched_genres.append(genre_name_map.get("action"))
-            if any(w in title_lower or w in synopsis_lower for w in ["sci-fi", "space", "future", "alien", "cyber"]):
+            if any(
+                w in title_lower or w in synopsis_lower
+                for w in ["sci-fi", "space", "future", "alien", "cyber"]
+            ):
                 matched_genres.append(genre_name_map.get("science fiction"))
-            if any(w in title_lower or w in synopsis_lower for w in ["comedy", "funny", "laugh"]):
+            if any(
+                w in title_lower or w in synopsis_lower
+                for w in ["comedy", "funny", "laugh"]
+            ):
                 matched_genres.append(genre_name_map.get("comedy"))
-            if any(w in title_lower or w in synopsis_lower for w in ["horror", "haunt", "ghost", "killer"]):
+            if any(
+                w in title_lower or w in synopsis_lower
+                for w in ["horror", "haunt", "ghost", "killer"]
+            ):
                 matched_genres.append(genre_name_map.get("horror"))
-            if any(w in title_lower or w in synopsis_lower for w in ["crime", "police", "detective", "murder"]):
+            if any(
+                w in title_lower or w in synopsis_lower
+                for w in ["crime", "police", "detective", "murder"]
+            ):
                 matched_genres.append(genre_name_map.get("crime"))
             if not matched_genres:
                 matched_genres.append(genre_name_map.get("drama", 18))
@@ -383,7 +428,15 @@ class WarehouseLoader:
                 )
 
             # 2. Dim Crew & Bridge
-            directors = ["Christopher Nolan", "Greta Gerwig", "Denis Villeneuve", "Bong Joon-ho", "Guillermo del Toro", "Rian Johnson", "David Fincher"]
+            directors = [
+                "Christopher Nolan",
+                "Greta Gerwig",
+                "Denis Villeneuve",
+                "Bong Joon-ho",
+                "Guillermo del Toro",
+                "Rian Johnson",
+                "David Fincher",
+            ]
             chosen_dir = directors[seed_val % len(directors)]
             cursor.execute(
                 """
@@ -408,7 +461,13 @@ class WarehouseLoader:
                 )
 
             # 3. Fact: Catalog Ratings Snapshot
-            critic_score = round(min(98.0, max(45.0, (vote_avg * 10) + (pop * 0.1) + random.uniform(-5, 5))), 1)
+            critic_score = round(
+                min(
+                    98.0,
+                    max(45.0, (vote_avg * 10) + (pop * 0.1) + random.uniform(-5, 5)),
+                ),
+                1,
+            )
             days_to_stream = int(r.get("days_to_streaming", 30) or 30)
             is_trending = bool(r.get("is_trending", False))
 
@@ -428,13 +487,29 @@ class WarehouseLoader:
             # 4. Fact: Streaming Performance & Viewership Metrics
             # View hours calibrated by popularity, vote count, and era
             era_mult = 1.8 if rel_year == 2026 else (1.2 if rel_year >= 2024 else 0.7)
-            global_hours = round(max(2.5, (pop * 1.5 + vote_avg * 4.0) * era_mult + random.uniform(1.0, 10.0)), 2)
-            est_viewers_k = int(global_hours * 1000 / (r.get("runtime_minutes", 90) / 60.0))
-            completion_rate = round(min(94.0, max(58.0, 65.0 + (vote_avg * 3.0) + random.uniform(-3, 3))), 2)
-            retention_rate = round(min(92.0, max(52.0, completion_rate - random.uniform(2, 6))), 2)
+            global_hours = round(
+                max(
+                    2.5,
+                    (pop * 1.5 + vote_avg * 4.0) * era_mult + random.uniform(1.0, 10.0),
+                ),
+                2,
+            )
+            est_viewers_k = int(
+                global_hours * 1000 / (r.get("runtime_minutes", 90) / 60.0)
+            )
+            completion_rate = round(
+                min(94.0, max(58.0, 65.0 + (vote_avg * 3.0) + random.uniform(-3, 3))), 2
+            )
+            retention_rate = round(
+                min(92.0, max(52.0, completion_rate - random.uniform(2, 6))), 2
+            )
             cost_per_hour = round(budget_usd / (global_hours * 1_000_000), 4)
             budget_eff = round(global_hours / max(1.0, (budget_usd / 1_000_000)), 2)
-            top_10_rank = random.choice([1, 2, 3, 4, 5, None, None, None]) if (is_trending or rel_year == 2026) else None
+            top_10_rank = (
+                random.choice([1, 2, 3, 4, 5, None, None, None])
+                if (is_trending or rel_year == 2026)
+                else None
+            )
 
             fact_perf_params = (
                 title_key,
@@ -458,9 +533,15 @@ class WarehouseLoader:
         os.makedirs(self.lakehouse_dir, exist_ok=True)
 
         csv_file = os.path.join(self.output_dir, "netflix_catalog_enriched_master.csv")
-        parquet_file = os.path.join(self.output_dir, "netflix_catalog_enriched_master.parquet")
-        powerbi_parquet = os.path.join(self.output_dir, "powerbi_reporting_pulse.parquet")
-        perf_parquet = os.path.join(self.output_dir, "powerbi_performance_matrix.parquet")
+        parquet_file = os.path.join(
+            self.output_dir, "netflix_catalog_enriched_master.parquet"
+        )
+        powerbi_parquet = os.path.join(
+            self.output_dir, "powerbi_reporting_pulse.parquet"
+        )
+        perf_parquet = os.path.join(
+            self.output_dir, "powerbi_performance_matrix.parquet"
+        )
         json_file = os.path.join(self.output_dir, "live_2026_pulse.json")
 
         result = {
@@ -476,10 +557,24 @@ class WarehouseLoader:
             return result
 
         fieldnames = [
-            "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
-            "maturity_rating", "synopsis", "vote_average", "vote_count", "popularity",
-            "imdb_score", "imdb_votes", "tmdb_id", "match_confidence", "days_to_streaming",
-            "is_trending", "date_added", "source"
+            "netflix_id",
+            "title",
+            "media_type",
+            "release_year",
+            "runtime_minutes",
+            "maturity_rating",
+            "synopsis",
+            "vote_average",
+            "vote_count",
+            "popularity",
+            "imdb_score",
+            "imdb_votes",
+            "tmdb_id",
+            "match_confidence",
+            "days_to_streaming",
+            "is_trending",
+            "date_added",
+            "source",
         ]
 
         # 1. Master CSV Export
@@ -496,40 +591,98 @@ class WarehouseLoader:
                 if col not in df_master.columns:
                     df_master[col] = None
 
-            df_master["release_year"] = pd.to_numeric(df_master["release_year"], errors="coerce").fillna(2026).astype("int32")
-            df_master["runtime_minutes"] = pd.to_numeric(df_master["runtime_minutes"], errors="coerce").fillna(90).astype("int32")
-            df_master["vote_average"] = pd.to_numeric(df_master["vote_average"], errors="coerce").fillna(0.0).astype("float32")
-            df_master["vote_count"] = pd.to_numeric(df_master["vote_count"], errors="coerce").fillna(0).astype("int32")
-            df_master["popularity"] = pd.to_numeric(df_master["popularity"], errors="coerce").fillna(0.0).astype("float32")
-            df_master["match_confidence"] = pd.to_numeric(df_master["match_confidence"], errors="coerce").fillna(100.0).astype("float32")
-            df_master["days_to_streaming"] = pd.to_numeric(df_master["days_to_streaming"], errors="coerce").fillna(30).astype("int32")
-            df_master["is_trending"] = df_master["is_trending"].fillna(False).astype("bool")
+            df_master["release_year"] = (
+                pd.to_numeric(df_master["release_year"], errors="coerce")
+                .fillna(2026)
+                .astype("int32")
+            )
+            df_master["runtime_minutes"] = (
+                pd.to_numeric(df_master["runtime_minutes"], errors="coerce")
+                .fillna(90)
+                .astype("int32")
+            )
+            df_master["vote_average"] = (
+                pd.to_numeric(df_master["vote_average"], errors="coerce")
+                .fillna(0.0)
+                .astype("float32")
+            )
+            df_master["vote_count"] = (
+                pd.to_numeric(df_master["vote_count"], errors="coerce")
+                .fillna(0)
+                .astype("int32")
+            )
+            df_master["popularity"] = (
+                pd.to_numeric(df_master["popularity"], errors="coerce")
+                .fillna(0.0)
+                .astype("float32")
+            )
+            df_master["match_confidence"] = (
+                pd.to_numeric(df_master["match_confidence"], errors="coerce")
+                .fillna(100.0)
+                .astype("float32")
+            )
+            df_master["days_to_streaming"] = (
+                pd.to_numeric(df_master["days_to_streaming"], errors="coerce")
+                .fillna(30)
+                .astype("int32")
+            )
+            df_master["is_trending"] = (
+                df_master["is_trending"].fillna(False).astype("bool")
+            )
 
-            df_master.to_parquet(parquet_file, engine="pyarrow", index=False, compression="snappy")
-            logger.info(f"Master Parquet exported: {parquet_file} ({len(df_master)} rows)")
+            df_master.to_parquet(
+                parquet_file, engine="pyarrow", index=False, compression="snappy"
+            )
+            logger.info(
+                f"Master Parquet exported: {parquet_file} ({len(df_master)} rows)"
+            )
 
             # 3. Power BI Analytics Star-Schema Parquet Export
             df_powerbi = df_master.copy()
             df_powerbi["catalog_era"] = df_powerbi["release_year"].apply(
-                lambda y: "2026 Live Releases" if y == 2026 else ("2024-2025 Modern" if y in (2024, 2025) else "Historical Archive (<2024)")
+                lambda y: (
+                    "2026 Live Releases"
+                    if y == 2026
+                    else (
+                        "2024-2025 Modern"
+                        if y in (2024, 2025)
+                        else "Historical Archive (<2024)"
+                    )
+                )
             )
             df_powerbi["rating_tier"] = df_powerbi["vote_average"].apply(
-                lambda v: "Top Rated (>= 8.0)" if v >= 8.0 else ("Good (6.5 - 7.9)" if v >= 6.5 else ("Mixed (< 6.5)" if v > 0.0 else "Unrated / Pending"))
+                lambda v: (
+                    "Top Rated (>= 8.0)"
+                    if v >= 8.0
+                    else (
+                        "Good (6.5 - 7.9)"
+                        if v >= 6.5
+                        else ("Mixed (< 6.5)" if v > 0.0 else "Unrated / Pending")
+                    )
+                )
             )
-            df_powerbi.to_parquet(powerbi_parquet, engine="pyarrow", index=False, compression="snappy")
-            logger.info(f"Power BI Reporting Parquet exported: {powerbi_parquet} ({len(df_powerbi)} rows)")
+            df_powerbi.to_parquet(
+                powerbi_parquet, engine="pyarrow", index=False, compression="snappy"
+            )
+            logger.info(
+                f"Power BI Reporting Parquet exported: {powerbi_parquet} ({len(df_powerbi)} rows)"
+            )
 
             # 4. Lakehouse Star Schema Individual Parquet Tables
             lakehouse_files = self._export_lakehouse_star_tables(df_master)
             result["lakehouse_tables"] = lakehouse_files
 
         except Exception as p_err:
-            logger.warning(f"Parquet export failed (fallback to CSV/JSON): {p_err}", exc_info=True)
+            logger.warning(
+                f"Parquet export failed (fallback to CSV/JSON): {p_err}", exc_info=True
+            )
 
         # 5. JSON Export of 2026 & latest releases
         latest_records = [r for r in records if (r.get("release_year") or 0) >= 2025]
         with open(json_file, "w", encoding="utf-8") as f:
-            json.dump(latest_records if latest_records else records, f, indent=2, default=str)
+            json.dump(
+                latest_records if latest_records else records, f, indent=2, default=str
+            )
 
         return result
 
@@ -539,90 +692,160 @@ class WarehouseLoader:
 
         # 1. Dim Titles Parquet
         dim_titles_file = os.path.join(self.lakehouse_dir, "dim_titles.parquet")
-        df_titles = df_master[[
-            "netflix_id", "title", "media_type", "release_year", "runtime_minutes",
-            "maturity_rating", "date_added", "match_confidence"
-        ]].copy()
+        df_titles = df_master[
+            [
+                "netflix_id",
+                "title",
+                "media_type",
+                "release_year",
+                "runtime_minutes",
+                "maturity_rating",
+                "date_added",
+                "match_confidence",
+            ]
+        ].copy()
         df_titles.rename(columns={"title": "canonical_title"}, inplace=True)
         df_titles["title_key"] = range(1, len(df_titles) + 1)
         df_titles["catalog_era"] = df_titles["release_year"].apply(
-            lambda y: "2026 Live Releases" if y == 2026 else ("2024-2025 Modern" if y in (2024, 2025) else "Historical Archive (<2024)")
+            lambda y: (
+                "2026 Live Releases"
+                if y == 2026
+                else (
+                    "2024-2025 Modern"
+                    if y in (2024, 2025)
+                    else "Historical Archive (<2024)"
+                )
+            )
         )
-        df_titles.to_parquet(dim_titles_file, engine="pyarrow", index=False, compression="snappy")
+        df_titles.to_parquet(
+            dim_titles_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(dim_titles_file)
 
         # 2. Dim Genres Parquet
         dim_genres_file = os.path.join(self.lakehouse_dir, "dim_genres.parquet")
-        df_genres = pd.DataFrame([
-            {"genre_key": idx + 1, "tmdb_genre_id": g[0], "genre_name": g[1], "genre_category": g[2]}
-            for idx, g in enumerate(GENRE_REGISTRY)
-        ])
-        df_genres.to_parquet(dim_genres_file, engine="pyarrow", index=False, compression="snappy")
+        df_genres = pd.DataFrame(
+            [
+                {
+                    "genre_key": idx + 1,
+                    "tmdb_genre_id": g[0],
+                    "genre_name": g[1],
+                    "genre_category": g[2],
+                }
+                for idx, g in enumerate(GENRE_REGISTRY)
+            ]
+        )
+        df_genres.to_parquet(
+            dim_genres_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(dim_genres_file)
 
         # 3. Dim Date Parquet (2020-2027)
         dim_date_file = os.path.join(self.lakehouse_dir, "dim_date.parquet")
         dates = pd.date_range(start="2020-01-01", end="2027-12-31")
-        df_date = pd.DataFrame({
-            "date_key": dates.strftime("%Y%m%d").astype("int32"),
-            "full_date": dates.date,
-            "year": dates.year.astype("int32"),
-            "quarter": dates.quarter.astype("int32"),
-            "quarter_name": "Q" + dates.quarter.astype(str) + " " + dates.year.astype(str),
-            "month_number": dates.month.astype("int32"),
-            "month_name": dates.strftime("%B"),
-            "month_short": dates.strftime("%b"),
-            "week_of_year": dates.isocalendar().week.astype("int32"),
-            "day_of_month": dates.day.astype("int32"),
-            "day_of_week": dates.dayofweek + 1,
-            "day_name": dates.strftime("%A"),
-            "is_weekend": dates.dayofweek.isin([5, 6]),
-            "fiscal_period": "FY" + dates.year.astype(str) + "-Q" + dates.quarter.astype(str),
-        })
-        df_date.to_parquet(dim_date_file, engine="pyarrow", index=False, compression="snappy")
+        df_date = pd.DataFrame(
+            {
+                "date_key": dates.strftime("%Y%m%d").astype("int32"),
+                "full_date": dates.date,
+                "year": dates.year.astype("int32"),
+                "quarter": dates.quarter.astype("int32"),
+                "quarter_name": "Q"
+                + dates.quarter.astype(str)
+                + " "
+                + dates.year.astype(str),
+                "month_number": dates.month.astype("int32"),
+                "month_name": dates.strftime("%B"),
+                "month_short": dates.strftime("%b"),
+                "week_of_year": dates.isocalendar().week.astype("int32"),
+                "day_of_month": dates.day.astype("int32"),
+                "day_of_week": dates.dayofweek + 1,
+                "day_name": dates.strftime("%A"),
+                "is_weekend": dates.dayofweek.isin([5, 6]),
+                "fiscal_period": "FY"
+                + dates.year.astype(str)
+                + "-Q"
+                + dates.quarter.astype(str),
+            }
+        )
+        df_date.to_parquet(
+            dim_date_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(dim_date_file)
 
         # 4. Fact Catalog Ratings Parquet
-        fact_ratings_file = os.path.join(self.lakehouse_dir, "fact_catalog_ratings.parquet")
-        df_fact_ratings = pd.DataFrame({
-            "fact_rating_key": range(1, len(df_master) + 1),
-            "title_key": range(1, len(df_master) + 1),
-            "date_key": int(datetime.date.today().strftime("%Y%m%d")),
-            "vote_average": df_master["vote_average"],
-            "vote_count": df_master["vote_count"],
-            "popularity_score": df_master["popularity"],
-            "critic_score": (df_master["vote_average"] * 10 + 15).clip(45, 98).round(1),
-            "days_to_streaming": df_master["days_to_streaming"],
-            "is_trending": df_master["is_trending"],
-        })
-        df_fact_ratings.to_parquet(fact_ratings_file, engine="pyarrow", index=False, compression="snappy")
+        fact_ratings_file = os.path.join(
+            self.lakehouse_dir, "fact_catalog_ratings.parquet"
+        )
+        df_fact_ratings = pd.DataFrame(
+            {
+                "fact_rating_key": range(1, len(df_master) + 1),
+                "title_key": range(1, len(df_master) + 1),
+                "date_key": int(datetime.date.today().strftime("%Y%m%d")),
+                "vote_average": df_master["vote_average"],
+                "vote_count": df_master["vote_count"],
+                "popularity_score": df_master["popularity"],
+                "critic_score": (df_master["vote_average"] * 10 + 15)
+                .clip(45, 98)
+                .round(1),
+                "days_to_streaming": df_master["days_to_streaming"],
+                "is_trending": df_master["is_trending"],
+            }
+        )
+        df_fact_ratings.to_parquet(
+            fact_ratings_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(fact_ratings_file)
 
         # 5. Fact Streaming Performance Parquet
-        fact_perf_file = os.path.join(self.lakehouse_dir, "fact_streaming_performance.parquet")
-        perf_hours = (df_master["popularity"] * 1.5 + df_master["vote_average"] * 4.0 + 8.5).round(2)
-        df_fact_perf = pd.DataFrame({
-            "performance_key": range(1, len(df_master) + 1),
-            "title_key": range(1, len(df_master) + 1),
-            "date_key": int(datetime.date.today().strftime("%Y%m%d")),
-            "global_view_hours_millions": perf_hours,
-            "estimated_unique_viewers_k": (perf_hours * 1000 / 1.5).astype("int32"),
-            "completion_rate_pct": (65.0 + df_master["vote_average"] * 2.8).clip(55.0, 94.0).round(2),
-            "watch_time_retention_pct": (60.0 + df_master["vote_average"] * 2.5).clip(50.0, 91.0).round(2),
-            "cost_per_view_hour_usd": (35_000_000 / (perf_hours * 1_000_000)).round(4),
-            "budget_efficiency_ratio": (perf_hours / 35.0).round(2),
-            "global_top_10_rank": [1 if i == 0 else (2 if i == 1 else (3 if i == 2 else None)) for i in range(len(df_master))],
-        })
-        df_fact_perf.to_parquet(fact_perf_file, engine="pyarrow", index=False, compression="snappy")
+        fact_perf_file = os.path.join(
+            self.lakehouse_dir, "fact_streaming_performance.parquet"
+        )
+        perf_hours = (
+            df_master["popularity"] * 1.5 + df_master["vote_average"] * 4.0 + 8.5
+        ).round(2)
+        df_fact_perf = pd.DataFrame(
+            {
+                "performance_key": range(1, len(df_master) + 1),
+                "title_key": range(1, len(df_master) + 1),
+                "date_key": int(datetime.date.today().strftime("%Y%m%d")),
+                "global_view_hours_millions": perf_hours,
+                "estimated_unique_viewers_k": (perf_hours * 1000 / 1.5).astype("int32"),
+                "completion_rate_pct": (65.0 + df_master["vote_average"] * 2.8)
+                .clip(55.0, 94.0)
+                .round(2),
+                "watch_time_retention_pct": (60.0 + df_master["vote_average"] * 2.5)
+                .clip(50.0, 91.0)
+                .round(2),
+                "cost_per_view_hour_usd": (35_000_000 / (perf_hours * 1_000_000)).round(
+                    4
+                ),
+                "budget_efficiency_ratio": (perf_hours / 35.0).round(2),
+                "global_top_10_rank": [
+                    1 if i == 0 else (2 if i == 1 else (3 if i == 2 else None))
+                    for i in range(len(df_master))
+                ],
+            }
+        )
+        df_fact_perf.to_parquet(
+            fact_perf_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(fact_perf_file)
 
         # 6. Combined Power BI Performance Matrix Parquet
-        matrix_file = os.path.join(self.output_dir, "powerbi_performance_matrix.parquet")
-        df_matrix = df_titles.merge(df_fact_perf, on="title_key").merge(df_fact_ratings, on="title_key")
-        df_matrix.to_parquet(matrix_file, engine="pyarrow", index=False, compression="snappy")
+        matrix_file = os.path.join(
+            self.output_dir, "powerbi_performance_matrix.parquet"
+        )
+        df_matrix = df_titles.merge(df_fact_perf, on="title_key").merge(
+            df_fact_ratings, on="title_key"
+        )
+        df_matrix.to_parquet(
+            matrix_file, engine="pyarrow", index=False, compression="snappy"
+        )
         lakehouse_files.append(matrix_file)
 
-        logger.info(f"Exported {len(lakehouse_files)} Star Schema Lakehouse Parquet tables to {self.lakehouse_dir}")
+        logger.info(
+            f"Exported {len(lakehouse_files)} Star Schema Lakehouse Parquet tables to {self.lakehouse_dir}"
+        )
         return lakehouse_files
 
 

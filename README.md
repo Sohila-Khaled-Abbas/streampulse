@@ -184,14 +184,14 @@ pytest -v
 
 ```text
 ============================= test session starts =============================
-tests/test_airbyte_client.py ...... PASSED
-tests/test_db.py .................. PASSED
-tests/test_extract.py ............. PASSED
-tests/test_powerbi_sources.py ..... PASSED
-tests/test_scraper_2026.py ........ PASSED
-tests/test_transform.py ........... PASSED
-tests/test_warehouse_loader.py .... PASSED
-============================= 22 passed in 28.12s =============================
+tests/test_airbyte_client.py ......... PASSED
+tests/test_db.py ..................... PASSED
+tests/test_extract.py ................ PASSED
+tests/test_powerbi_sources.py ........ PASSED
+tests/test_scraper_2026.py ........... PASSED
+tests/test_transform.py .............. PASSED
+tests/test_warehouse_loader.py ....... PASSED
+============================= 29 passed in 27.31s =============================
 ```
 
 ---

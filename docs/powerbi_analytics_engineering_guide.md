@@ -498,44 +498,43 @@ let
         "title_key", "date_key", "territory_key", "device_category",
         "global_view_hours_millions", "avg_completion_pct", "subscribers_reached_thousands"
     }),
-    AddPerformanceKey = Table.AddIndexColumn(SelectFact, "performance_key", 1, 1, Int64.Type)
-in
-    AddPerformanceKey
-```
-
----
-
 #### Table 9: `Fact_Catalog_Ratings` (Periodic Rating Snapshot Fact)
 ```powerquery
 let
+    // Part A: Live Snapshot Ratings (from Raw_IMDb_Ratings CSV)
     SourceLive = Csv.Document(File.Contents(File_Path & "imdb_external_ratings.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
     PromotedLive = Table.PromoteHeaders(SourceLive, [PromoteAllScalars=true]),
 
     ParseLiveVotes = Table.AddColumn(PromotedLive, "vote_count_clean", each
         let
-            v = Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
-            num = if Text.EndsWith(v, "M") then
-                      Number.FromText(Text.Remove(v, "M")) * 1000000
+            v = if [vote_count_raw] = null then "" else Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
+            num = if v = "" or v = "NULL" or v = "N/A" then
+                      1000
+                  else if Text.EndsWith(v, "M") then
+                      (try Number.FromText(Text.Remove(v, "M")) otherwise 1.0) * 1000000
                   else if Text.EndsWith(v, "K") then
-                      Number.FromText(Text.Remove(v, "K")) * 1000
+                      (try Number.FromText(Text.Remove(v, "K")) otherwise 1.0) * 1000
                   else
-                      try Number.FromText(Text.Replace(v, ",", "")) otherwise 0
+                      try Number.FromText(Text.Replace(v, ",", "")) otherwise 1000
         in
-            Int64.From(num),
+            Int64.From(if num = null or num < 0 then 1000 else num),
         Int64.Type
     ),
 
     ParseLiveScore = Table.AddColumn(ParseLiveVotes, "vote_average_clean", each
         let
-            raw = Text.Trim(Text.From([user_score])),
-            score = if Text.Contains(raw, "/10") then
-                        Number.FromText(Text.BeforeDelimiter(raw, "/10"))
+            raw = if [user_score] = null then "" else Text.Upper(Text.Trim(Text.From([user_score]))),
+            score = if raw = "" or raw = "NULL" or raw = "N/A" then
+                        7.0
+                    else if Text.Contains(raw, "/10") then
+                        try Number.FromText(Text.BeforeDelimiter(raw, "/10")) otherwise 7.0
                     else if Text.EndsWith(raw, "%") then
-                        Number.FromText(Text.Remove(raw, "%")) / 10.0
+                        (try Number.FromText(Text.Remove(raw, "%")) otherwise 70.0) / 10.0
                     else
-                        try Number.FromText(raw) otherwise 7.0
+                        try Number.FromText(raw) otherwise 7.0,
+            valid_score = if score = null then 7.0 else score
         in
-            if score > 10.0 then 10.0 else if score < 0.0 then 0.0 else Number.Round(score, 1),
+            if valid_score > 10.0 then 10.0 else if valid_score < 0.0 then 0.0 else Number.Round(valid_score, 1),
         type number
     ),
 
@@ -559,23 +558,45 @@ let
         "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
     }),
 
+    // Part B: Historical Kaggle Ratings (7,786 records)
     SourceHist = Csv.Document(File.Contents(File_Path & "netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
     PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
 
     AddHistDateKey = Table.AddColumn(PromotedHist, "date_key", each
         let y = try Number.FromText(Text.From([release_year])) otherwise 2020 in
-        y * 10000 + 101,
+        (if y = null or y < 1900 or y > 2100 then 2020 else y) * 10000 + 101,
         Int64.Type
     ),
 
-    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each try Number.FromText(Text.From([imdb_score])) otherwise 7.0, type number),
-    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000, Int64.Type),
-    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70, type number),
+    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each
+        let
+            s = try Number.FromText(Text.From([imdb_score])) otherwise 7.0,
+            valid_s = if s = null then 7.0 else s
+        in
+            if valid_s > 10.0 then 10.0 else if valid_s <= 0.0 then 7.0 else Number.Round(valid_s, 1),
+        type number
+    ),
+    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each
+        let
+            v = try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000
+        in
+            if v = null or v <= 0 then 1000 else v,
+        Int64.Type
+    ),
+    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each
+        let
+            m = try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70.0,
+            valid_m = if m = null then 70.0 else m
+        in
+            if valid_m > 100.0 then 100.0 else if valid_m <= 0.0 then 70.0 else Number.Round(valid_m, 1),
+        type number
+    ),
     RenameHistFact = Table.RenameColumns(CleanHistMetascore, {{"id", "netflix_id"}}),
     SelectHistFact = Table.SelectColumns(RenameHistFact, {
         "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
     }),
 
+    // Part C: Combine & Map Surrogate Title Key
     CombinedFacts = Table.Combine({SelectLiveFact, SelectHistFact}),
     MergedTitles = Table.NestedJoin(CombinedFacts, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
     ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
@@ -601,29 +622,31 @@ let
 
     ParseBudgetUSD = Table.AddColumn(ExpandedProd, "production_budget_usd", each
         let
-            txt = Text.Upper(Text.Trim(Text.From([budget_raw]))),
-            num = if Text.Contains(txt, "M") then
-                      try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) * 1000000 otherwise 50000000
+            txt = if [budget_raw] = null then "" else Text.Upper(Text.Trim(Text.From([budget_raw]))),
+            num = if txt = "" or txt = "NULL" or txt = "N/A" or Text.Contains(txt, "DIRECT TO SVOD") or Text.Contains(txt, "TBD") then
+                      25000000.0
+                  else if Text.Contains(txt, "M") then
+                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) otherwise 50.0) * 1000000
                   else if Text.Contains(txt, "MILLION") then
-                      try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "MILLION"), {"0".."9", "."})) * 1000000 * 1.08 otherwise 45000000
+                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "MILLION"), {"0".."9", "."})) otherwise 45.0) * 1000000 * 1.08
                   else
-                      try Number.FromText(Text.Select(txt, {"0".."9"})) otherwise 35000000
+                      try Number.FromText(Text.Select(txt, {"0".."9"})) otherwise 25000000.0
         in
-            num,
+            if num = null or num <= 0 then 25000000.0 else num,
         type number
     ),
 
     ParseGrossUSD = Table.AddColumn(ParseBudgetUSD, "worldwide_gross_usd", each
         let
-            txt = Text.Upper(Text.Trim(Text.From([gross_raw]))),
-            num = if Text.Contains(txt, "M") then
-                      try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) * 1000000 otherwise 0
-                  else if Text.Contains(txt, "DIRECT TO SVOD") or Text.Contains(txt, "TBD") or Text.Contains(txt, "N/A") then
+            txt = if [gross_raw] = null then "" else Text.Upper(Text.Trim(Text.From([gross_raw]))),
+            num = if txt = "" or txt = "NULL" or txt = "N/A" or Text.Contains(txt, "DIRECT TO SVOD") or Text.Contains(txt, "TBD") then
                       0.0
+                  else if Text.Contains(txt, "M") then
+                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) otherwise 0.0) * 1000000
                   else
                       try Number.FromText(Text.Select(txt, {"0".."9"})) otherwise 0.0
         in
-            num,
+            if num = null or num < 0 then 0.0 else num,
         type number
     ),
 

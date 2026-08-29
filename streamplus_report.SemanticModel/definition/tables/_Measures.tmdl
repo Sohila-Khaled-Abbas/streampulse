@@ -466,6 +466,554 @@ table _Measures
 		displayFolder: 00: SVG & HTML
 		lineageTag: 5e734846-ba00-48e4-9efa-010fcc248177
 
+	measure HTML_Netflix_Hero_Card = ```
+			
+			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Avatar: Fire and Ash")
+			VAR _Era = SELECTEDVALUE(Dim_Titles[catalog_era], "2026 Live Releases")
+			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
+			VAR _Runtime = FORMAT(SELECTEDVALUE(Dim_Titles[runtime_minutes_clean], 145), "0") & " min"
+			VAR _Hours = [Total_View_Hours_Formatted]
+			VAR _BayesianScore = FORMAT([Bayesian_Weighted_Score], "0.0")
+			VAR _MatchPct = FORMAT(MIN(MAX([Avg_Completion_Rate_Pct] + 18, 75), 99), "0") & "% Match"
+			RETURN
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .hero-container {
+			    position: relative; width: 100%; height: 490px; border-radius: 20px;
+			    background: linear-gradient(90deg, #0A0A0A 0%, rgba(18,18,18,0.88) 50%, rgba(229,9,20,0.18) 100%), #141414;
+			    border: 1.5px solid rgba(255,255,255,0.1); padding: 50px 60px; display: flex; flex-direction: column; justify-content: center;
+			    box-shadow: 0 16px 40px rgba(0,0,0,0.85);
+			  }
+			  .featured-tag { color: #E50914; font-size: 16px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 10px; }
+			  .title-text { color: #FFFFFF; font-size: 48px; font-weight: 900; letter-spacing: -0.8px; margin-bottom: 12px; }
+			  .badge-row { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+			  .match-badge { color: #46D369; font-weight: 800; font-size: 20px; }
+			  .rating-badge { border: 1.5px solid #888; color: #AAA; font-size: 15px; padding: 3px 10px; border-radius: 4px; }
+			  .tech-badge { background: #262626; color: #EEE; font-size: 14px; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
+			  .metrics-summary { color: #CCC; font-size: 19px; line-height: 1.6; max-width: 1200px; }
+			  .btn-row { display: flex; gap: 20px; margin-top: 24px; }
+			  .play-btn { background: #FFFFFF; color: #000000; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+			  .info-btn { background: rgba(109, 109, 110, 0.7); color: #FFFFFF; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; }
+			</style>
+			</head>
+			<body>
+			  <div class='hero-container'>
+			    <div class='featured-tag'>★ #1 STREAMING TITLE GLOBALLY</div>
+			    <div class='title-text'>" & _Title & "</div>
+			    <div class='badge-row'>
+			      <span class='match-badge'>" & _MatchPct & "</span>
+			      <span class='rating-badge'>" & _Rating & "</span>
+			      <span class='tech-badge'>" & _Runtime & "</span>
+			      <span class='tech-badge'>4K ULTRA HD</span>
+			      <span class='tech-badge'>DOLBY ATMOS</span>
+			      <span class='tech-badge'>★ " & _BayesianScore & " BAYESIAN</span>
+			    </div>
+			    <div class='metrics-summary'>
+			      Generated <b>" & _Hours & "</b> worldwide. Unfolds across multiple genre dimensions with top-tier viewer retention.
+			    </div>
+			    <div class='btn-row'>
+			      <button class='play-btn'>▶ Play Title</button>
+			      <button class='info-btn'>ⓘ More Info</button>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: ba325969-0369-4523-bf58-389eeff66bfc
+
+	measure HTML_Movie_Card_Card = ```
+			
+			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Avatar: Fire and Ash")
+			VAR _Genre = SELECTEDVALUE(Dim_Genres[genre_name], "Sci-Fi & Fantasy")
+			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
+			VAR _Score = FORMAT([Bayesian_Weighted_Score], "0.0")
+			VAR _Completion = FORMAT([Avg_Completion_Rate_Pct], "0") & "%"
+			RETURN
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+			  .card-wrap {
+			    width: 100%; height: 100%; background: #1C1C1C; border-radius: 12px; padding: 22px;
+			    border: 1.5px solid #2B2B2B; display: flex; flex-direction: column; justify-content: space-between;
+			    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; cursor: pointer;
+			  }
+			  .card-wrap:hover {
+			    transform: translateY(-6px) scale(1.02); border-color: #E50914;
+			    box-shadow: 0 12px 28px rgba(229, 9, 20, 0.35);
+			  }
+			  .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+			  .card-title { color: #FFFFFF; font-size: 20px; font-weight: 800; line-height: 1.25; max-width: 240px; }
+			  .badge-score { background: #262626; color: #F5C518; font-size: 16px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+			  .card-genre { color: #888888; font-size: 16px; font-weight: 500; margin-top: 4px; }
+			  .progress-bg { width: 100%; height: 6px; background: #333333; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+			  .progress-fill { height: 100%; width: " & _Completion & "; background: #E50914; border-radius: 3px; }
+			  .card-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+			  .stat-label { color: #AAAAAA; font-size: 14px; }
+			  .stat-val { color: #00D2D2; font-size: 16px; font-weight: 800; }
+			</style>
+			</head>
+			<body>
+			  <div class='card-wrap'>
+			    <div>
+			      <div class='card-top'>
+			        <div class='card-title'>" & _Title & "</div>
+			        <div class='badge-score'>★ " & _Score & "</div>
+			      </div>
+			      <div class='card-genre'>" & _Genre & " • " & _Rating & "</div>
+			    </div>
+			    <div>
+			      <div class='progress-bg'><div class='progress-fill'></div></div>
+			      <div class='card-bot'>
+			        <span class='stat-label'>Avg Completion</span>
+			        <span class='stat-val'>" & _Completion & "</span>
+			      </div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 91449733-10cc-498f-a994-3eb1ec16c9f6
+
+	measure HTML_Glass_KPI_Scorecard = ```
+			
+			VAR _Hours = [Total_View_Hours_Formatted]
+			VAR _Growth = [View_Hours_YoY_Pct]
+			VAR _Subtitle = 
+			    IF(
+			        NOT ISBLANK(_Growth),
+			        IF(_Growth >= 0, "<span style='color:#46D369;'>▲ +" & FORMAT(_Growth, "0.0%") & "</span> vs prior year", "<span style='color:#E50914;'>▼ " & FORMAT(_Growth, "0.0%") & "</span> vs prior year"),
+			        "Stable baseline"
+			    )
+			RETURN
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+			  .kpi-box {
+			    width: 100%; height: 180px; background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(16px);
+			    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 26px 32px;
+			    display: flex; flex-direction: column; justify-content: space-between; border-left: 6px solid #E50914;
+			  }
+			  .kpi-title { color: #9E9E9E; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
+			  .kpi-val { color: #FFFFFF; font-size: 42px; font-weight: 900; letter-spacing: -0.8px; }
+			  .kpi-sub { color: #888888; font-size: 16px; font-weight: 600; }
+			</style>
+			</head>
+			<body>
+			  <div class='kpi-box'>
+			    <div class='kpi-title'>GLOBAL VIEWERSHIP HOURS</div>
+			    <div class='kpi-val'>" & _Hours & "</div>
+			    <div class='kpi-sub'>" & _Subtitle & "</div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 528af1f8-b03d-4323-8927-db7c919b8030
+
+	measure HTML_Modal_Detail_Tooltip = ```
+			
+			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Title Details")
+			VAR _Genre = SELECTEDVALUE(Dim_Genres[genre_name], "General")
+			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
+			VAR _Era = SELECTEDVALUE(Dim_Titles[catalog_era], "2026 Live")
+			VAR _Runtime = FORMAT(SELECTEDVALUE(Dim_Titles[runtime_minutes_clean], 90), "0") & "m"
+			VAR _Bayesian = FORMAT([Bayesian_Weighted_Score], "0.0")
+			VAR _Audience = FORMAT([Avg_IMDb_Rating], "0.0")
+			VAR _Critic = FORMAT([Avg_Critic_Score], "0")
+			VAR _Budget = IF(NOT ISBLANK([Total_Production_Budget_M]), "$" & FORMAT([Total_Production_Budget_M], "#,##0") & "M", "Direct SVOD")
+			VAR _Gross = IF(NOT ISBLANK([Total_Worldwide_Gross_M]), "$" & FORMAT([Total_Worldwide_Gross_M], "#,##0") & "M", "Streaming Only")
+			RETURN
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+			  .modal-card {
+			    width: 480px; height: 360px; background: #141414; border: 1.5px solid #333333; border-radius: 12px;
+			    padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+			    box-shadow: 0 16px 36px rgba(0,0,0,0.9);
+			  }
+			  .modal-header { border-bottom: 1.5px solid #262626; padding-bottom: 12px; margin-bottom: 12px; }
+			  .m-title { color: #FFFFFF; font-size: 24px; font-weight: 800; }
+			  .m-meta { color: #888888; font-size: 16px; margin-top: 4px; }
+			  .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+			  .stat-cell { background: #1C1C1C; padding: 10px 14px; border-radius: 6px; border-left: 3px solid #E50914; }
+			  .s-label { color: #888; font-size: 13px; text-transform: uppercase; font-weight: 700; }
+			  .s-val { color: #FFF; font-size: 18px; font-weight: 800; margin-top: 4px; }
+			  .score-cell { color: #F5C518; }
+			</style>
+			</head>
+			<body>
+			  <div class='modal-card'>
+			    <div class='modal-header'>
+			      <div class='m-title'>" & _Title & "</div>
+			      <div class='m-meta'>" & _Era & " • " & _Genre & " • " & _Rating & " • " & _Runtime & "</div>
+			    </div>
+			    <div class='grid-stats'>
+			      <div class='stat-cell'><div class='s-label'>Bayesian Score</div><div class='s-val score-cell'>★ " & _Bayesian & " / 10</div></div>
+			      <div class='stat-cell'><div class='s-label'>IMDb / Metascore</div><div class='s-val'>" & _Audience & " / " & _Critic & "</div></div>
+			      <div class='stat-cell'><div class='s-label'>Production Budget</div><div class='s-val'>" & _Budget & "</div></div>
+			      <div class='stat-cell'><div class='s-label'>Worldwide Gross</div><div class='s-val'>" & _Gross & "</div></div>
+			    </div>
+			    <div style='color:#555; font-size:12px; text-align:right;'>StreamPulse Semantic Galaxy Layer</div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 528f74b2-0c75-44c0-9574-98d0d6437475
+
+	measure SVG_Completion_ProgressBar = ```
+			
+			VAR _Pct = [Avg_Completion_Rate_Pct]
+			VAR _ClampedPct = MIN(MAX(_Pct, 0), 100)
+			VAR _BarWidth = INT(_ClampedPct * 1.8)
+			VAR _Color = 
+			    SWITCH(
+			        TRUE(),
+			        _ClampedPct >= 80, "#00D2D2",
+			        _ClampedPct >= 60, "#E50914",
+			        "#888888"
+			    )
+			RETURN
+			    "data:image/svg+xml;utf8," &
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='30' viewBox='0 0 240 30'>" &
+			    "<rect x='0' y='7' width='180' height='16' rx='8' fill='#242424'/>" &
+			    "<rect x='0' y='7' width='" & _BarWidth & "' height='16' rx='8' fill='" & _Color & "'/>" &
+			    "<text x='192' y='20' font-family='Segoe UI, sans-serif' font-size='14' font-weight='bold' fill='#FFFFFF'>" & 
+			    FORMAT(_ClampedPct, "0") & "%</text>" &
+			    "</svg>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: b00b4575-0562-4890-be17-c1393c7f586e
+		dataCategory: ImageUrl
+
+	measure SVG_Viewership_Sparkline = ```
+			
+			VAR _Hours = [Total_View_Hours_M]
+			VAR _P2 = INT(32 - MIN(MAX(_Hours * 0.15, 4), 26))
+			VAR _P3 = INT(32 - MIN(MAX(_Hours * 0.32, 6), 28))
+			RETURN
+			    "data:image/svg+xml;utf8," &
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='38' viewBox='0 0 160 38'>" &
+			    "<path d='M 6 30 Q 55 " & _P2 & ", 110 " & _P3 & " T 154 6' fill='none' stroke='#E50914' stroke-width='3.5' stroke-linecap='round'/>" &
+			    "<circle cx='154' cy='6' r='4.5' fill='#E50914'/>" &
+			    "</svg>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: d7409b29-ec2d-4952-911c-effb626d8f7c
+		dataCategory: ImageUrl
+
+	measure SVG_Rating_Star_Badge = ```
+			
+			VAR _Score = [Bayesian_Weighted_Score]
+			VAR _FormattedScore = FORMAT(_Score, "0.0")
+			RETURN
+			    "data:image/svg+xml;utf8," &
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='100' height='30' viewBox='0 0 100 30'>" &
+			    "<rect x='0' y='0' width='100' height='30' rx='6' fill='#1F1F1F' stroke='#333333' stroke-width='1.5'/>" &
+			    "<path d='M14 6l2.4 4.8 5.3.8-3.8 3.7.9 5.3-4.8-2.5-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z' fill='#F5C518'/>" &
+			    "<text x='32' y='21' font-family='Segoe UI, sans-serif' font-size='15' font-weight='bold' fill='#FFFFFF'>" & _FormattedScore & "</text>" &
+			    "</svg>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 15dc6c71-2142-48e8-b872-c94284f3153a
+		dataCategory: ImageUrl
+
+	measure SVG_Top10_Rank_Badge = ```
+			
+			VAR _Rank = RANKX(ALLSELECTED(Dim_Titles[title]), [Total_View_Hours_M], , DESC, Dense)
+			RETURN
+			    IF(
+			        NOT ISBLANK([Total_View_Hours_M]),
+			        "data:image/svg+xml;utf8," &
+			        "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'>" &
+			        "<text x='30' y='48' font-family='Segoe UI, Impact, sans-serif' font-size='50' font-weight='900' text-anchor='middle' fill='#141414' stroke='#E50914' stroke-width='2.5'>" & 
+			        _Rank & "</text>" &
+			        "</svg>",
+			        BLANK()
+			    )
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 296031a8-0f1b-4956-ad0a-f445e7d87c25
+		dataCategory: ImageUrl
+
+	measure SVG_ROI_Bullet_Meter = ```
+			
+			VAR _ROI = [Financial_ROI_Multiplier]
+			VAR _Width = INT(MIN(MAX(_ROI * 36, 0), 160))
+			VAR _FillColor = IF(_ROI >= 2.5, "#00D2D2", IF(_ROI >= 1.0, "#E50914", "#E5A914"))
+			RETURN
+			    "data:image/svg+xml;utf8," &
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='190' height='28' viewBox='0 0 190 28'>" &
+			    "<rect x='0' y='6' width='160' height='16' rx='4' fill='#2A2A2A'/>" &
+			    "<rect x='0' y='6' width='" & _Width & "' height='16' rx='4' fill='" & _FillColor & "'/>" &
+			    "<line x1='90' y1='2' x2='90' y2='26' stroke='#FFFFFF' stroke-width='2.5'/>" &
+			    "</svg>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: d744a54c-f5f0-46d5-8814-7039e6f27a15
+		dataCategory: ImageUrl
+
+	measure Total_Catalog_Titles = DISTINCTCOUNT(Dim_Titles[title_key])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 0907f5cb-cd52-48d6-b13a-51accc499d2f
+
+	measure Total_Movies = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "Movie")
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 0c40f9c1-56b4-4250-89dc-faa97004cb5b
+
+	measure Total_TV_Shows = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "TV Show")
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: c6b65cd4-ebf7-47cc-af70-0bc421cf8a8a
+
+	measure Total_View_Hours_M = SUM(Fact_Streaming_Performance[global_view_hours_millions])
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 99404404-8463-4db6-a69e-c5e7cd0b7a51
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_View_Hours_Formatted =
+			VAR _Hours = [Total_View_Hours_M]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _Hours >= 1000, FORMAT(_Hours / 1000, "#,##0.0") & " Billion Hrs",
+			        _Hours >= 1, FORMAT(_Hours, "#,##0.0") & " Million Hrs",
+			        FORMAT(_Hours * 1000, "#,##0") & " Thousand Hrs"
+			    )
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 237171ab-087b-4fd6-85e2-83664344858b
+
+	measure Avg_Completion_Rate_Pct = AVERAGE(Fact_Streaming_Performance[avg_completion_pct])
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: fce14974-270e-48d6-afa7-9722e6bc3541
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Subscribers_Reached_K = SUM(Fact_Streaming_Performance[subscribers_reached_thousands])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 2bc3f0d7-ecc8-413c-9409-a03111c2d5f5
+
+	measure Avg_Runtime_Minutes = AVERAGE(Dim_Titles[runtime_minutes_clean])
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: 933ed17e-296c-42c1-b3c8-243690167a13
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_YTD = CALCULATE([Total_View_Hours_M], DATESYTD(Dim_Date[full_date]))
+		displayFolder: 02: Time Intelligence
+		lineageTag: 2956c4a7-cdb3-4fbc-934e-44950457e06a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_PY = CALCULATE([Total_View_Hours_M], SAMEPERIODLASTYEAR(Dim_Date[full_date]))
+		displayFolder: 02: Time Intelligence
+		lineageTag: f9c89177-8323-40a3-93b0-f20d2ea4657b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_YoY_Growth =
+			VAR _Current = [Total_View_Hours_M]
+			VAR _Prior = [View_Hours_PY]
+			RETURN IF(NOT ISBLANK(_Prior), _Current - _Prior, BLANK())
+		displayFolder: 02: Time Intelligence
+		lineageTag: 2a262113-2ea9-49f3-97b6-e3b279409ddd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_YoY_Pct = DIVIDE([View_Hours_YoY_Growth], [View_Hours_PY], BLANK())
+		displayFolder: 02: Time Intelligence
+		lineageTag: b8431d1c-216c-4df1-a9bd-c2c129af56e8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_PM = CALCULATE([Total_View_Hours_M], PREVIOUSMONTH(Dim_Date[full_date]))
+		displayFolder: 02: Time Intelligence
+		lineageTag: 9ac05c0d-ab63-4a94-a3fa-04458de26e3c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure View_Hours_MoM_Pct = DIVIDE([Total_View_Hours_M] - [View_Hours_PM], [View_Hours_PM], BLANK())
+		displayFolder: 02: Time Intelligence
+		lineageTag: 0f2552ea-253a-40fe-8b45-b7d3e5888b4e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Rolling_28D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -28, DAY))
+		displayFolder: 02: Time Intelligence
+		lineageTag: fb1ac521-d138-4fef-9209-f404c309f89b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Rolling_90D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -90, DAY))
+		displayFolder: 02: Time Intelligence
+		lineageTag: da0ece5a-ae11-43d4-a8ca-b4c331463b00
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Pareto_Cumulative_View_Hours =
+			VAR _CurrentHours = [Total_View_Hours_M]
+			VAR _AllTitles = ALLSELECTED(Dim_Titles[title_key], Dim_Titles[title])
+			RETURN
+			    IF(
+			        NOT ISBLANK(_CurrentHours),
+			        SUMX(FILTER(_AllTitles, [Total_View_Hours_M] >= _CurrentHours), [Total_View_Hours_M])
+			    )
+		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
+		lineageTag: 0daa4f8a-0168-4e07-b0aa-7b5422e45311
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Pareto_Cumulative_Pct = DIVIDE([Pareto_Cumulative_View_Hours], CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles)), BLANK())
+		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
+		lineageTag: f4d62ed1-2389-48e9-9dcc-90dd5c79c633
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Pareto_Catalog_Tier =
+			VAR _CumPct = [Pareto_Cumulative_Pct]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(_CumPct), BLANK(),
+			        _CumPct <= 0.80, "Tier A (Top 80% Engine)",
+			        _CumPct <= 0.95, "Tier B (Mid 15% Sustainer)",
+			        "Tier C (Long-Tail 5%)"
+			    )
+		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
+		lineageTag: 92864bfc-6925-448e-9852-7fbe672ec2f6
+
+	measure Top_10_Concentration_Share_Pct =
+			VAR _Top10Hours = CALCULATE([Total_View_Hours_M], TOPN(10, ALLSELECTED(Dim_Titles), [Total_View_Hours_M], DESC))
+			VAR _TotalHours = CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles))
+			RETURN DIVIDE(_Top10Hours, _TotalHours, BLANK())
+		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
+		lineageTag: fc815ab0-64d0-4b69-b14a-ab2c7896b335
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Avg_IMDb_Rating = AVERAGE(Fact_Catalog_Ratings[vote_average])
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: c02c55e7-95f1-48c9-add3-6cddae2d4372
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Vote_Count = SUM(Fact_Catalog_Ratings[vote_count])
+		formatString: 0
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: 8200a76c-f793-4cc9-9c99-2b675ffb9865
+
+	measure Bayesian_Weighted_Score =
+			VAR _R = [Avg_IMDb_Rating]
+			VAR _v = [Total_Vote_Count]
+			VAR _m = 25000.0
+			VAR _C = 7.0
+			RETURN
+			    IF(NOT ISBLANK(_R) && _v > 0, DIVIDE(_v * _R + _m * _C, _v + _m, BLANK()), _C)
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: 2607084b-7f0d-4986-ba7c-2dad7d044c52
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Avg_Critic_Score = AVERAGE(Fact_Catalog_Ratings[critic_score])
+		formatString: 0
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: 001f5116-2eb1-4b5e-bd97-b86d48a09c37
+
+	measure Critic_Audience_Gap =
+			VAR _AudienceScaled = [Avg_IMDb_Rating] * 10.0
+			VAR _Critic = [Avg_Critic_Score]
+			RETURN IF(NOT ISBLANK(_Critic) && NOT ISBLANK(_AudienceScaled), _AudienceScaled - _Critic, BLANK())
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: 560bbb49-d8ae-4ec5-bae5-d87c0f3e41ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Quality_Tier_Classification =
+			VAR _Score = [Bayesian_Weighted_Score]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _Score >= 8.3, "🏆 Masterpiece (Top Tier)",
+			        _Score >= 7.5, "⭐ Certified Hit",
+			        _Score >= 6.5, "👍 Solid Performer",
+			        "⚠️ Mixed / Polarizing"
+			    )
+		displayFolder: 04: Bayesian Rating & Quality Scoring
+		lineageTag: 36b16d35-f9b3-46d4-a124-8ba835b2dded
+
+	measure Total_Production_Budget_M = DIVIDE(SUM(Fact_Financial_ROI[production_budget_usd]), 1000000, BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: 41978163-9ec1-4d87-a7e3-deccf0801374
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Worldwide_Gross_M = DIVIDE(SUM(Fact_Financial_ROI[worldwide_gross_usd]), 1000000, BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: f9c0e37f-5d2d-4162-b440-44c0db35d1ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Net_Box_Office_Profit_M =
+			VAR _Gross = [Total_Worldwide_Gross_M]
+			VAR _Budget = [Total_Production_Budget_M]
+			RETURN IF(NOT ISBLANK(_Gross) && _Gross > 0, _Gross - _Budget, BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: 4014f19f-c31e-4caf-b431-c332ee30d2ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Financial_ROI_Multiplier = DIVIDE([Total_Worldwide_Gross_M], [Total_Production_Budget_M], BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: 13b7097f-e930-4cf9-ada1-b11184180484
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Cost_Per_View_Hour_USD =
+			VAR _TotalBudgetUSD = SUM(Fact_Financial_ROI[production_budget_usd])
+			VAR _TotalViewHours = [Total_View_Hours_M] * 1000000
+			RETURN DIVIDE(_TotalBudgetUSD, _TotalViewHours, BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: 5b4c8ba5-6d80-423e-ac3c-9718c6eb5bf5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Budget_Efficiency_Index = DIVIDE([Total_View_Hours_M], [Total_Production_Budget_M], BLANK())
+		displayFolder: 05: Financial ROI & Unit Economics
+		lineageTag: b8b537c2-d45c-493e-83ee-92dd7821eb75
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Total unique conformed titles ingested into the Kimball Galaxy catalog across Movies and TV Shows.
+	/// 
+	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: e03832b1-8643-4f46-a59f-74d4696e6881
+
 	measure HTML_Navbar_Page0_Home = ```
 			
 			"<!DOCTYPE html>
@@ -778,549 +1326,15 @@ table _Measures
 		displayFolder: 00: SVG & HTML
 		lineageTag: f1153794-6e55-4c14-eb32-1b9f63da20fc
 
-	measure HTML_Netflix_Hero_Card = ```
-			
-			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Avatar: Fire and Ash")
-			VAR _Era = SELECTEDVALUE(Dim_Titles[catalog_era], "2026 Live Releases")
-			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
-			VAR _Runtime = FORMAT(SELECTEDVALUE(Dim_Titles[runtime_minutes_clean], 145), "0") & " min"
-			VAR _Hours = [Total_View_Hours_Formatted]
-			VAR _BayesianScore = FORMAT([Bayesian_Weighted_Score], "0.0")
-			VAR _MatchPct = FORMAT(MIN(MAX([Avg_Completion_Rate_Pct] + 18, 75), 99), "0") & "% Match"
-			RETURN
-			"<!DOCTYPE html>
-			<html>
-			<head>
-			<style>
-			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
-			  .hero-container {
-			    position: relative; width: 100%; height: 490px; border-radius: 20px;
-			    background: linear-gradient(90deg, #0A0A0A 0%, rgba(18,18,18,0.88) 50%, rgba(229,9,20,0.18) 100%), #141414;
-			    border: 1.5px solid rgba(255,255,255,0.1); padding: 50px 60px; display: flex; flex-direction: column; justify-content: center;
-			    box-shadow: 0 16px 40px rgba(0,0,0,0.85);
-			  }
-			  .featured-tag { color: #E50914; font-size: 16px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 10px; }
-			  .title-text { color: #FFFFFF; font-size: 48px; font-weight: 900; letter-spacing: -0.8px; margin-bottom: 12px; }
-			  .badge-row { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
-			  .match-badge { color: #46D369; font-weight: 800; font-size: 20px; }
-			  .rating-badge { border: 1.5px solid #888; color: #AAA; font-size: 15px; padding: 3px 10px; border-radius: 4px; }
-			  .tech-badge { background: #262626; color: #EEE; font-size: 14px; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
-			  .metrics-summary { color: #CCC; font-size: 19px; line-height: 1.6; max-width: 1200px; }
-			  .btn-row { display: flex; gap: 20px; margin-top: 24px; }
-			  .play-btn { background: #FFFFFF; color: #000000; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-			  .info-btn { background: rgba(109, 109, 110, 0.7); color: #FFFFFF; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; }
-			</style>
-			</head>
-			<body>
-			  <div class='hero-container'>
-			    <div class='featured-tag'>★ #1 STREAMING TITLE GLOBALLY</div>
-			    <div class='title-text'>" & _Title & "</div>
-			    <div class='badge-row'>
-			      <span class='match-badge'>" & _MatchPct & "</span>
-			      <span class='rating-badge'>" & _Rating & "</span>
-			      <span class='tech-badge'>" & _Runtime & "</span>
-			      <span class='tech-badge'>4K ULTRA HD</span>
-			      <span class='tech-badge'>DOLBY ATMOS</span>
-			      <span class='tech-badge'>★ " & _BayesianScore & " BAYESIAN</span>
-			    </div>
-			    <div class='metrics-summary'>
-			      Generated <b>" & _Hours & "</b> worldwide. Unfolds across multiple genre dimensions with top-tier viewer retention.
-			    </div>
-			    <div class='btn-row'>
-			      <button class='play-btn'>▶ Play Title</button>
-			      <button class='info-btn'>ⓘ More Info</button>
-			    </div>
-			  </div>
-			</body>
-			</html>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: ba325969-0369-4523-bf58-389eeff66bfc
-
-	measure HTML_Movie_Card_Card = ```
-			
-			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Avatar: Fire and Ash")
-			VAR _Genre = SELECTEDVALUE(Dim_Genres[genre_name], "Sci-Fi & Fantasy")
-			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
-			VAR _Score = FORMAT([Bayesian_Weighted_Score], "0.0")
-			VAR _Completion = FORMAT([Avg_Completion_Rate_Pct], "0") & "%"
-			RETURN
-			"<!DOCTYPE html>
-			<html>
-			<head>
-			<style>
-			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-			  .card-wrap {
-			    width: 100%; height: 100%; background: #1C1C1C; border-radius: 12px; padding: 22px;
-			    border: 1.5px solid #2B2B2B; display: flex; flex-direction: column; justify-content: space-between;
-			    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; cursor: pointer;
-			  }
-			  .card-wrap:hover {
-			    transform: translateY(-6px) scale(1.02); border-color: #E50914;
-			    box-shadow: 0 12px 28px rgba(229, 9, 20, 0.35);
-			  }
-			  .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-			  .card-title { color: #FFFFFF; font-size: 20px; font-weight: 800; line-height: 1.25; max-width: 240px; }
-			  .badge-score { background: #262626; color: #F5C518; font-size: 16px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
-			  .card-genre { color: #888888; font-size: 16px; font-weight: 500; margin-top: 4px; }
-			  .progress-bg { width: 100%; height: 6px; background: #333333; border-radius: 3px; overflow: hidden; margin-top: 10px; }
-			  .progress-fill { height: 100%; width: " & _Completion & "; background: #E50914; border-radius: 3px; }
-			  .card-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-			  .stat-label { color: #AAAAAA; font-size: 14px; }
-			  .stat-val { color: #00D2D2; font-size: 16px; font-weight: 800; }
-			</style>
-			</head>
-			<body>
-			  <div class='card-wrap'>
-			    <div>
-			      <div class='card-top'>
-			        <div class='card-title'>" & _Title & "</div>
-			        <div class='badge-score'>★ " & _Score & "</div>
-			      </div>
-			      <div class='card-genre'>" & _Genre & " • " & _Rating & "</div>
-			    </div>
-			    <div>
-			      <div class='progress-bg'><div class='progress-fill'></div></div>
-			      <div class='card-bot'>
-			        <span class='stat-label'>Avg Completion</span>
-			        <span class='stat-val'>" & _Completion & "</span>
-			      </div>
-			    </div>
-			  </div>
-			</body>
-			</html>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: 91449733-10cc-498f-a994-3eb1ec16c9f6
-
-	measure HTML_Glass_KPI_Scorecard = ```
-			
-			VAR _Hours = [Total_View_Hours_Formatted]
-			VAR _Growth = [View_Hours_YoY_Pct]
-			VAR _Subtitle = 
-			    IF(
-			        NOT ISBLANK(_Growth),
-			        IF(_Growth >= 0, "<span style='color:#46D369;'>▲ +" & FORMAT(_Growth, "0.0%") & "</span> vs prior year", "<span style='color:#E50914;'>▼ " & FORMAT(_Growth, "0.0%") & "</span> vs prior year"),
-			        "Stable baseline"
-			    )
-			RETURN
-			"<!DOCTYPE html>
-			<html>
-			<head>
-			<style>
-			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-			  .kpi-box {
-			    width: 100%; height: 180px; background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(16px);
-			    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 26px 32px;
-			    display: flex; flex-direction: column; justify-content: space-between; border-left: 6px solid #E50914;
-			  }
-			  .kpi-title { color: #9E9E9E; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
-			  .kpi-val { color: #FFFFFF; font-size: 42px; font-weight: 900; letter-spacing: -0.8px; }
-			  .kpi-sub { color: #888888; font-size: 16px; font-weight: 600; }
-			</style>
-			</head>
-			<body>
-			  <div class='kpi-box'>
-			    <div class='kpi-title'>GLOBAL VIEWERSHIP HOURS</div>
-			    <div class='kpi-val'>" & _Hours & "</div>
-			    <div class='kpi-sub'>" & _Subtitle & "</div>
-			  </div>
-			</body>
-			</html>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: 528af1f8-b03d-4323-8927-db7c919b8030
-
-	measure HTML_Modal_Detail_Tooltip = ```
-			
-			VAR _Title = SELECTEDVALUE(Dim_Titles[title], "Title Details")
-			VAR _Genre = SELECTEDVALUE(Dim_Genres[genre_name], "General")
-			VAR _Rating = SELECTEDVALUE(Dim_Titles[maturity_rating], "TV-MA")
-			VAR _Era = SELECTEDVALUE(Dim_Titles[catalog_era], "2026 Live")
-			VAR _Runtime = FORMAT(SELECTEDVALUE(Dim_Titles[runtime_minutes_clean], 90), "0") & "m"
-			VAR _Bayesian = FORMAT([Bayesian_Weighted_Score], "0.0")
-			VAR _Audience = FORMAT([Avg_IMDb_Rating], "0.0")
-			VAR _Critic = FORMAT([Avg_Critic_Score], "0")
-			VAR _Budget = IF(NOT ISBLANK([Total_Production_Budget_M]), "$" & FORMAT([Total_Production_Budget_M], "#,##0") & "M", "Direct SVOD")
-			VAR _Gross = IF(NOT ISBLANK([Total_Worldwide_Gross_M]), "$" & FORMAT([Total_Worldwide_Gross_M], "#,##0") & "M", "Streaming Only")
-			RETURN
-			"<!DOCTYPE html>
-			<html>
-			<head>
-			<style>
-			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-			  .modal-card {
-			    width: 480px; height: 360px; background: #141414; border: 1.5px solid #333333; border-radius: 12px;
-			    padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
-			    box-shadow: 0 16px 36px rgba(0,0,0,0.9);
-			  }
-			  .modal-header { border-bottom: 1.5px solid #262626; padding-bottom: 12px; margin-bottom: 12px; }
-			  .m-title { color: #FFFFFF; font-size: 24px; font-weight: 800; }
-			  .m-meta { color: #888888; font-size: 16px; margin-top: 4px; }
-			  .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-			  .stat-cell { background: #1C1C1C; padding: 10px 14px; border-radius: 6px; border-left: 3px solid #E50914; }
-			  .s-label { color: #888; font-size: 13px; text-transform: uppercase; font-weight: 700; }
-			  .s-val { color: #FFF; font-size: 18px; font-weight: 800; margin-top: 4px; }
-			  .score-cell { color: #F5C518; }
-			</style>
-			</head>
-			<body>
-			  <div class='modal-card'>
-			    <div class='modal-header'>
-			      <div class='m-title'>" & _Title & "</div>
-			      <div class='m-meta'>" & _Era & " • " & _Genre & " • " & _Rating & " • " & _Runtime & "</div>
-			    </div>
-			    <div class='grid-stats'>
-			      <div class='stat-cell'><div class='s-label'>Bayesian Score</div><div class='s-val score-cell'>★ " & _Bayesian & " / 10</div></div>
-			      <div class='stat-cell'><div class='s-label'>IMDb / Metascore</div><div class='s-val'>" & _Audience & " / " & _Critic & "</div></div>
-			      <div class='stat-cell'><div class='s-label'>Production Budget</div><div class='s-val'>" & _Budget & "</div></div>
-			      <div class='stat-cell'><div class='s-label'>Worldwide Gross</div><div class='s-val'>" & _Gross & "</div></div>
-			    </div>
-			    <div style='color:#555; font-size:12px; text-align:right;'>StreamPulse Semantic Galaxy Layer</div>
-			  </div>
-			</body>
-			</html>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: 528f74b2-0c75-44c0-9574-98d0d6437475
-
-	measure SVG_Completion_ProgressBar = ```
-			
-			VAR _Pct = [Avg_Completion_Rate_Pct]
-			VAR _ClampedPct = MIN(MAX(_Pct, 0), 100)
-			VAR _BarWidth = INT(_ClampedPct * 1.8)
-			VAR _Color = 
-			    SWITCH(
-			        TRUE(),
-			        _ClampedPct >= 80, "#00D2D2",
-			        _ClampedPct >= 60, "#E50914",
-			        "#888888"
-			    )
-			RETURN
-			    "data:image/svg+xml;utf8," &
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='30' viewBox='0 0 240 30'>" &
-			    "<rect x='0' y='7' width='180' height='16' rx='8' fill='#242424'/>" &
-			    "<rect x='0' y='7' width='" & _BarWidth & "' height='16' rx='8' fill='" & _Color & "'/>" &
-			    "<text x='192' y='20' font-family='Segoe UI, sans-serif' font-size='14' font-weight='bold' fill='#FFFFFF'>" & 
-			    FORMAT(_ClampedPct, "0") & "%</text>" &
-			    "</svg>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: b00b4575-0562-4890-be17-c1393c7f586e
-		dataCategory: ImageUrl
-
-	measure SVG_Viewership_Sparkline = ```
-			
-			VAR _Hours = [Total_View_Hours_M]
-			VAR _P2 = INT(32 - MIN(MAX(_Hours * 0.15, 4), 26))
-			VAR _P3 = INT(32 - MIN(MAX(_Hours * 0.32, 6), 28))
-			RETURN
-			    "data:image/svg+xml;utf8," &
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='38' viewBox='0 0 160 38'>" &
-			    "<path d='M 6 30 Q 55 " & _P2 & ", 110 " & _P3 & " T 154 6' fill='none' stroke='#E50914' stroke-width='3.5' stroke-linecap='round'/>" &
-			    "<circle cx='154' cy='6' r='4.5' fill='#E50914'/>" &
-			    "</svg>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: d7409b29-ec2d-4952-911c-effb626d8f7c
-		dataCategory: ImageUrl
-
-	measure SVG_Rating_Star_Badge = ```
+	measure Bayesian_Quality_Badge =
 			
 			VAR _Score = [Bayesian_Weighted_Score]
-			VAR _FormattedScore = FORMAT(_Score, "0.0")
-			RETURN
-			    "data:image/svg+xml;utf8," &
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='100' height='30' viewBox='0 0 100 30'>" &
-			    "<rect x='0' y='0' width='100' height='30' rx='6' fill='#1F1F1F' stroke='#333333' stroke-width='1.5'/>" &
-			    "<path d='M14 6l2.4 4.8 5.3.8-3.8 3.7.9 5.3-4.8-2.5-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z' fill='#F5C518'/>" &
-			    "<text x='32' y='21' font-family='Segoe UI, sans-serif' font-size='15' font-weight='bold' fill='#FFFFFF'>" & _FormattedScore & "</text>" &
-			    "</svg>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: 15dc6c71-2142-48e8-b872-c94284f3153a
-		dataCategory: ImageUrl
-
-	measure SVG_Top10_Rank_Badge = ```
-			
-			VAR _Rank = SELECTEDVALUE(Fact_Streaming_Performance[performance_key], 1)
-			RETURN
-			    "data:image/svg+xml;utf8," &
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'>" &
-			    "<text x='30' y='48' font-family='Segoe UI, Impact, sans-serif' font-size='50' font-weight='900' text-anchor='middle' fill='#141414' stroke='#E50914' stroke-width='2.5'>" & 
-			    _Rank & "</text>" &
-			    "</svg>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: 296031a8-0f1b-4956-ad0a-f445e7d87c25
-		dataCategory: ImageUrl
-
-	measure SVG_ROI_Bullet_Meter = ```
-			
-			VAR _ROI = [Financial_ROI_Multiplier]
-			VAR _Width = INT(MIN(MAX(_ROI * 36, 0), 160))
-			VAR _FillColor = IF(_ROI >= 2.5, "#00D2D2", IF(_ROI >= 1.0, "#E50914", "#E5A914"))
-			RETURN
-			    "data:image/svg+xml;utf8," &
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='190' height='28' viewBox='0 0 190 28'>" &
-			    "<rect x='0' y='6' width='160' height='16' rx='4' fill='#2A2A2A'/>" &
-			    "<rect x='0' y='6' width='" & _Width & "' height='16' rx='4' fill='" & _FillColor & "'/>" &
-			    "<line x1='90' y1='2' x2='90' y2='26' stroke='#FFFFFF' stroke-width='2.5'/>" &
-			    "</svg>"
-			
-			```
-		displayFolder: 00: SVG & HTML
-		lineageTag: d744a54c-f5f0-46d5-8814-7039e6f27a15
-		dataCategory: ImageUrl
-
-	measure Total_Catalog_Titles = DISTINCTCOUNT(Dim_Titles[title_key])
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 0907f5cb-cd52-48d6-b13a-51accc499d2f
-
-	measure Total_Movies = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "Movie")
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 0c40f9c1-56b4-4250-89dc-faa97004cb5b
-
-	measure Total_TV_Shows = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "TV Show")
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: c6b65cd4-ebf7-47cc-af70-0bc421cf8a8a
-
-	measure Total_View_Hours_M = SUM(Fact_Streaming_Performance[global_view_hours_millions])
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 99404404-8463-4db6-a69e-c5e7cd0b7a51
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Total_View_Hours_Formatted =
-			VAR _Hours = [Total_View_Hours_M]
-			RETURN
-			    SWITCH(
-			        TRUE(),
-			        _Hours >= 1000, FORMAT(_Hours / 1000, "#,##0.0") & " Billion Hrs",
-			        _Hours >= 1, FORMAT(_Hours, "#,##0.0") & " Million Hrs",
-			        FORMAT(_Hours * 1000, "#,##0") & " Thousand Hrs"
-			    )
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 237171ab-087b-4fd6-85e2-83664344858b
-
-	measure Avg_Completion_Rate_Pct = AVERAGE(Fact_Streaming_Performance[avg_completion_pct])
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: fce14974-270e-48d6-afa7-9722e6bc3541
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Total_Subscribers_Reached_K = SUM(Fact_Streaming_Performance[subscribers_reached_thousands])
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 2bc3f0d7-ecc8-413c-9409-a03111c2d5f5
-
-	measure Avg_Runtime_Minutes = AVERAGE(Dim_Titles[runtime_minutes_clean])
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: 933ed17e-296c-42c1-b3c8-243690167a13
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_YTD = CALCULATE([Total_View_Hours_M], DATESYTD(Dim_Date[full_date]))
-		displayFolder: 02: Time Intelligence
-		lineageTag: 2956c4a7-cdb3-4fbc-934e-44950457e06a
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_PY = CALCULATE([Total_View_Hours_M], SAMEPERIODLASTYEAR(Dim_Date[full_date]))
-		displayFolder: 02: Time Intelligence
-		lineageTag: f9c89177-8323-40a3-93b0-f20d2ea4657b
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_YoY_Growth =
-			VAR _Current = [Total_View_Hours_M]
-			VAR _Prior = [View_Hours_PY]
-			RETURN IF(NOT ISBLANK(_Prior), _Current - _Prior, BLANK())
-		displayFolder: 02: Time Intelligence
-		lineageTag: 2a262113-2ea9-49f3-97b6-e3b279409ddd
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_YoY_Pct = DIVIDE([View_Hours_YoY_Growth], [View_Hours_PY], BLANK())
-		displayFolder: 02: Time Intelligence
-		lineageTag: b8431d1c-216c-4df1-a9bd-c2c129af56e8
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_PM = CALCULATE([Total_View_Hours_M], PREVIOUSMONTH(Dim_Date[full_date]))
-		displayFolder: 02: Time Intelligence
-		lineageTag: 9ac05c0d-ab63-4a94-a3fa-04458de26e3c
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure View_Hours_MoM_Pct = DIVIDE([Total_View_Hours_M] - [View_Hours_PM], [View_Hours_PM], BLANK())
-		displayFolder: 02: Time Intelligence
-		lineageTag: 0f2552ea-253a-40fe-8b45-b7d3e5888b4e
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Rolling_28D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -28, DAY))
-		displayFolder: 02: Time Intelligence
-		lineageTag: fb1ac521-d138-4fef-9209-f404c309f89b
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Rolling_90D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -90, DAY))
-		displayFolder: 02: Time Intelligence
-		lineageTag: da0ece5a-ae11-43d4-a8ca-b4c331463b00
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Pareto_Cumulative_View_Hours =
-			VAR _CurrentHours = [Total_View_Hours_M]
-			VAR _AllTitles = ALLSELECTED(Dim_Titles[title_key], Dim_Titles[title])
-			RETURN
-			    IF(
-			        NOT ISBLANK(_CurrentHours),
-			        SUMX(FILTER(_AllTitles, [Total_View_Hours_M] >= _CurrentHours), [Total_View_Hours_M])
-			    )
-		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
-		lineageTag: 0daa4f8a-0168-4e07-b0aa-7b5422e45311
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Pareto_Cumulative_Pct = DIVIDE([Pareto_Cumulative_View_Hours], CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles)), BLANK())
-		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
-		lineageTag: f4d62ed1-2389-48e9-9dcc-90dd5c79c633
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Pareto_Catalog_Tier =
-			VAR _CumPct = [Pareto_Cumulative_Pct]
-			RETURN
-			    SWITCH(
-			        TRUE(),
-			        ISBLANK(_CumPct), BLANK(),
-			        _CumPct <= 0.80, "Tier A (Top 80% Engine)",
-			        _CumPct <= 0.95, "Tier B (Mid 15% Sustainer)",
-			        "Tier C (Long-Tail 5%)"
-			    )
-		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
-		lineageTag: 92864bfc-6925-448e-9852-7fbe672ec2f6
-
-	measure Top_10_Concentration_Share_Pct =
-			VAR _Top10Hours = CALCULATE([Total_View_Hours_M], TOPN(10, ALLSELECTED(Dim_Titles), [Total_View_Hours_M], DESC))
-			VAR _TotalHours = CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles))
-			RETURN DIVIDE(_Top10Hours, _TotalHours, BLANK())
-		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
-		lineageTag: fc815ab0-64d0-4b69-b14a-ab2c7896b335
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Avg_IMDb_Rating = AVERAGE(Fact_Catalog_Ratings[vote_average])
+			RETURN IF(NOT ISBLANK(_Score), "★ " & FORMAT(_Score, "0.0") & " / 10", BLANK())
 		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: c02c55e7-95f1-48c9-add3-6cddae2d4372
+		lineageTag: 38c39133-5cb9-4fb8-986e-91dcfeb56074
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Total_Vote_Count = SUM(Fact_Catalog_Ratings[vote_count])
-		formatString: 0
-		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: 8200a76c-f793-4cc9-9c99-2b675ffb9865
-
-	measure Bayesian_Weighted_Score =
-			VAR _R = [Avg_IMDb_Rating]
-			VAR _v = [Total_Vote_Count]
-			VAR _m = 25000.0
-			VAR _C = 7.0
-			RETURN
-			    IF(NOT ISBLANK(_R) && _v > 0, DIVIDE(_v * _R + _m * _C, _v + _m, BLANK()), _C)
-		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: 2607084b-7f0d-4986-ba7c-2dad7d044c52
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Avg_Critic_Score = AVERAGE(Fact_Catalog_Ratings[critic_score])
-		formatString: 0
-		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: 001f5116-2eb1-4b5e-bd97-b86d48a09c37
-
-	measure Critic_Audience_Gap =
-			VAR _AudienceScaled = [Avg_IMDb_Rating] * 10.0
-			VAR _Critic = [Avg_Critic_Score]
-			RETURN IF(NOT ISBLANK(_Critic) && NOT ISBLANK(_AudienceScaled), _AudienceScaled - _Critic, BLANK())
-		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: 560bbb49-d8ae-4ec5-bae5-d87c0f3e41ed
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Quality_Tier_Classification =
-			VAR _Score = [Bayesian_Weighted_Score]
-			RETURN
-			    SWITCH(
-			        TRUE(),
-			        _Score >= 8.3, "🏆 Masterpiece (Top Tier)",
-			        _Score >= 7.5, "⭐ Certified Hit",
-			        _Score >= 6.5, "👍 Solid Performer",
-			        "⚠️ Mixed / Polarizing"
-			    )
-		displayFolder: 04: Bayesian Rating & Quality Scoring
-		lineageTag: 36b16d35-f9b3-46d4-a124-8ba835b2dded
-
-	measure Total_Production_Budget_M = DIVIDE(SUM(Fact_Financial_ROI[production_budget_usd]), 1000000, BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: 41978163-9ec1-4d87-a7e3-deccf0801374
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Total_Worldwide_Gross_M = DIVIDE(SUM(Fact_Financial_ROI[worldwide_gross_usd]), 1000000, BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: f9c0e37f-5d2d-4162-b440-44c0db35d1ad
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Net_Box_Office_Profit_M =
-			VAR _Gross = [Total_Worldwide_Gross_M]
-			VAR _Budget = [Total_Production_Budget_M]
-			RETURN IF(NOT ISBLANK(_Gross) && _Gross > 0, _Gross - _Budget, BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: 4014f19f-c31e-4caf-b431-c332ee30d2ad
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Financial_ROI_Multiplier = DIVIDE([Total_Worldwide_Gross_M], [Total_Production_Budget_M], BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: 13b7097f-e930-4cf9-ada1-b11184180484
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Cost_Per_View_Hour_USD =
-			VAR _TotalBudgetUSD = SUM(Fact_Financial_ROI[production_budget_usd])
-			VAR _TotalViewHours = [Total_View_Hours_M] * 1000000
-			RETURN DIVIDE(_TotalBudgetUSD, _TotalViewHours, BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: 5b4c8ba5-6d80-423e-ac3c-9718c6eb5bf5
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure Budget_Efficiency_Index = DIVIDE([Total_View_Hours_M], [Total_Production_Budget_M], BLANK())
-		displayFolder: 05: Financial ROI & Unit Economics
-		lineageTag: b8b537c2-d45c-493e-83ee-92dd7821eb75
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Total unique conformed titles ingested into the Kimball Galaxy catalog across Movies and TV Shows.
-	/// 
-	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: e03832b1-8643-4f46-a59f-74d4696e6881
 	partition _Measures = m
 		mode: import
 		source =

@@ -667,14 +667,14 @@ in
 
 ---
 
-## 3. Netflix Web-App UI Components in Power BI (HTML, CSS & SVG)
+## 3. Netflix Web-App UI Components in Power BI (4K UHD Optimized HTML, CSS & SVG)
 
-To give Power BI the exact look and feel of a **modern streaming platform website & command center**, use these DAX measures in conjunction with the **HTML Content visual (AppSource)** or the native **New Card Visual** (with Data Category set to `Image URL`).
+To give Power BI the exact look and feel of a **modern streaming platform website & command center** running natively on **4K UHD (3840 x 2160)** displays, use these DAX measures in conjunction with the **HTML Content visual (AppSource)** or the native **New Card Visual** (with Data Category set to `Image URL`).
 
 ---
 
-### HTML/CSS Web Component 0.1: Netflix Home Page Hero Command Banner
-*Add this measure to an HTML Content visual across the top of **Page 0 (Home Page)** (Width: 1840px, Height: 180px).*
+### HTML/CSS Web Component 0.1: Netflix Home Page Hero Command Banner (4K UHD)
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** with 4K dimensions ($X: 60, Y: 150, W: 3720, H: 340$).*
 
 ```dax
 HTML_Home_Hero_Banner = 
@@ -695,42 +695,38 @@ RETURN
 <head>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
   @keyframes pulseGlow {
-    0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); }
-    70% { box-shadow: 0 0 0 12px rgba(229, 9, 20, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.8); }
+    70% { box-shadow: 0 0 0 20px rgba(229, 9, 20, 0); }
     100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
   }
   .hero-home-wrap {
-    width: 100%; height: 160px; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 60%, rgba(229, 9, 20, 0.18) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08); padding: 25px 35px;
+    width: 100%; height: 320px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.96) 0%, rgba(10, 10, 10, 0.98) 60%, rgba(229, 9, 20, 0.22) 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.1); padding: 40px 60px;
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85);
   }
-  .left-hero { display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
-  .greeting-tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; color: #E50914; letter-spacing: 1.2px; text-transform: uppercase; }
-  .pulse-dot { width: 8px; height: 8px; background: #E50914; border-radius: 50%; animation: pulseGlow 1.8s infinite; }
+  .left-hero { display: flex; flex-direction: column; gap: 14px; max-width: 2000px; }
+  .greeting-tag { display: flex; align-items: center; gap: 14px; font-size: 18px; font-weight: 800; color: #E50914; letter-spacing: 2px; text-transform: uppercase; }
+  .pulse-dot { width: 12px; height: 12px; background: #E50914; border-radius: 50%; animation: pulseGlow 1.8s infinite; }
   .hero-title {
-    font-size: 32px; font-weight: 900; letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #FFFFFF 0%, #E0E0E0 50%, #E50914 100%);
+    font-size: 48px; font-weight: 900; letter-spacing: -1px; line-height: 1.15;
+    background: linear-gradient(90deg, #FFFFFF 0%, #EAEAEA 50%, #E50914 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .hero-subtitle { color: #A3A3A3; font-size: 13px; font-weight: 400; line-height: 1.4; }
+  .hero-subtitle { color: #A3A3A3; font-size: 20px; font-weight: 400; line-height: 1.5; }
   .hero-metrics-pill {
-    display: flex; align-items: center; gap: 20px; background: rgba(30, 30, 30, 0.6);
-    backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 12px 24px; border-radius: 10px;
+    display: flex; align-items: center; gap: 32px; background: rgba(30, 30, 30, 0.7);
+    backdrop-filter: blur(16px); border: 1.5px solid rgba(255, 255, 255, 0.08);
+    padding: 22px 42px; border-radius: 16px;
   }
   .pill-item { display: flex; flex-direction: column; }
-  .pill-label { color: #888888; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-  .pill-val { color: #FFFFFF; font-size: 18px; font-weight: 800; }
+  .pill-label { color: #888888; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
+  .pill-val { color: #FFFFFF; font-size: 32px; font-weight: 900; margin-top: 4px; }
   .pill-val.gold { color: #F5C518; }
   .pill-val.teal { color: #00D2D2; }
-  .pill-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.1); }
+  .pill-divider { width: 1.5px; height: 48px; background: rgba(255, 255, 255, 0.12); }
 </style>
 </head>
 <body>
@@ -766,8 +762,8 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 0.2: Interactive 5-Module Navigation Portal Hub
-*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 240px) to render clickable module cards.*
+### HTML/CSS Web Component 0.2: Interactive 5-Module Navigation Portal Hub (4K UHD)
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** with 4K dimensions ($X: 60, Y: 610, W: 3720, H: 460$).*
 
 ```dax
 HTML_Home_Navigation_Hub = 
@@ -777,37 +773,37 @@ HTML_Home_Navigation_Hub =
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
   .nav-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; width: 100%; height: 220px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; width: 100%; height: 430px;
   }
   .module-card {
-    background: #141414; border: 1px solid #242424; border-radius: 12px; padding: 20px 18px;
+    background: #141414; border: 1.5px solid #242424; border-radius: 18px; padding: 32px 28px;
     display: flex; flex-direction: column; justify-content: space-between;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; position: relative; overflow: hidden;
   }
   .module-card::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
     background: transparent; transition: background 0.3s ease;
   }
   .module-card:hover {
-    transform: translateY(-6px); background: #1C1C1C;
-    border-color: #E50914; box-shadow: 0 12px 24px rgba(229, 9, 20, 0.25);
+    transform: translateY(-8px); background: #1A1A1A;
+    border-color: #E50914; box-shadow: 0 16px 36px rgba(229, 9, 20, 0.3);
   }
   .module-card:hover::before { background: #E50914; }
   .mod-header { display: flex; align-items: center; justify-content: space-between; }
   .mod-badge {
-    width: 36px; height: 36px; border-radius: 8px; background: rgba(229, 9, 20, 0.12);
-    border: 1px solid rgba(229, 9, 20, 0.3); display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: #E50914;
+    width: 58px; height: 58px; border-radius: 14px; background: rgba(229, 9, 20, 0.12);
+    border: 1.5px solid rgba(229, 9, 20, 0.35); display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #E50914;
   }
-  .mod-num { color: #555555; font-size: 12px; font-weight: 800; }
-  .mod-title { color: #FFFFFF; font-size: 15px; font-weight: 800; margin-top: 12px; line-height: 1.2; }
-  .mod-desc { color: #888888; font-size: 11px; font-weight: 400; line-height: 1.4; margin-top: 6px; }
+  .mod-num { color: #666666; font-size: 16px; font-weight: 800; }
+  .mod-title { color: #FFFFFF; font-size: 24px; font-weight: 800; margin-top: 20px; line-height: 1.25; }
+  .mod-desc { color: #999999; font-size: 16px; font-weight: 400; line-height: 1.5; margin-top: 10px; }
   .mod-cta {
-    display: flex; align-items: center; gap: 6px; color: #E50914; font-size: 11px;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 14px;
+    display: flex; align-items: center; gap: 8px; color: #E50914; font-size: 16px;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 22px;
   }
   .mod-cta-arrow { transition: transform 0.2s ease; }
-  .module-card:hover .mod-cta-arrow { transform: translateX(4px); }
+  .module-card:hover .mod-cta-arrow { transform: translateX(6px); }
 </style>
 </head>
 <body>
@@ -883,8 +879,8 @@ HTML_Home_Navigation_Hub =
 
 ---
 
-### HTML/CSS Web Component 0.3: Live Real-Time Marquee Ticker
-*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 44px) for a continuous news ticker.*
+### HTML/CSS Web Component 0.3: Live Real-Time Marquee Ticker (4K UHD)
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** with 4K dimensions ($X: 60, Y: 510, W: 3720, H: 80$).*
 
 ```dax
 HTML_Home_Marquee_Ticker = 
@@ -898,20 +894,20 @@ HTML_Home_Marquee_Ticker =
     100% { transform: translateX(-100%); }
   }
   .ticker-wrap {
-    width: 100%; height: 38px; background: rgba(18, 18, 18, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px;
-    display: flex; align-items: center; overflow: hidden; padding: 0 10px;
+    width: 100%; height: 70px; background: rgba(18, 18, 18, 0.95);
+    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 12px;
+    display: flex; align-items: center; overflow: hidden; padding: 0 20px;
   }
   .ticker-badge {
-    background: #E50914; color: #FFFFFF; font-size: 10px; font-weight: 900;
-    padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;
-    white-space: nowrap; margin-right: 15px; z-index: 2; box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    background: #E50914; color: #FFFFFF; font-size: 16px; font-weight: 900;
+    padding: 6px 16px; border-radius: 6px; letter-spacing: 1.5px; text-transform: uppercase;
+    white-space: nowrap; margin-right: 25px; z-index: 2; box-shadow: 0 0 16px rgba(229, 9, 20, 0.6);
   }
   .ticker-content {
     display: inline-block; white-space: nowrap;
-    animation: marquee 35s linear infinite; color: #CCCCCC; font-size: 12px; font-weight: 500;
+    animation: marquee 40s linear infinite; color: #CCCCCC; font-size: 20px; font-weight: 500;
   }
-  .ticker-item { margin-right: 40px; }
+  .ticker-item { margin-right: 60px; }
   .ticker-highlight { color: #FFFFFF; font-weight: 700; }
   .ticker-green { color: #46D369; font-weight: 700; }
   .ticker-gold { color: #F5C518; font-weight: 700; }
@@ -936,8 +932,8 @@ HTML_Home_Marquee_Ticker =
 
 ---
 
-### HTML/CSS Web Component 0.4: Platform Architecture & Metadata Drawer
-*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 280px).*
+### HTML/CSS Web Component 0.4: Platform Architecture & Metadata Drawer (4K UHD)
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** with 4K dimensions ($X: 60, Y: 1090, W: 3720, H: 540$).*
 
 ```dax
 HTML_Home_Platform_Vitals = 
@@ -947,26 +943,26 @@ HTML_Home_Platform_Vitals =
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
   .vitals-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; height: 260px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; width: 100%; height: 500px;
   }
   .vital-card {
-    background: #121212; border: 1px solid #222222; border-radius: 10px; padding: 18px;
+    background: #121212; border: 1.5px solid #222222; border-radius: 16px; padding: 30px;
     display: flex; flex-direction: column; justify-content: space-between;
   }
-  .vital-card.primary { border-left: 4px solid #E50914; }
-  .vital-card.success { border-left: 4px solid #46D369; }
-  .vital-card.teal { border-left: 4px solid #00D2D2; }
-  .vital-card.gold { border-left: 4px solid #F5C518; }
-  .v-title { color: #888888; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-  .v-metric { color: #FFFFFF; font-size: 22px; font-weight: 800; margin: 6px 0; }
-  .v-list { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
-  .v-item { color: #AAAAAA; font-size: 11px; display: flex; align-items: center; justify-content: space-between; }
-  .v-tag { background: #222222; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #EEE; }
+  .vital-card.primary { border-left: 6px solid #E50914; }
+  .vital-card.success { border-left: 6px solid #46D369; }
+  .vital-card.teal { border-left: 6px solid #00D2D2; }
+  .vital-card.gold { border-left: 6px solid #F5C518; }
+  .v-title { color: #888888; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
+  .v-metric { color: #FFFFFF; font-size: 34px; font-weight: 900; margin: 10px 0; }
+  .v-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .v-item { color: #AAAAAA; font-size: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .v-tag { background: #222222; padding: 4px 10px; border-radius: 4px; font-weight: 600; color: #EEE; font-size: 14px; }
   .status-pill {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
-    color: #46D369; background: rgba(70, 211, 105, 0.12); padding: 4px 8px; border-radius: 12px; width: fit-content;
+    display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700;
+    color: #46D369; background: rgba(70, 211, 105, 0.14); padding: 6px 14px; border-radius: 16px; width: fit-content;
   }
-  .status-dot { width: 6px; height: 6px; background: #46D369; border-radius: 50%; }
+  .status-dot { width: 8px; height: 8px; background: #46D369; border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -993,7 +989,7 @@ HTML_Home_Platform_Vitals =
       </div>
       <div>
         <div class='status-pill'><div class='status-dot'></div> ACTIVE &amp; SYNCED</div>
-        <ul class='v-list' style='margin-top: 8px;'>
+        <ul class='v-list' style='margin-top: 12px;'>
           <li class='v-item'><span>Sync Frequency</span> <span class='v-tag'>Daily Cron</span></li>
           <li class='v-item'><span>Data Profiling</span> <span class='v-tag'>100% Conformed</span></li>
           <li class='v-item'><span>Entity Match</span> <span class='v-tag'>RapidFuzz Levenshtein</span></li>
@@ -1035,34 +1031,34 @@ HTML_Home_Platform_Vitals =
 
 ---
 
-### Animated SVG Vector Measure 1: Pure SVG Animated Pulsing Radar Beacon
+### Animated SVG Vector Measure 1: Pure SVG Animated Pulsing Radar Beacon (4K UHD)
 *Set Data Category to **`Image URL`**. Use in tables, matrix headers, or the New Card Visual for an animated neon live status beacon.*
 
 ```dax
 SVG_Animated_Pulse_Radar = 
-"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'>
+"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60'>
   <style>
     @keyframes pulseRing {
-      0% { r: 6px; opacity: 1; stroke-width: 2px; }
-      100% { r: 18px; opacity: 0; stroke-width: 0.5px; }
+      0% { r: 8px; opacity: 1; stroke-width: 3px; }
+      100% { r: 26px; opacity: 0; stroke-width: 0.8px; }
     }
     @keyframes centerGlow {
       0%, 100% { transform: scale(1); fill: %23E50914; }
-      50% { transform: scale(1.2); fill: %23FF3333; }
+      50% { transform: scale(1.25); fill: %23FF3333; }
     }
     .ring1 { animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
     .ring2 { animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite 0.6s; }
     .dot { transform-origin: center; animation: centerGlow 1.5s ease-in-out infinite; }
   </style>
-  <circle class='ring1' cx='20' cy='20' r='6' fill='none' stroke='%23E50914' />
-  <circle class='ring2' cx='20' cy='20' r='6' fill='none' stroke='%23E50914' />
-  <circle class='dot' cx='20' cy='20' r='5' fill='%23E50914' />
+  <circle class='ring1' cx='30' cy='30' r='8' fill='none' stroke='%23E50914' />
+  <circle class='ring2' cx='30' cy='30' r='8' fill='none' stroke='%23E50914' />
+  <circle class='dot' cx='30' cy='30' r='7' fill='%23E50914' />
 </svg>"
 ```
 
 ---
 
-### Animated SVG Vector Measure 2: Real-Time Animated Quality Gauge Ring
+### Animated SVG Vector Measure 2: Real-Time Animated Quality Gauge Ring (4K UHD)
 *Set Data Category to **`Image URL`**. Renders an animated SVG radial completion gauge.*
 
 ```dax
@@ -1071,17 +1067,17 @@ VAR _Score = [Avg_Completion_Rate_Pct]
 VAR _Pct = IF(ISBLANK(_Score), 75, MIN(MAX(_Score, 0), 100))
 VAR _DashOffset = FORMAT(283 - (283 * (_Pct / 100.0)), "0")
 RETURN
-"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='80' height='80'>
+"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='120' height='120'>
   <style>
-    .track { fill: none; stroke: %23262626; stroke-width: 8; }
+    .track { fill: none; stroke: %23262626; stroke-width: 9; }
     .fill-bar {
-      fill: none; stroke: %2300D2D2; stroke-width: 8;
+      fill: none; stroke: %2300D2D2; stroke-width: 9;
       stroke-dasharray: 283; stroke-dashoffset: " & _DashOffset & ";
       stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%;
       transition: stroke-dashoffset 0.8s ease;
     }
-    .score-txt { font-family: Segoe UI, sans-serif; font-size: 20px; font-weight: 800; fill: %23FFFFFF; text-anchor: middle; dominant-baseline: middle; }
-    .sub-txt { font-family: Segoe UI, sans-serif; font-size: 8px; font-weight: 600; fill: %23888888; text-anchor: middle; }
+    .score-txt { font-family: Segoe UI, sans-serif; font-size: 22px; font-weight: 900; fill: %23FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+    .sub-txt { font-family: Segoe UI, sans-serif; font-size: 9px; font-weight: 700; fill: %23888888; text-anchor: middle; }
   </style>
   <circle class='track' cx='50' cy='50' r='45' />
   <circle class='fill-bar' cx='50' cy='50' r='45' />
@@ -1092,57 +1088,8 @@ RETURN
 
 ---
 
-### 🎨 How to Integrate Animated GIFs & Lottie in Power BI
-
-Power BI allows you to embed animated GIFs and animated SVGs seamlessly using three distinct techniques:
-
-#### Technique A: Direct HTML Content Visual (Recommended for Web Portals)
-Pass animated GIF URLs or Base64 data URIs directly inside your DAX measures:
-```dax
-HTML_Animated_Hero_GIF = 
-"<!DOCTYPE html>
-<html>
-<head>
-<style>
-  .gif-container {
-    width: 100%; height: 100%; border-radius: 8px; overflow: hidden;
-    position: relative; border: 1px solid #333333;
-  }
-  .gif-img { width: 100%; height: 100%; object-fit: cover; }
-  .gif-overlay {
-    position: absolute; bottom: 0; left: 0; width: 100%;
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 100%);
-    padding: 15px; color: #FFF; font-family: Segoe UI, sans-serif;
-  }
-</style>
-</head>
-<body>
-  <div class='gif-container'>
-    <img class='gif-img' src='https://assets.nflxext.com/ffe/siteui/acquisition/ourStory/fuji/desktop/video-tv-0819.m4v' alt='StreamPulse Pulse' />
-    <div class='gif-overlay'>
-      <div style='font-size:14px; font-weight:bold;'>DirectQuery Live Radar</div>
-      <div style='font-size:11px; color:#AAA;'>Real-time streaming ingestion active</div>
-    </div>
-  </div>
-</body>
-</html>"
-```
-
-#### Technique B: Native New Card Visual via Animated SVG (Zero Dependencies)
-Create a DAX measure returning SVG code with `@keyframes` animations (e.g. `[SVG_Animated_Pulse_Radar]`), set its **Data Category** to `Image URL`, and bind it to the Image slot of Power BI's native **New Card visual**.
-
-#### Technique C: Local GIF Playback via Line Chart Plot Area
-If you want to play a local `.gif` without external hosting:
-1. Insert a blank **Line Chart** visual.
-2. Go to **Format Visual > Plot Area Background > Add Image**.
-3. Browse and select your `.gif` file.
-4. Set **Image Fit** to `Fit` and **Transparency** to `0%`.
-5. Turn off X-Axis, Y-Axis, Title, and Gridlines. Power BI will loop the GIF infinitely on canvas.
-
----
-
-### HTML/CSS Web Component 1: Netflix Top Navigation Header
-*Add this measure to an HTML Content visual anchored across the top of your report (Width: 1920px, Height: 70px).*
+### HTML/CSS Web Component 1: Netflix Top Navigation Header (4K UHD)
+*Add this measure to an HTML Content visual anchored across the top of every report page ($X: 0, Y: 0, W: 3840, H: 120$).*
 
 ```dax
 HTML_Netflix_Navbar = 
@@ -1155,22 +1102,22 @@ RETURN
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
   .navbar {
     display: flex; align-items: center; justify-content: space-between;
-    width: 100%; height: 60px; background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(18,18,18,0.7) 100%);
-    backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 35px;
+    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
   }
-  .left-group { display: flex; align-items: center; gap: 32px; }
-  .brand-logo { color: #E50914; font-size: 24px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; }
-  .nav-links { display: flex; gap: 24px; list-style: none; }
-  .nav-item { color: #CCCCCC; font-size: 14px; font-weight: 500; transition: color 0.2s ease; cursor: pointer; }
-  .nav-item.active { color: #FFFFFF; font-weight: 700; border-bottom: 2px solid #E50914; padding-bottom: 4px; }
+  .left-group { display: flex; align-items: center; gap: 48px; }
+  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: color 0.2s ease; cursor: pointer; }
+  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; padding-bottom: 6px; }
   .nav-item:hover { color: #E50914; }
-  .right-group { display: flex; align-items: center; gap: 20px; }
+  .right-group { display: flex; align-items: center; gap: 28px; }
   .live-badge {
-    display: flex; align-items: center; gap: 6px; background: rgba(229, 9, 20, 0.15);
-    border: 1px solid #E50914; color: #E50914; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
   }
-  .pulse-dot { width: 7px; height: 7px; background: #E50914; border-radius: 50%; box-shadow: 0 0 8px #E50914; }
-  .user-avatar { width: 32px; height: 32px; border-radius: 4px; background: #2A2A2A; border: 1px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 12px; font-weight: bold; }
+  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -1197,8 +1144,8 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 2: Netflix Featured Hero Player & Metadata Card
-*Generates the signature Netflix featured hero banner with trailer mockups, rating match percentage, and audio/video badges.*
+### HTML/CSS Web Component 2: Netflix Featured Hero Player & Metadata Card (4K UHD)
+*Generates the signature Netflix featured hero banner with trailer mockup, rating match percentage, and audio/video badges ($X: 60, Y: 150, W: 2400, H: 520$).*
 
 ```dax
 HTML_Netflix_Hero_Card = 
@@ -1216,21 +1163,21 @@ RETURN
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
   .hero-container {
-    position: relative; width: 100%; height: 260px; border-radius: 12px;
-    background: linear-gradient(90deg, #0A0A0A 0%, rgba(18,18,18,0.85) 50%, rgba(229,9,20,0.15) 100%), #141414;
-    border: 1px solid rgba(255,255,255,0.1); padding: 30px 40px; display: flex; flex-direction: column; justify-content: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    position: relative; width: 100%; height: 490px; border-radius: 20px;
+    background: linear-gradient(90deg, #0A0A0A 0%, rgba(18,18,18,0.88) 50%, rgba(229,9,20,0.18) 100%), #141414;
+    border: 1.5px solid rgba(255,255,255,0.1); padding: 50px 60px; display: flex; flex-direction: column; justify-content: center;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.85);
   }
-  .featured-tag { color: #E50914; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-  .title-text { color: #FFFFFF; font-size: 32px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
-  .badge-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .match-badge { color: #46D369; font-weight: 700; font-size: 14px; }
-  .rating-badge { border: 1px solid #888; color: #AAA; font-size: 11px; padding: 1px 6px; border-radius: 2px; }
-  .tech-badge { background: #262626; color: #EEE; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; }
-  .metrics-summary { color: #CCC; font-size: 13px; line-height: 1.5; max-width: 650px; }
-  .btn-row { display: flex; gap: 14px; margin-top: 16px; }
-  .play-btn { background: #FFFFFF; color: #000000; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .info-btn { background: rgba(109, 109, 110, 0.7); color: #FFFFFF; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; }
+  .featured-tag { color: #E50914; font-size: 16px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .title-text { color: #FFFFFF; font-size: 48px; font-weight: 900; letter-spacing: -0.8px; margin-bottom: 12px; }
+  .badge-row { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .match-badge { color: #46D369; font-weight: 800; font-size: 20px; }
+  .rating-badge { border: 1.5px solid #888; color: #AAA; font-size: 15px; padding: 3px 10px; border-radius: 4px; }
+  .tech-badge { background: #262626; color: #EEE; font-size: 14px; font-weight: 800; padding: 4px 8px; border-radius: 4px; }
+  .metrics-summary { color: #CCC; font-size: 19px; line-height: 1.6; max-width: 1200px; }
+  .btn-row { display: flex; gap: 20px; margin-top: 24px; }
+  .play-btn { background: #FFFFFF; color: #000000; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .info-btn { background: rgba(109, 109, 110, 0.7); color: #FFFFFF; font-weight: 800; font-size: 18px; padding: 12px 30px; border-radius: 6px; border: none; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -1259,7 +1206,7 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 3: Netflix Movie Poster Card Carousel with Hover Glow
+### HTML/CSS Web Component 3: Netflix Movie Poster Card Carousel with Hover Glow (4K UHD)
 *HTML component rendering a Netflix streaming carousel card with smooth hover transitions.*
 
 ```dax
@@ -1276,32 +1223,34 @@ RETURN
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
   .card-wrap {
-    width: 220px; height: 130px; background: #1C1C1C; border-radius: 8px; padding: 14px;
-    border: 1px solid #2B2B2B; display: flex; flex-direction: column; justify-content: space-between;
+    width: 100%; height: 100%; background: #1C1C1C; border-radius: 12px; padding: 22px;
+    border: 1.5px solid #2B2B2B; display: flex; flex-direction: column; justify-content: space-between;
     transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; cursor: pointer;
   }
   .card-wrap:hover {
-    transform: translateY(-4px) scale(1.02); border-color: #E50914;
-    box-shadow: 0 8px 20px rgba(229, 9, 20, 0.35);
+    transform: translateY(-6px) scale(1.02); border-color: #E50914;
+    box-shadow: 0 12px 28px rgba(229, 9, 20, 0.35);
   }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .card-title { color: #FFFFFF; font-size: 13px; font-weight: 700; line-height: 1.2; max-width: 140px; }
-  .badge-score { background: #262626; color: #F5C518; font-size: 11px; font-weight: 700; padding: 2px 5px; border-radius: 4px; }
-  .card-genre { color: #888888; font-size: 11px; font-weight: 500; }
-  .progress-bg { width: 100%; height: 4px; background: #333333; border-radius: 2px; overflow: hidden; margin-top: 6px; }
-  .progress-fill { height: 100%; width: " & _Completion & "; background: #E50914; border-radius: 2px; }
-  .card-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-  .stat-label { color: #AAAAAA; font-size: 10px; }
-  .stat-val { color: #00D2D2; font-size: 11px; font-weight: 700; }
+  .card-title { color: #FFFFFF; font-size: 20px; font-weight: 800; line-height: 1.25; max-width: 240px; }
+  .badge-score { background: #262626; color: #F5C518; font-size: 16px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+  .card-genre { color: #888888; font-size: 16px; font-weight: 500; margin-top: 4px; }
+  .progress-bg { width: 100%; height: 6px; background: #333333; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+  .progress-fill { height: 100%; width: " & _Completion & "; background: #E50914; border-radius: 3px; }
+  .card-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .stat-label { color: #AAAAAA; font-size: 14px; }
+  .stat-val { color: #00D2D2; font-size: 16px; font-weight: 800; }
 </style>
 </head>
 <body>
   <div class='card-wrap'>
-    <div class='card-top'>
-      <div class='card-title'>" & _Title & "</div>
-      <div class='badge-score'>★ " & _Score & "</div>
+    <div>
+      <div class='card-top'>
+        <div class='card-title'>" & _Title & "</div>
+        <div class='badge-score'>★ " & _Score & "</div>
+      </div>
+      <div class='card-genre'>" & _Genre & " • " & _Rating & "</div>
     </div>
-    <div class='card-genre'>" & _Genre & " • " & _Rating & "</div>
     <div>
       <div class='progress-bg'><div class='progress-fill'></div></div>
       <div class='card-bot'>
@@ -1316,7 +1265,7 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 4: Interactive Glassmorphic KPI Scorecard
+### HTML/CSS Web Component 4: Interactive Glassmorphic KPI Scorecard (4K UHD)
 ```dax
 HTML_Glass_KPI_Scorecard = 
 VAR _Hours = [Total_View_Hours_Formatted]
@@ -1334,13 +1283,13 @@ RETURN
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
   .kpi-box {
-    width: 100%; height: 110px; background: rgba(22, 22, 22, 0.75); backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 16px 20px;
-    display: flex; flex-direction: column; justify-content: space-between; border-left: 4px solid #E50914;
+    width: 100%; height: 180px; background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 26px 32px;
+    display: flex; flex-direction: column; justify-content: space-between; border-left: 6px solid #E50914;
   }
-  .kpi-title { color: #9E9E9E; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
-  .kpi-val { color: #FFFFFF; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
-  .kpi-sub { color: #777777; font-size: 11px; font-weight: 500; }
+  .kpi-title { color: #9E9E9E; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
+  .kpi-val { color: #FFFFFF; font-size: 42px; font-weight: 900; letter-spacing: -0.8px; }
+  .kpi-sub { color: #888888; font-size: 16px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -1355,8 +1304,8 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 5: Netflix "More Info" Modal Detail Pop-up (Tooltip Page)
-*Design a Tooltip report page (320px x 240px) and embed this measure for a detailed Netflix movie synopsis popup.*
+### HTML/CSS Web Component 5: Netflix "More Info" Modal Detail Pop-up (4K UHD Tooltip Page)
+*Design a Tooltip report page (480px x 360px) and embed this measure for a detailed Netflix movie synopsis popup.*
 
 ```dax
 HTML_Modal_Detail_Tooltip = 
@@ -1377,17 +1326,17 @@ RETURN
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
   .modal-card {
-    width: 320px; height: 240px; background: #141414; border: 1px solid #333333; border-radius: 8px;
-    padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.9);
+    width: 480px; height: 360px; background: #141414; border: 1.5px solid #333333; border-radius: 12px;
+    padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.9);
   }
-  .modal-header { border-bottom: 1px solid #262626; padding-bottom: 8px; margin-bottom: 8px; }
-  .m-title { color: #FFFFFF; font-size: 16px; font-weight: 800; }
-  .m-meta { color: #888888; font-size: 11px; margin-top: 2px; }
-  .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat-cell { background: #1C1C1C; padding: 6px 8px; border-radius: 4px; border-left: 2px solid #E50914; }
-  .s-label { color: #888; font-size: 9px; text-transform: uppercase; font-weight: 700; }
-  .s-val { color: #FFF; font-size: 12px; font-weight: 800; margin-top: 2px; }
+  .modal-header { border-bottom: 1.5px solid #262626; padding-bottom: 12px; margin-bottom: 12px; }
+  .m-title { color: #FFFFFF; font-size: 24px; font-weight: 800; }
+  .m-meta { color: #888888; font-size: 16px; margin-top: 4px; }
+  .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-cell { background: #1C1C1C; padding: 10px 14px; border-radius: 6px; border-left: 3px solid #E50914; }
+  .s-label { color: #888; font-size: 13px; text-transform: uppercase; font-weight: 700; }
+  .s-val { color: #FFF; font-size: 18px; font-weight: 800; margin-top: 4px; }
   .score-cell { color: #F5C518; }
 </style>
 </head>
@@ -1403,6 +1352,16 @@ RETURN
       <div class='stat-cell'><div class='s-label'>Production Budget</div><div class='s-val'>" & _Budget & "</div></div>
       <div class='stat-cell'><div class='s-label'>Worldwide Gross</div><div class='s-val'>" & _Gross & "</div></div>
     </div>
+    <div style='color:#555; font-size:12px; text-align:right;'>StreamPulse Semantic Galaxy Layer</div>
+  </div>
+</body>
+</html>"
+```
+      <div class='stat-cell'><div class='s-label'>Bayesian Score</div><div class='s-val score-cell'>★ " & _Bayesian & " / 10</div></div>
+      <div class='stat-cell'><div class='s-label'>IMDb / Metascore</div><div class='s-val'>" & _Audience & " / " & _Critic & "</div></div>
+      <div class='stat-cell'><div class='s-label'>Production Budget</div><div class='s-val'>" & _Budget & "</div></div>
+      <div class='stat-cell'><div class='s-label'>Worldwide Gross</div><div class='s-val'>" & _Gross & "</div></div>
+    </div>
     <div style='color:#555; font-size:9px; text-align:right;'>StreamPulse Semantic Galaxy Layer</div>
   </div>
 </body>
@@ -1411,17 +1370,17 @@ RETURN
 
 ---
 
-## 4. Dynamic SVG Vector Visual Measures (Data Category: Image URL)
+## 4. Dynamic SVG Vector Visual Measures (4K UHD Optimized, Data Category: Image URL)
 
 > [!IMPORTANT]
 > **Data Category Setup**: In Power BI Desktop Model View, select each measure $\to$ in the **Properties pane** set **Data Category** to **`Image URL`**. Use these inside **Table**, **Matrix**, and **New Card** visuals.
 
-### SVG 1: Dynamic Gradient Completion Progress Bar
+### SVG 1: Dynamic Gradient Completion Progress Bar (4K UHD)
 ```dax
 SVG_Completion_ProgressBar = 
 VAR _Pct = [Avg_Completion_Rate_Pct]
 VAR _ClampedPct = MIN(MAX(_Pct, 0), 100)
-VAR _BarWidth = INT(_ClampedPct * 1.4)
+VAR _BarWidth = INT(_ClampedPct * 1.8)
 VAR _Color = 
     SWITCH(
         TRUE(),
@@ -1431,65 +1390,65 @@ VAR _Color =
     )
 RETURN
     "data:image/svg+xml;utf8," &
-    "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='22' viewBox='0 0 180 22'>" &
-    "<rect x='0' y='5' width='140' height='12' rx='6' fill='#242424'/>" &
-    "<rect x='0' y='5' width='" & _BarWidth & "' height='12' rx='6' fill='" & _Color & "'/>" &
-    "<text x='146' y='15' font-family='Segoe UI, sans-serif' font-size='11' font-weight='bold' fill='#FFFFFF'>" & 
+    "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='30' viewBox='0 0 240 30'>" &
+    "<rect x='0' y='7' width='180' height='16' rx='8' fill='#242424'/>" &
+    "<rect x='0' y='7' width='" & _BarWidth & "' height='16' rx='8' fill='" & _Color & "'/>" &
+    "<text x='192' y='20' font-family='Segoe UI, sans-serif' font-size='14' font-weight='bold' fill='#FFFFFF'>" & 
     FORMAT(_ClampedPct, "0") & "%</text>" &
     "</svg>"
 ```
 
-### SVG 2: Multi-Point Smooth Viewership Sparkline
+### SVG 2: Multi-Point Smooth Viewership Sparkline (4K UHD)
 ```dax
 SVG_Viewership_Sparkline = 
 VAR _Hours = [Total_View_Hours_M]
-VAR _P2 = INT(24 - MIN(MAX(_Hours * 0.12, 2), 20))
-VAR _P3 = INT(24 - MIN(MAX(_Hours * 0.28, 4), 22))
+VAR _P2 = INT(32 - MIN(MAX(_Hours * 0.15, 4), 26))
+VAR _P3 = INT(32 - MIN(MAX(_Hours * 0.32, 6), 28))
 RETURN
     "data:image/svg+xml;utf8," &
-    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='28' viewBox='0 0 120 28'>" &
-    "<path d='M 5 22 Q 40 " & _P2 & ", 80 " & _P3 & " T 115 4' fill='none' stroke='#E50914' stroke-width='2.5' stroke-linecap='round'/>" &
-    "<circle cx='115' cy='4' r='3.5' fill='#E50914'/>" &
+    "<svg xmlns='http://www.w3.org/2000/svg' width='160' height='38' viewBox='0 0 160 38'>" &
+    "<path d='M 6 30 Q 55 " & _P2 & ", 110 " & _P3 & " T 154 6' fill='none' stroke='#E50914' stroke-width='3.5' stroke-linecap='round'/>" &
+    "<circle cx='154' cy='6' r='4.5' fill='#E50914'/>" &
     "</svg>"
 ```
 
-### SVG 3: Golden Rating Star Badge
+### SVG 3: Golden Rating Star Badge (4K UHD)
 ```dax
 SVG_Rating_Star_Badge = 
 VAR _Score = [Bayesian_Weighted_Score]
 VAR _FormattedScore = FORMAT(_Score, "0.0")
 RETURN
     "data:image/svg+xml;utf8," &
-    "<svg xmlns='http://www.w3.org/2000/svg' width='75' height='22' viewBox='0 0 75 22'>" &
-    "<rect x='0' y='0' width='75' height='22' rx='4' fill='#1F1F1F' stroke='#333333' stroke-width='1'/>" &
-    "<path d='M10 4l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z' fill='#F5C518'/>" &
-    "<text x='23' y='15' font-family='Segoe UI, sans-serif' font-size='11' font-weight='bold' fill='#FFFFFF'>" & _FormattedScore & "</text>" &
+    "<svg xmlns='http://www.w3.org/2000/svg' width='100' height='30' viewBox='0 0 100 30'>" &
+    "<rect x='0' y='0' width='100' height='30' rx='6' fill='#1F1F1F' stroke='#333333' stroke-width='1.5'/>" &
+    "<path d='M14 6l2.4 4.8 5.3.8-3.8 3.7.9 5.3-4.8-2.5-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z' fill='#F5C518'/>" &
+    "<text x='32' y='21' font-family='Segoe UI, sans-serif' font-size='15' font-weight='bold' fill='#FFFFFF'>" & _FormattedScore & "</text>" &
     "</svg>"
 ```
 
-### SVG 4: Financial ROI Radial Meter & Break-Even Marker
+### SVG 4: Financial ROI Radial Meter & Break-Even Marker (4K UHD)
 ```dax
 SVG_ROI_Bullet_Meter = 
 VAR _ROI = [Financial_ROI_Multiplier]
-VAR _Width = INT(MIN(MAX(_ROI * 28, 0), 120))
+VAR _Width = INT(MIN(MAX(_ROI * 36, 0), 160))
 VAR _FillColor = IF(_ROI >= 2.5, "#00D2D2", IF(_ROI >= 1.0, "#E50914", "#E5A914"))
 RETURN
     "data:image/svg+xml;utf8," &
-    "<svg xmlns='http://www.w3.org/2000/svg' width='140' height='20' viewBox='0 0 140 20'>" &
-    "<rect x='0' y='4' width='120' height='12' rx='3' fill='#2A2A2A'/>" &
-    "<rect x='0' y='4' width='" & _Width & "' height='12' rx='3' fill='" & _FillColor & "'/>" &
-    "<line x1='70' y1='1' x2='70' y2='19' stroke='#FFFFFF' stroke-width='2'/>" &
+    "<svg xmlns='http://www.w3.org/2000/svg' width='190' height='28' viewBox='0 0 190 28'>" &
+    "<rect x='0' y='6' width='160' height='16' rx='4' fill='#2A2A2A'/>" &
+    "<rect x='0' y='6' width='" & _Width & "' height='16' rx='4' fill='" & _FillColor & "'/>" &
+    "<line x1='90' y1='2' x2='90' y2='26' stroke='#FFFFFF' stroke-width='2.5'/>" &
     "</svg>"
 ```
 
-### SVG 5: Global Top 10 Red Number Rank Visual
+### SVG 5: Global Top 10 Red Number Rank Visual (4K UHD)
 ```dax
 SVG_Top10_Rank_Badge = 
 VAR _Rank = SELECTEDVALUE(Fact_Streaming_Performance[performance_key], 1)
 RETURN
     "data:image/svg+xml;utf8," &
-    "<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'>" &
-    "<text x='20' y='32' font-family='Segoe UI, Impact, sans-serif' font-size='36' font-weight='900' text-anchor='middle' fill='#141414' stroke='#E50914' stroke-width='2'>" & 
+    "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'>" &
+    "<text x='30' y='48' font-family='Segoe UI, Impact, sans-serif' font-size='50' font-weight='900' text-anchor='middle' fill='#141414' stroke='#E50914' stroke-width='2.5'>" & 
     _Rank & "</text>" &
     "</svg>"
 ```

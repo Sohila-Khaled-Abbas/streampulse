@@ -665,9 +665,479 @@ in
 
 ---
 
+---
+
 ## 3. Netflix Web-App UI Components in Power BI (HTML, CSS & SVG)
 
-To give Power BI the exact look and feel of a **modern streaming platform website**, use these DAX measures in conjunction with the **HTML Content visual (AppSource)** or the native **New Card Visual** (with Data Category set to `Image URL`).
+To give Power BI the exact look and feel of a **modern streaming platform website & command center**, use these DAX measures in conjunction with the **HTML Content visual (AppSource)** or the native **New Card Visual** (with Data Category set to `Image URL`).
+
+---
+
+### HTML/CSS Web Component 0.1: Netflix Home Page Hero Command Banner
+*Add this measure to an HTML Content visual across the top of **Page 0 (Home Page)** (Width: 1840px, Height: 180px).*
+
+```dax
+HTML_Home_Hero_Banner = 
+VAR _Hour = HOUR(NOW())
+VAR _Greeting = 
+    SWITCH(
+        TRUE(),
+        _Hour < 12, "Good Morning",
+        _Hour < 18, "Good Afternoon",
+        "Good Evening"
+    )
+VAR _TotalTitles = FORMAT(COUNTROWS(Dim_Titles), "#,##0")
+VAR _TotalHours = [Total_View_Hours_Formatted]
+VAR _AvgQuality = FORMAT([Bayesian_Weighted_Score], "0.0") & " / 10.0"
+RETURN
+"<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(229, 9, 20, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
+  }
+  .hero-home-wrap {
+    width: 100%; height: 160px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 60%, rgba(229, 9, 20, 0.18) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08); padding: 25px 35px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+  }
+  .left-hero { display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
+  .greeting-tag { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; color: #E50914; letter-spacing: 1.2px; text-transform: uppercase; }
+  .pulse-dot { width: 8px; height: 8px; background: #E50914; border-radius: 50%; animation: pulseGlow 1.8s infinite; }
+  .hero-title {
+    font-size: 32px; font-weight: 900; letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #FFFFFF 0%, #E0E0E0 50%, #E50914 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-subtitle { color: #A3A3A3; font-size: 13px; font-weight: 400; line-height: 1.4; }
+  .hero-metrics-pill {
+    display: flex; align-items: center; gap: 20px; background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 24px; border-radius: 10px;
+  }
+  .pill-item { display: flex; flex-direction: column; }
+  .pill-label { color: #888888; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .pill-val { color: #FFFFFF; font-size: 18px; font-weight: 800; }
+  .pill-val.gold { color: #F5C518; }
+  .pill-val.teal { color: #00D2D2; }
+  .pill-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.1); }
+</style>
+</head>
+<body>
+  <div class='hero-home-wrap'>
+    <div class='left-hero'>
+      <div class='greeting-tag'>
+        <div class='pulse-dot'></div>
+        <span>" & _Greeting & " • StreamPulse 2026 Enterprise Platform Portal</span>
+      </div>
+      <div class='hero-title'>Streaming Intelligence &amp; Analytics Command Center</div>
+      <div class='hero-subtitle'>Unified Kimball Galaxy Warehouse • 3-Tier Medallion Architecture • Live DirectQuery Telemetry</div>
+    </div>
+    <div class='hero-metrics-pill'>
+      <div class='pill-item'>
+        <span class='pill-label'>Total Catalog</span>
+        <span class='pill-val'>" & _TotalTitles & "</span>
+      </div>
+      <div class='pill-divider'></div>
+      <div class='pill-item'>
+        <span class='pill-label'>Global Streamed</span>
+        <span class='pill-val teal'>" & _TotalHours & "</span>
+      </div>
+      <div class='pill-divider'></div>
+      <div class='pill-item'>
+        <span class='pill-label'>Bayesian Quality</span>
+        <span class='pill-val gold'>★ " & _AvgQuality & "</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>"
+```
+
+---
+
+### HTML/CSS Web Component 0.2: Interactive 5-Module Navigation Portal Hub
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 240px) to render clickable module cards.*
+
+```dax
+HTML_Home_Navigation_Hub = 
+"<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+  .nav-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; width: 100%; height: 220px;
+  }
+  .module-card {
+    background: #141414; border: 1px solid #242424; border-radius: 12px; padding: 20px 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; position: relative; overflow: hidden;
+  }
+  .module-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: transparent; transition: background 0.3s ease;
+  }
+  .module-card:hover {
+    transform: translateY(-6px); background: #1C1C1C;
+    border-color: #E50914; box-shadow: 0 12px 24px rgba(229, 9, 20, 0.25);
+  }
+  .module-card:hover::before { background: #E50914; }
+  .mod-header { display: flex; align-items: center; justify-content: space-between; }
+  .mod-badge {
+    width: 36px; height: 36px; border-radius: 8px; background: rgba(229, 9, 20, 0.12);
+    border: 1px solid rgba(229, 9, 20, 0.3); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #E50914;
+  }
+  .mod-num { color: #555555; font-size: 12px; font-weight: 800; }
+  .mod-title { color: #FFFFFF; font-size: 15px; font-weight: 800; margin-top: 12px; line-height: 1.2; }
+  .mod-desc { color: #888888; font-size: 11px; font-weight: 400; line-height: 1.4; margin-top: 6px; }
+  .mod-cta {
+    display: flex; align-items: center; gap: 6px; color: #E50914; font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 14px;
+  }
+  .mod-cta-arrow { transition: transform 0.2s ease; }
+  .module-card:hover .mod-cta-arrow { transform: translateX(4px); }
+</style>
+</head>
+<body>
+  <div class='nav-grid'>
+    <!-- Card 1 -->
+    <div class='module-card'>
+      <div>
+        <div class='mod-header'>
+          <div class='mod-badge'>🎬</div>
+          <span class='mod-num'>PAGE 01</span>
+        </div>
+        <div class='mod-title'>Executive Pulse</div>
+        <div class='mod-desc'>Global Top 10 rankings, live scraper drops, featured hero player, and high-level KPIs.</div>
+      </div>
+      <div class='mod-cta'>Launch View <span class='mod-cta-arrow'>→</span></div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class='module-card'>
+      <div>
+        <div class='mod-header'>
+          <div class='mod-badge'>🌌</div>
+          <span class='mod-num'>PAGE 02</span>
+        </div>
+        <div class='mod-title'>Catalog Galaxy</div>
+        <div class='mod-desc'>7,786 conformed titles, multi-genre bridge matrix, era segmentation &amp; maturity ratings.</div>
+      </div>
+      <div class='mod-cta'>Launch View <span class='mod-cta-arrow'>→</span></div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class='module-card'>
+      <div>
+        <div class='mod-header'>
+          <div class='mod-badge'>📊</div>
+          <span class='mod-num'>PAGE 03</span>
+        </div>
+        <div class='mod-title'>Viewership Telemetry</div>
+        <div class='mod-desc'>Monthly stream hours, completion rate %, subscriber reach &amp; regional device mix.</div>
+      </div>
+      <div class='mod-cta'>Launch View <span class='mod-cta-arrow'>→</span></div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class='module-card'>
+      <div>
+        <div class='mod-header'>
+          <div class='mod-badge'>💰</div>
+          <span class='mod-num'>PAGE 04</span>
+        </div>
+        <div class='mod-title'>Financial ROI Hub</div>
+        <div class='mod-desc'>Production budget vs. worldwide gross, 2.5x break-even indicator &amp; Cost Per View Hour.</div>
+      </div>
+      <div class='mod-cta'>Launch View <span class='mod-cta-arrow'>→</span></div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class='module-card'>
+      <div>
+        <div class='mod-header'>
+          <div class='mod-badge'>🎭</div>
+          <span class='mod-num'>PAGE 05</span>
+        </div>
+        <div class='mod-title'>Creative Talent Hub</div>
+        <div class='mod-desc'>Director &amp; producer credits, billing order hierarchy, star power tiers &amp; filmographies.</div>
+      </div>
+      <div class='mod-cta'>Launch View <span class='mod-cta-arrow'>→</span></div>
+    </div>
+  </div>
+</body>
+</html>"
+```
+
+---
+
+### HTML/CSS Web Component 0.3: Live Real-Time Marquee Ticker
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 44px) for a continuous news ticker.*
+
+```dax
+HTML_Home_Marquee_Ticker = 
+"<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .ticker-wrap {
+    width: 100%; height: 38px; background: rgba(18, 18, 18, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px;
+    display: flex; align-items: center; overflow: hidden; padding: 0 10px;
+  }
+  .ticker-badge {
+    background: #E50914; color: #FFFFFF; font-size: 10px; font-weight: 900;
+    padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;
+    white-space: nowrap; margin-right: 15px; z-index: 2; box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+  }
+  .ticker-content {
+    display: inline-block; white-space: nowrap;
+    animation: marquee 35s linear infinite; color: #CCCCCC; font-size: 12px; font-weight: 500;
+  }
+  .ticker-item { margin-right: 40px; }
+  .ticker-highlight { color: #FFFFFF; font-weight: 700; }
+  .ticker-green { color: #46D369; font-weight: 700; }
+  .ticker-gold { color: #F5C518; font-weight: 700; }
+  .ticker-teal { color: #00D2D2; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class='ticker-wrap'>
+    <div class='ticker-badge'>LIVE DROPS</div>
+    <div class='ticker-content'>
+      <span class='ticker-item'>🔥 <span class='ticker-highlight'>Avatar: Fire and Ash</span> leads global charts with <span class='ticker-teal'>2.1B Hours</span></span>
+      <span class='ticker-item'>⭐ <span class='ticker-highlight'>Stranger Things S5</span> achieves highest Bayesian Quality Score at <span class='ticker-gold'>8.8 / 10.0</span></span>
+      <span class='ticker-item'>🔄 <span class='ticker-highlight'>Airbyte ELT Pipeline 0.50.36</span>: Daily sync completed with <span class='ticker-green'>100% Conformance</span></span>
+      <span class='ticker-item'>💰 <span class='ticker-highlight'>Avengers: Doomsday</span> grosses <span class='ticker-green'>$1.2B Worldwide</span> (2.4x Multiplier)</span>
+      <span class='ticker-item'>⚡ <span class='ticker-highlight'>DirectQuery Latency</span>: Optimized at <span class='ticker-teal'>&lt;240ms</span> response time</span>
+      <span class='ticker-item'>📊 <span class='ticker-highlight'>Catalog Galaxy</span>: 10 Unified Tables conformed under Kimball Architecture</span>
+    </div>
+  </div>
+</body>
+</html>"
+```
+
+---
+
+### HTML/CSS Web Component 0.4: Platform Architecture & Metadata Drawer
+*Add this measure to an HTML Content visual on **Page 0 (Home Page)** (Width: 1840px, Height: 280px).*
+
+```dax
+HTML_Home_Platform_Vitals = 
+"<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+  .vitals-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; height: 260px;
+  }
+  .vital-card {
+    background: #121212; border: 1px solid #222222; border-radius: 10px; padding: 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .vital-card.primary { border-left: 4px solid #E50914; }
+  .vital-card.success { border-left: 4px solid #46D369; }
+  .vital-card.teal { border-left: 4px solid #00D2D2; }
+  .vital-card.gold { border-left: 4px solid #F5C518; }
+  .v-title { color: #888888; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .v-metric { color: #FFFFFF; font-size: 22px; font-weight: 800; margin: 6px 0; }
+  .v-list { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .v-item { color: #AAAAAA; font-size: 11px; display: flex; align-items: center; justify-content: space-between; }
+  .v-tag { background: #222222; padding: 2px 6px; border-radius: 3px; font-weight: 600; color: #EEE; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+    color: #46D369; background: rgba(70, 211, 105, 0.12); padding: 4px 8px; border-radius: 12px; width: fit-content;
+  }
+  .status-dot { width: 6px; height: 6px; background: #46D369; border-radius: 50%; }
+</style>
+</head>
+<body>
+  <div class='vitals-grid'>
+    <!-- Tile 1 -->
+    <div class='vital-card primary'>
+      <div>
+        <div class='v-title'>Lakehouse Ingestion Stack</div>
+        <div class='v-metric'>Bronze Layer</div>
+      </div>
+      <ul class='v-list'>
+        <li class='v-item'><span>Live 2026 Scraper</span> <span class='v-tag'>Wikipedia / RSS</span></li>
+        <li class='v-item'><span>Historical Archive</span> <span class='v-tag'>7,786 Kaggle CSV</span></li>
+        <li class='v-item'><span>Audience Ratings</span> <span class='v-tag'>IMDb / TMDb</span></li>
+        <li class='v-item'><span>Streaming Telemetry</span> <span class='v-tag'>Wide Parquet</span></li>
+      </ul>
+    </div>
+
+    <!-- Tile 2 -->
+    <div class='vital-card success'>
+      <div>
+        <div class='v-title'>ELT &amp; Data Pipeline Engine</div>
+        <div class='v-metric'>Airbyte 0.50.36</div>
+      </div>
+      <div>
+        <div class='status-pill'><div class='status-dot'></div> ACTIVE &amp; SYNCED</div>
+        <ul class='v-list' style='margin-top: 8px;'>
+          <li class='v-item'><span>Sync Frequency</span> <span class='v-tag'>Daily Cron</span></li>
+          <li class='v-item'><span>Data Profiling</span> <span class='v-tag'>100% Conformed</span></li>
+          <li class='v-item'><span>Entity Match</span> <span class='v-tag'>RapidFuzz Levenshtein</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tile 3 -->
+    <div class='vital-card teal'>
+      <div>
+        <div class='v-title'>Kimball Galaxy Architecture</div>
+        <div class='v-metric'>10 Data Tables</div>
+      </div>
+      <ul class='v-list'>
+        <li class='v-item'><span>Conformed Dimensions</span> <span class='v-tag'>5 Tables (1:*)</span></li>
+        <li class='v-item'><span>Many-to-Many Bridges</span> <span class='v-tag'>2 Tables (Weight 1.0)</span></li>
+        <li class='v-item'><span>Multi-Grain Facts</span> <span class='v-tag'>3 Tables</span></li>
+        <li class='v-item'><span>DirectQuery Views</span> <span class='v-tag'>3 Views</span></li>
+      </ul>
+    </div>
+
+    <!-- Tile 4 -->
+    <div class='vital-card gold'>
+      <div>
+        <div class='v-title'>Power BI Semantic Platform</div>
+        <div class='v-metric'>45+ DAX Measures</div>
+      </div>
+      <ul class='v-list'>
+        <li class='v-item'><span>Bayesian Shrinkage</span> <span class='v-tag'>m=25K, C=7.0</span></li>
+        <li class='v-item'><span>Calculation Groups</span> <span class='v-tag'>Time Intelligence</span></li>
+        <li class='v-item'><span>Embedded Components</span> <span class='v-tag'>HTML5 / CSS3 / SVG</span></li>
+        <li class='v-item'><span>DirectQuery Latency</span> <span class='v-tag'>&lt; 300 ms SLA</span></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>"
+```
+
+---
+
+### Animated SVG Vector Measure 1: Pure SVG Animated Pulsing Radar Beacon
+*Set Data Category to **`Image URL`**. Use in tables, matrix headers, or the New Card Visual for an animated neon live status beacon.*
+
+```dax
+SVG_Animated_Pulse_Radar = 
+"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'>
+  <style>
+    @keyframes pulseRing {
+      0% { r: 6px; opacity: 1; stroke-width: 2px; }
+      100% { r: 18px; opacity: 0; stroke-width: 0.5px; }
+    }
+    @keyframes centerGlow {
+      0%, 100% { transform: scale(1); fill: %23E50914; }
+      50% { transform: scale(1.2); fill: %23FF3333; }
+    }
+    .ring1 { animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    .ring2 { animation: pulseRing 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite 0.6s; }
+    .dot { transform-origin: center; animation: centerGlow 1.5s ease-in-out infinite; }
+  </style>
+  <circle class='ring1' cx='20' cy='20' r='6' fill='none' stroke='%23E50914' />
+  <circle class='ring2' cx='20' cy='20' r='6' fill='none' stroke='%23E50914' />
+  <circle class='dot' cx='20' cy='20' r='5' fill='%23E50914' />
+</svg>"
+```
+
+---
+
+### Animated SVG Vector Measure 2: Real-Time Animated Quality Gauge Ring
+*Set Data Category to **`Image URL`**. Renders an animated SVG radial completion gauge.*
+
+```dax
+SVG_Animated_Quality_Ring = 
+VAR _Score = [Avg_Completion_Rate_Pct]
+VAR _Pct = IF(ISBLANK(_Score), 75, MIN(MAX(_Score, 0), 100))
+VAR _DashOffset = FORMAT(283 - (283 * (_Pct / 100.0)), "0")
+RETURN
+"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='80' height='80'>
+  <style>
+    .track { fill: none; stroke: %23262626; stroke-width: 8; }
+    .fill-bar {
+      fill: none; stroke: %2300D2D2; stroke-width: 8;
+      stroke-dasharray: 283; stroke-dashoffset: " & _DashOffset & ";
+      stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%;
+      transition: stroke-dashoffset 0.8s ease;
+    }
+    .score-txt { font-family: Segoe UI, sans-serif; font-size: 20px; font-weight: 800; fill: %23FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+    .sub-txt { font-family: Segoe UI, sans-serif; font-size: 8px; font-weight: 600; fill: %23888888; text-anchor: middle; }
+  </style>
+  <circle class='track' cx='50' cy='50' r='45' />
+  <circle class='fill-bar' cx='50' cy='50' r='45' />
+  <text class='score-txt' x='50' y='46'>" & FORMAT(_Pct, "0") & "%</text>
+  <text class='sub-txt' x='50' y='64'>QUALITY</text>
+</svg>"
+```
+
+---
+
+### 🎨 How to Integrate Animated GIFs & Lottie in Power BI
+
+Power BI allows you to embed animated GIFs and animated SVGs seamlessly using three distinct techniques:
+
+#### Technique A: Direct HTML Content Visual (Recommended for Web Portals)
+Pass animated GIF URLs or Base64 data URIs directly inside your DAX measures:
+```dax
+HTML_Animated_Hero_GIF = 
+"<!DOCTYPE html>
+<html>
+<head>
+<style>
+  .gif-container {
+    width: 100%; height: 100%; border-radius: 8px; overflow: hidden;
+    position: relative; border: 1px solid #333333;
+  }
+  .gif-img { width: 100%; height: 100%; object-fit: cover; }
+  .gif-overlay {
+    position: absolute; bottom: 0; left: 0; width: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 100%);
+    padding: 15px; color: #FFF; font-family: Segoe UI, sans-serif;
+  }
+</style>
+</head>
+<body>
+  <div class='gif-container'>
+    <img class='gif-img' src='https://assets.nflxext.com/ffe/siteui/acquisition/ourStory/fuji/desktop/video-tv-0819.m4v' alt='StreamPulse Pulse' />
+    <div class='gif-overlay'>
+      <div style='font-size:14px; font-weight:bold;'>DirectQuery Live Radar</div>
+      <div style='font-size:11px; color:#AAA;'>Real-time streaming ingestion active</div>
+    </div>
+  </div>
+</body>
+</html>"
+```
+
+#### Technique B: Native New Card Visual via Animated SVG (Zero Dependencies)
+Create a DAX measure returning SVG code with `@keyframes` animations (e.g. `[SVG_Animated_Pulse_Radar]`), set its **Data Category** to `Image URL`, and bind it to the Image slot of Power BI's native **New Card visual**.
+
+#### Technique C: Local GIF Playback via Line Chart Plot Area
+If you want to play a local `.gif` without external hosting:
+1. Insert a blank **Line Chart** visual.
+2. Go to **Format Visual > Plot Area Background > Add Image**.
+3. Browse and select your `.gif` file.
+4. Set **Image Fit** to `Fit` and **Transparency** to `0%`.
+5. Turn off X-Axis, Y-Axis, Title, and Gridlines. Power BI will loop the GIF infinitely on canvas.
 
 ---
 
@@ -708,6 +1178,7 @@ RETURN
     <div class='left-group'>
       <div class='brand-logo'>STREAMPULSE</div>
       <ul class='nav-links'>
+        <li class='nav-item'>Portal Home</li>
         <li class='nav-item active'>Executive Pulse</li>
         <li class='nav-item'>Catalog Galaxy</li>
         <li class='nav-item'>Viewership Telemetry</li>
@@ -748,49 +1219,38 @@ RETURN
     position: relative; width: 100%; height: 260px; border-radius: 12px;
     background: linear-gradient(90deg, #0A0A0A 0%, rgba(18,18,18,0.85) 50%, rgba(229,9,20,0.15) 100%), #141414;
     border: 1px solid rgba(255,255,255,0.1); padding: 30px 40px; display: flex; flex-direction: column; justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
   }
-  .tag-ribbon { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .top10-pill { background: #E50914; color: #FFF; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.8px; }
-  .category-text { color: #AAAAAA; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-  .hero-title { color: #FFFFFF; font-size: 32px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
-  .metadata-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-  .match-pct { color: #46D369; font-size: 14px; font-weight: 700; }
-  .age-cert { border: 1px solid #777; color: #CCC; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 2px; }
-  .quality-badge { border: 1px solid rgba(255,255,255,0.3); color: #FFF; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 2px; }
-  .score-star { color: #F5C518; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
-  .action-row { display: flex; align-items: center; gap: 14px; }
-  .btn-play {
-    background: #FFFFFF; color: #000000; font-size: 14px; font-weight: 700; padding: 8px 22px; border-radius: 6px;
-    display: flex; align-items: center; gap: 8px; border: none; cursor: pointer;
-  }
-  .btn-info {
-    background: rgba(109,109,110,0.7); color: #FFFFFF; font-size: 14px; font-weight: 600; padding: 8px 20px; border-radius: 6px;
-    display: flex; align-items: center; gap: 8px; border: none; backdrop-filter: blur(8px);
-  }
-  .telemetry-tag { margin-left: auto; color: #AAAAAA; font-size: 13px; font-weight: 500; }
-  .telemetry-val { color: #E50914; font-weight: 800; font-size: 15px; }
+  .featured-tag { color: #E50914; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .title-text { color: #FFFFFF; font-size: 32px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .badge-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .match-badge { color: #46D369; font-weight: 700; font-size: 14px; }
+  .rating-badge { border: 1px solid #888; color: #AAA; font-size: 11px; padding: 1px 6px; border-radius: 2px; }
+  .tech-badge { background: #262626; color: #EEE; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 2px; }
+  .metrics-summary { color: #CCC; font-size: 13px; line-height: 1.5; max-width: 650px; }
+  .btn-row { display: flex; gap: 14px; margin-top: 16px; }
+  .play-btn { background: #FFFFFF; color: #000000; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .info-btn { background: rgba(109, 109, 110, 0.7); color: #FFFFFF; font-weight: 700; font-size: 13px; padding: 8px 20px; border-radius: 4px; border: none; cursor: pointer; }
 </style>
 </head>
 <body>
   <div class='hero-container'>
-    <div class='tag-ribbon'>
-      <div class='top10-pill'>TOP 10</div>
-      <div class='category-text'>" & _Era & " • GLOBAL STREAMING PULSE</div>
+    <div class='featured-tag'>★ #1 STREAMING TITLE GLOBALLY</div>
+    <div class='title-text'>" & _Title & "</div>
+    <div class='badge-row'>
+      <span class='match-badge'>" & _MatchPct & "</span>
+      <span class='rating-badge'>" & _Rating & "</span>
+      <span class='tech-badge'>" & _Runtime & "</span>
+      <span class='tech-badge'>4K ULTRA HD</span>
+      <span class='tech-badge'>DOLBY ATMOS</span>
+      <span class='tech-badge'>★ " & _BayesianScore & " BAYESIAN</span>
     </div>
-    <div class='hero-title'>" & _Title & "</div>
-    <div class='metadata-bar'>
-      <span class='match-pct'>" & _MatchPct & "</span>
-      <span class='age-cert'>" & _Rating & "</span>
-      <span style='color:#DDD; font-size:13px;'>" & _Runtime & "</span>
-      <span class='quality-badge'>4K ULTRA HD</span>
-      <span class='quality-badge'>5.1 AUDIO</span>
-      <span class='score-star'>★ " & _BayesianScore & " Bayesian</span>
+    <div class='metrics-summary'>
+      Generated <b>" & _Hours & "</b> worldwide. Unfolds across multiple genre dimensions with top-tier viewer retention.
     </div>
-    <div class='action-row'>
-      <button class='btn-play'>▶ Watch Telemetry</button>
-      <button class='btn-info'>ⓘ Title Metrics</button>
-      <div class='telemetry-tag'>Global Stream Velocity: <span class='telemetry-val'>" & _Hours & "</span></div>
+    <div class='btn-row'>
+      <button class='play-btn'>▶ Play Title</button>
+      <button class='info-btn'>ⓘ More Info</button>
     </div>
   </div>
 </body>
@@ -1203,31 +1663,85 @@ Create the **Time Intelligence Calculation Group** using Tabular Editor:
 
 ## 7. Netflix Cinematic Dark JSON Theme File
 
-Save the following JSON as `netflix_cinematic_dark.json` and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
+Save the following schema-compliant JSON as [`dashboard/netflix_cinematic_dark.json`](file:///d:/courses/Data%20Science/Data%20Engineering/Projects/streampulse/dashboard/netflix_cinematic_dark.json) and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/refs/heads/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.140.json",
   "name": "StreamPulse Netflix Cinematic Dark",
   "dataColors": [
     "#E50914",
-    "#B81D24",
     "#00D2D2",
     "#F5C518",
-    "#E5A914",
+    "#46D369",
+    "#B81D24",
+    "#7C3AED",
+    "#F97316",
+    "#38BDF8",
     "#FFFFFF",
-    "#999999",
-    "#564D4D"
+    "#888888"
   ],
   "background": "#0B0B0B",
   "foreground": "#141414",
   "tableAccent": "#E50914",
+  "good": "#46D369",
+  "neutral": "#F5C518",
+  "bad": "#E50914",
+  "minimum": "#1A1A1A",
+  "center": "#F5C518",
+  "maximum": "#46D369",
+  "nullColor": "#333333",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Segoe UI",
+      "fontSize": 28,
+      "color": "#FFFFFF"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14,
+      "color": "#FFFFFF"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#E5E5E5"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 11,
+      "color": "#CCCCCC"
+    },
+    "secondaryLabel": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#888888"
+    }
+  },
   "visualStyles": {
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": { "solid": { "color": "#0B0B0B" } },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": { "solid": { "color": "#050505" } },
+            "transparency": 0
+          }
+        ]
+      }
+    },
     "*": {
       "*": {
         "background": [
           {
+            "show": true,
             "color": { "solid": { "color": "#141414" } },
-            "transparency": 10
+            "transparency": 0
           }
         ],
         "border": [
@@ -1250,7 +1764,146 @@ Save the following JSON as `netflix_cinematic_dark.json` and import it into Powe
             "show": true,
             "fontColor": { "solid": { "color": "#FFFFFF" } },
             "fontFamily": "Segoe UI Semibold",
-            "fontSize": 14
+            "fontSize": 13,
+            "heading": "Heading3"
+          }
+        ],
+        "subTitle": [
+          {
+            "show": true,
+            "fontColor": { "solid": { "color": "#888888" } },
+            "fontFamily": "Segoe UI",
+            "fontSize": 10
+          }
+        ],
+        "divider": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#222222" } }
+          }
+        ],
+        "padding": [
+          {
+            "top": 12,
+            "bottom": 12,
+            "left": 12,
+            "right": 12
+          }
+        ],
+        "visualTooltip": [
+          {
+            "show": true,
+            "titleFontColor": { "solid": { "color": "#FFFFFF" } },
+            "valueFontColor": { "solid": { "color": "#CCCCCC" } },
+            "fontSize": 10,
+            "fontFamily": "Segoe UI",
+            "background": { "solid": { "color": "#1C1C1C" } },
+            "transparency": 5
+          }
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "grid": [
+          {
+            "gridVertical": false,
+            "gridHorizontal": true,
+            "gridHorizontalColor": { "solid": { "color": "#242424" } },
+            "rowPadding": 6
+          }
+        ],
+        "columnHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#FFFFFF" } },
+            "backColor": { "solid": { "color": "#1A1A1A" } },
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 11,
+            "autoSizeColumnWidth": true
+          }
+        ],
+        "values": [
+          {
+            "fontColorPrimary": { "solid": { "color": "#CCCCCC" } },
+            "backColorPrimary": { "solid": { "color": "#141414" } },
+            "fontColorSecondary": { "solid": { "color": "#CCCCCC" } },
+            "backColorSecondary": { "solid": { "color": "#181818" } },
+            "fontSize": 11,
+            "fontFamily": "Segoe UI"
+          }
+        ],
+        "total": [
+          {
+            "fontColor": { "solid": { "color": "#E50914" } },
+            "backColor": { "solid": { "color": "#1A1A1A" } },
+            "fontFamily": "Segoe UI Bold",
+            "fontSize": 11
+          }
+        ]
+      }
+    },
+    "matrix": {
+      "*": {
+        "grid": [
+          {
+            "gridVertical": false,
+            "gridHorizontal": true,
+            "gridHorizontalColor": { "solid": { "color": "#242424" } },
+            "rowPadding": 6
+          }
+        ],
+        "columnHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#FFFFFF" } },
+            "backColor": { "solid": { "color": "#1A1A1A" } },
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 11
+          }
+        ],
+        "rowHeaders": [
+          {
+            "fontColor": { "solid": { "color": "#FFFFFF" } },
+            "backColor": { "solid": { "color": "#141414" } },
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 11
+          }
+        ],
+        "values": [
+          {
+            "fontColorPrimary": { "solid": { "color": "#CCCCCC" } },
+            "backColorPrimary": { "solid": { "color": "#141414" } },
+            "fontColorSecondary": { "solid": { "color": "#CCCCCC" } },
+            "backColorSecondary": { "solid": { "color": "#181818" } },
+            "fontSize": 11,
+            "fontFamily": "Segoe UI"
+          }
+        ],
+        "subTotals": [
+          {
+            "fontColor": { "solid": { "color": "#E50914" } },
+            "backColor": { "solid": { "color": "#1A1A1A" } },
+            "fontFamily": "Segoe UI Bold",
+            "fontSize": 11
+          }
+        ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "header": [
+          {
+            "show": true,
+            "fontColor": { "solid": { "color": "#FFFFFF" } },
+            "fontFamily": "Segoe UI Semibold",
+            "textSize": 11
+          }
+        ],
+        "items": [
+          {
+            "fontColor": { "solid": { "color": "#CCCCCC" } },
+            "background": { "solid": { "color": "#1C1C1C" } },
+            "textSize": 10,
+            "fontFamily": "Segoe UI"
           }
         ]
       }
@@ -1261,13 +1914,40 @@ Save the following JSON as `netflix_cinematic_dark.json` and import it into Powe
 
 ---
 
-## 8. 5-Page Native Web-App Layout & Navigation Architecture
+## 8. 6-Page Native Web-App Layout & Navigation Architecture
 
 Set your page canvas to **1920 x 1080 (16:9)**. Place the `[HTML_Netflix_Navbar]` measure at $(X=0, Y=0, W=1920, H=60)$ on all pages.
 
+### Page 0: Streaming Platform Command Center & Home Portal (Landing Page)
 ```
 +---------------------------------------------------------------------------------------------------------------+
-| [N] STREAMPULSE   Executive Pulse   Catalog Galaxy   Viewership Telemetry   Financial ROI   Talent Hub   [LIVE] |
+| [N] STREAMPULSE  [Portal Home]   Executive Pulse   Catalog Galaxy   Viewership Telemetry   ROI   Talent [LIVE]|
++---------------------------------------------------------------------------------------------------------------+
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  | HERO HOME COMMAND BANNER (HTML/CSS Dynamic Greeting, DirectQuery Pulse, Total Catalog Vitals)           |  |
+|  | "Good Evening • StreamPulse 2026 Platform" | 7,786 Titles | 1.25B Hours Streamed | 98.4% Quality Index  |  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  | LIVE REAL-TIME MARQUEE TICKER (HTML/CSS Keyframes Continuous News Ticker)                               |  |
+|  | [LIVE DROPS] 🔥 Avatar: Fire & Ash 2.1B Hrs • 🔄 Airbyte 0.50.36 Active • 💰 Avengers 4 $1.2B Worldwide|  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  | INTERACTIVE 5-MODULE NAVIGATION PORTAL HUB (Hover Glow Web Route Cards)                                 |  |
+|  | [🎬 Page 1: Executive] [🌌 Page 2: Catalog] [📊 Page 3: Telemetry] [💰 Page 4: ROI] [🎭 Page 5: Talent] |  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  +---------------------------------------------------------------------------------------------------------+  |
+|  | PLATFORM ARCHITECTURE & METADATA VITALS DRAWER (4 Glassmorphic Architecture Cards)                      |  |
+|  | 1. Lakehouse Ingestion  | 2. Airbyte ELT 0.50.36 | 3. Kimball Galaxy Star | 4. Power BI DirectQuery SLA|  |
+|  +---------------------------------------------------------------------------------------------------------+  |
++---------------------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### Page 1: Executive Pulse & Live Radar
+```
++---------------------------------------------------------------------------------------------------------------+
+| [N] STREAMPULSE   Portal Home  [Executive Pulse]  Catalog Galaxy   Viewership Telemetry   Financial ROI [LIVE]|
 +---------------------------------------------------------------------------------------------------------------+
 |  +-------------------------------------------------------------------+  +------------------------------------+|
 |  | HERO STREAMING FEATURED PLAYER (HTML/CSS Embedded Visual)         |  | GLOBAL TOP 10 RANKINGS MATRIX      ||

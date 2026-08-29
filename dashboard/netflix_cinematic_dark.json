@@ -21,26 +21,25 @@
   "minimum": "#1A1A1A",
   "center": "#F5C518",
   "maximum": "#46D369",
-  "nullColor": "#333333",
   "textClasses": {
     "callout": {
-      "fontFace": "Segoe UI",
       "fontSize": 28,
+      "fontFace": "Segoe UI",
       "color": "#FFFFFF"
     },
     "title": {
-      "fontFace": "Segoe UI Semibold",
       "fontSize": 14,
+      "fontFace": "Segoe UI Semibold",
       "color": "#FFFFFF"
     },
     "header": {
-      "fontFace": "Segoe UI Semibold",
       "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
       "color": "#E5E5E5"
     },
     "label": {
-      "fontFace": "Segoe UI",
       "fontSize": 11,
+      "fontFace": "Segoe UI",
       "color": "#CCCCCC"
     }
   },
@@ -55,7 +54,7 @@
         ],
         "outspace": [
           {
-            "color": { "solid": { "color": "#0B0B0B" } },
+            "color": { "solid": { "color": "#050505" } },
             "transparency": 0
           }
         ]
@@ -65,7 +64,6 @@
       "*": {
         "background": [
           {
-            "show": true,
             "color": { "solid": { "color": "#141414" } },
             "transparency": 0
           }
@@ -73,16 +71,13 @@
         "border": [
           {
             "show": true,
-            "color": { "solid": { "color": "#282828" } },
-            "radius": 8
+            "color": { "solid": { "color": "#282828" } }
           }
         ],
         "dropShadow": [
           {
             "show": true,
-            "color": { "solid": { "color": "#000000" } },
-            "position": "Outer",
-            "preset": "BottomRight"
+            "color": { "solid": { "color": "#000000" } }
           }
         ],
         "title": [

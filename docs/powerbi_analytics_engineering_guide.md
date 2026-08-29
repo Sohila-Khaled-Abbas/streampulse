@@ -1663,7 +1663,7 @@ Create the **Time Intelligence Calculation Group** using Tabular Editor:
 
 ## 7. Netflix Cinematic Dark JSON Theme File
 
-Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_dark.json`](file:///d:/courses/Data%20Science/Data%20Engineering/Projects/streampulse/dashboard/netflix_cinematic_dark.json) and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
+Save the following clean, schema-compliant JSON as [`dashboard/netflix_cinematic_dark.json`](file:///d:/courses/Data%20Science/Data%20Engineering/Projects/streampulse/dashboard/netflix_cinematic_dark.json) and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
 
 ```json
 {
@@ -1689,26 +1689,25 @@ Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_d
   "minimum": "#1A1A1A",
   "center": "#F5C518",
   "maximum": "#46D369",
-  "nullColor": "#333333",
   "textClasses": {
     "callout": {
-      "fontFace": "Segoe UI",
       "fontSize": 28,
+      "fontFace": "Segoe UI",
       "color": "#FFFFFF"
     },
     "title": {
-      "fontFace": "Segoe UI Semibold",
       "fontSize": 14,
+      "fontFace": "Segoe UI Semibold",
       "color": "#FFFFFF"
     },
     "header": {
-      "fontFace": "Segoe UI Semibold",
       "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
       "color": "#E5E5E5"
     },
     "label": {
-      "fontFace": "Segoe UI",
       "fontSize": 11,
+      "fontFace": "Segoe UI",
       "color": "#CCCCCC"
     }
   },
@@ -1723,7 +1722,7 @@ Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_d
         ],
         "outspace": [
           {
-            "color": { "solid": { "color": "#0B0B0B" } },
+            "color": { "solid": { "color": "#050505" } },
             "transparency": 0
           }
         ]
@@ -1733,7 +1732,6 @@ Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_d
       "*": {
         "background": [
           {
-            "show": true,
             "color": { "solid": { "color": "#141414" } },
             "transparency": 0
           }
@@ -1741,16 +1739,13 @@ Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_d
         "border": [
           {
             "show": true,
-            "color": { "solid": { "color": "#282828" } },
-            "radius": 8
+            "color": { "solid": { "color": "#282828" } }
           }
         ],
         "dropShadow": [
           {
             "show": true,
-            "color": { "solid": { "color": "#000000" } },
-            "position": "Outer",
-            "preset": "BottomRight"
+            "color": { "solid": { "color": "#000000" } }
           }
         ],
         "title": [

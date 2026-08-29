@@ -1,0 +1,150 @@
+table Fact_Catalog_Ratings
+	lineageTag: 85ba46d4-088d-4ae8-affd-e45cea1dafb6
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: d3ad50b1-2529-4f52-bbf3-85832a7af62b
+		summarizeBy: sum
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: b45f8147-3d11-4703-ab41-cb17ddc5bf26
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column vote_average
+		dataType: double
+		lineageTag: 81c58375-f955-46fa-af09-3bb4492ef15d
+		summarizeBy: sum
+		sourceColumn: vote_average
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vote_count
+		dataType: int64
+		formatString: 0
+		lineageTag: fa6ded27-4ac4-4030-a40b-4d44c4a2c831
+		summarizeBy: sum
+		sourceColumn: vote_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column critic_score
+		dataType: double
+		lineageTag: 93546980-8e1b-433a-9ce2-037a737b9f55
+		summarizeBy: sum
+		sourceColumn: critic_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Catalog_Ratings = m
+		mode: import
+		queryGroup: Facts
+		source =
+				let
+				    // -------------------------------------------------------------
+				    // Part A: Live Snapshot Ratings (from Raw_IMDb_Ratings)
+				    // -------------------------------------------------------------
+				    SourceLive = Raw_IMDb_Ratings,
+				
+				    ParseLiveVotes = Table.AddColumn(SourceLive, "vote_count_clean", each
+				        let
+				            v = Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
+				            num = if Text.EndsWith(v, "M") then
+				                      Number.FromText(Text.Remove(v, "M")) * 1000000
+				                  else if Text.EndsWith(v, "K") then
+				                      Number.FromText(Text.Remove(v, "K")) * 1000
+				                  else
+				                      try Number.FromText(Text.Replace(v, ",", "")) otherwise 0
+				        in
+				            Int64.From(num),
+				        Int64.Type
+				    ),
+				
+				    ParseLiveScore = Table.AddColumn(ParseLiveVotes, "vote_average_clean", each
+				        let
+				            raw = Text.Trim(Text.From([user_score])),
+				            score = if Text.Contains(raw, "/10") then
+				                        Number.FromText(Text.BeforeDelimiter(raw, "/10"))
+				                    else if Text.EndsWith(raw, "%") then
+				                        Number.FromText(Text.Remove(raw, "%")) / 10.0
+				                    else
+				                        try Number.FromText(raw) otherwise 7.0
+				        in
+				            if score > 10.0 then 10.0 else if score < 0.0 then 0.0 else Number.Round(score, 1),
+				        type number
+				    ),
+				
+				    SortedLive = Table.Sort(ParseLiveScore, {{"title_id", Order.Ascending}, {"snapshot_timestamp", Order.Descending}}),
+				    DeduplicatedLive = Table.Distinct(SortedLive, {"title_id"}),
+				
+				    AddLiveDateKey = Table.AddColumn(SortedLive, "date_key", each
+				        let
+				            d = try Date.From(DateTimeZone.From([snapshot_timestamp])) otherwise #date(2026, 2, 1)
+				        in
+				            Date.Year(d) * 10000 + Date.Month(d) * 100 + Date.Day(d),
+				        Int64.Type
+				    ),
+				
+				    RenameLiveFact = Table.RenameColumns(AddLiveDateKey, {
+				        {"title_id", "netflix_id"},
+				        {"vote_average_clean", "vote_average"},
+				        {"vote_count_clean", "vote_count"},
+				        {"critic_metascore", "critic_score"}
+				    }),
+				
+				    SelectLiveFact = Table.SelectColumns(RenameLiveFact, {
+				        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
+				    }),
+				
+				    // -------------------------------------------------------------
+				    // Part B: Historical Ratings (from Raw_Historical_Archive, 7,786 records)
+				    // -------------------------------------------------------------
+				    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+				
+				    AddHistDateKey = Table.AddColumn(PromotedHist, "date_key", each
+				        let
+				            y = try Number.FromText(Text.From([release_year])) otherwise 2020
+				        in
+				            y * 10000 + 101,
+				        Int64.Type
+				    ),
+				
+				    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each try Number.FromText(Text.From([imdb_score])) otherwise 7.0, type number),
+				    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000, Int64.Type),
+				    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70, type number),
+				
+				    RenameHistFact = Table.RenameColumns(CleanHistMetascore, {{"id", "netflix_id"}}),
+				    SelectHistFact = Table.SelectColumns(RenameHistFact, {
+				        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
+				    }),
+				
+				    // -------------------------------------------------------------
+				    // Part C: Combine & Map Surrogate Title Key
+				    // -------------------------------------------------------------
+				    CombinedFacts = Table.Combine({SelectLiveFact, SelectHistFact}),
+				    MergedTitles = Table.NestedJoin(CombinedFacts, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+				
+				    FinalFact = Table.SelectColumns(ExpandedTitleKey, {
+				        "title_key", "date_key", "vote_average", "vote_count", "critic_score"
+				    })
+				in
+				    FinalFact
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

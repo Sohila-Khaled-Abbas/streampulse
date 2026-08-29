@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 850" width="100%" height="100%" style="background:#0b0f19; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 900" width="100%" height="100%" style="background:#0b0f19; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
   <defs>
     <!-- Gradients -->
     <linearGradient id="grad-bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -42,288 +42,245 @@
     <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#4ade80" />
     </marker>
-    <marker id="arrow-yellow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 10 5 L 0 9 z" fill="#facc15" />
-    </marker>
     <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#e50914" />
     </marker>
   </defs>
 
   <!-- Background Base -->
-  <rect width="1400" height="850" fill="url(#grad-bg)" />
-
-  <!-- Grid Background Overlay -->
-  <g stroke="#1e293b" stroke-width="0.5" opacity="0.4">
-    <path d="M 0,100 L 1400,100 M 0,200 L 1400,200 M 0,300 L 1400,300 M 0,400 L 1400,400 M 0,500 L 1400,500 M 0,600 L 1400,600 M 0,700 L 1400,700" />
-    <path d="M 100,0 L 100,850 M 200,0 L 200,850 M 300,0 L 300,850 M 400,0 L 400,850 M 500,0 L 500,850 M 600,0 L 600,850 M 700,0 L 700,850 M 800,0 L 800,850 M 900,0 L 900,850 M 1000,0 L 1000,850 M 1100,0 L 1100,850 M 1200,0 L 1200,850 M 1300,0 L 1300,850" />
-  </g>
+  <rect width="1500" height="900" fill="url(#grad-bg)" />
 
   <!-- Header Section -->
-  <g transform="translate(60, 45)">
-    <!-- StreamPulse Logo Icon -->
-    <rect x="0" y="0" width="42" height="42" rx="8" fill="url(#grad-red)" filter="url(#glow)" />
-    <path d="M 12,21 L 18,21 L 22,10 L 26,32 L 30,21 L 34,21" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <g transform="translate(60, 35)">
+    <rect x="0" y="0" width="46" height="46" rx="8" fill="url(#grad-red)" filter="url(#glow)" />
+    <path d="M 14,23 L 20,23 L 24,12 L 28,34 L 32,23 L 36,23" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
     
-    <text x="56" y="24" fill="#ffffff" font-size="24" font-weight="800" letter-spacing="1">STREAMPULSE 2026</text>
-    <text x="56" y="42" fill="#94a3b8" font-size="12" font-weight="600" letter-spacing="0.5">ENTERPRISE LIVE STREAMING DATA PLATFORM &amp; ANALYTICS ENGINEERING ARCHITECTURE</text>
+    <text x="60" y="26" fill="#ffffff" font-size="24" font-weight="900" letter-spacing="1">STREAMPULSE 2026 ENTERPRISE ARCHITECTURE</text>
+    <text x="60" y="44" fill="#94a3b8" font-size="12" font-weight="600">MEDALLION LAKEHOUSE, KIMBALL GALAXY MODEL &amp; POWER BI NATIVE NETFLIX WEB-APP</text>
 
     <!-- Badges -->
-    <g transform="translate(950, 6)">
-      <rect x="0" y="0" width="90" height="26" rx="13" fill="#1e293b" stroke="#334155" />
-      <text x="45" y="17" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle">LIVE 2026</text>
+    <g transform="translate(1000, 8)">
+      <rect x="0" y="0" width="100" height="26" rx="13" fill="#1e293b" stroke="#334155" />
+      <text x="50" y="17" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle">MEDALLION</text>
       
-      <rect x="100" y="0" width="110" height="26" rx="13" fill="#1e293b" stroke="#334155" />
-      <text x="155" y="17" fill="#4ade80" font-size="11" font-weight="700" text-anchor="middle">KIMBALL GALAXY</text>
+      <rect x="110" y="0" width="120" height="26" rx="13" fill="#1e293b" stroke="#334155" />
+      <text x="170" y="17" fill="#4ade80" font-size="11" font-weight="700" text-anchor="middle">KIMBALL GALAXY</text>
 
-      <rect x="220" y="0" width="105" height="26" rx="13" fill="#1e293b" stroke="#334155" />
-      <text x="272" y="17" fill="#facc15" font-size="11" font-weight="700" text-anchor="middle">DIRECTQUERY</text>
+      <rect x="240" y="0" width="130" height="26" rx="13" fill="#1e293b" stroke="#334155" />
+      <text x="305" y="17" fill="#e50914" font-size="11" font-weight="700" text-anchor="middle">NETFLIX WEB-APP</text>
     </g>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- LAYER 1: MULTI-SOURCE INGESTION (X: 60 to 300) -->
+  <!-- 1. BRONZE LAYER: MULTI-SOURCE INGESTION (X: 60, Y: 110) -->
   <!-- ========================================================================= -->
-  <g transform="translate(60, 120)">
-    <!-- Container Box -->
-    <rect width="250" height="660" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
-    <rect width="250" height="40" rx="16" fill="#1e293b" />
-    <text x="20" y="25" fill="#f8fafc" font-size="14" font-weight="700">1. MULTI-SOURCE INGESTION</text>
+  <g transform="translate(60, 110)">
+    <rect width="250" height="740" rx="14" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
+    <rect width="250" height="38" rx="14" fill="#1e293b" />
+    <text x="18" y="24" fill="#f8fafc" font-size="13" font-weight="800">1. BRONZE INGESTION</text>
 
-    <!-- Source 1: Live Web Scraper -->
-    <g transform="translate(18, 55)">
-      <rect width="214" height="120" rx="10" fill="#1e293b" stroke="#e50914" stroke-width="1.5" />
-      <circle cx="20" cy="22" r="6" fill="#e50914" />
-      <text x="35" y="26" fill="#ffffff" font-size="13" font-weight="700">Live 2026 Scraper</text>
-      <text x="15" y="50" fill="#94a3b8" font-size="11">• Wikipedia 2026 Films &amp; TV</text>
-      <text x="15" y="68" fill="#94a3b8" font-size="11">• Netflix Tudum Newsroom</text>
-      <text x="15" y="86" fill="#94a3b8" font-size="11">• RSS Feeds &amp; Press Drops</text>
-      <rect x="15" y="96" width="90" height="16" rx="4" fill="#3b0764" />
-      <text x="60" y="108" fill="#c084fc" font-size="9" font-weight="700" text-anchor="middle">BEAUTIFULSOUP</text>
+    <!-- Source 1: PostgreSQL Live Staging -->
+    <g transform="translate(16, 50)">
+      <rect width="218" height="115" rx="8" fill="#1e293b" stroke="#e50914" stroke-width="1.5" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Live 2026 Scraped Feed</text>
+      <text x="14" y="44" fill="#94a3b8" font-size="10">• Wikipedia 2026 Films</text>
+      <text x="14" y="60" fill="#94a3b8" font-size="10">• Netflix RSS News Drops</text>
+      <text x="14" y="76" fill="#94a3b8" font-size="10">• staging.stg_netflix_titles</text>
+      <text x="14" y="98" fill="#e50914" font-size="10" font-weight="700">⚡ Automated Daily Ingestion</text>
     </g>
 
-    <!-- Source 2: TMDb / IMDb APIs -->
-    <g transform="translate(18, 190)">
-      <rect width="214" height="110" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
-      <circle cx="20" cy="22" r="6" fill="#38bdf8" />
-      <text x="35" y="26" fill="#ffffff" font-size="13" font-weight="700">TMDb / IMDb Metadata</text>
-      <text x="15" y="50" fill="#94a3b8" font-size="11">• TMDb API v3 Discovery</text>
-      <text x="15" y="68" fill="#94a3b8" font-size="11">• Cast, Crew &amp; Genres</text>
-      <text x="15" y="86" fill="#94a3b8" font-size="11">• Vote Avg &amp; Popularity</text>
+    <!-- Source 2: Kaggle Historical CSV -->
+    <g transform="translate(16, 180)">
+      <rect width="218" height="115" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Historical Benchmark</text>
+      <text x="14" y="44" fill="#94a3b8" font-size="10">• 7,786 Kaggle Records (CSV)</text>
+      <text x="14" y="60" fill="#94a3b8" font-size="10">• Decade &amp; Genre Baseline</text>
+      <text x="14" y="76" fill="#94a3b8" font-size="10">• Multi-Country Catalog</text>
+      <text x="14" y="98" fill="#38bdf8" font-size="10" font-weight="700">📂 Raw CSV Archive</text>
     </g>
 
-    <!-- Source 3: Kaggle Historical Archive -->
-    <g transform="translate(18, 315)">
-      <rect width="214" height="100" rx="10" fill="#1e293b" stroke="#64748b" stroke-width="1" />
-      <circle cx="20" cy="22" r="6" fill="#94a3b8" />
-      <text x="35" y="26" fill="#ffffff" font-size="13" font-weight="700">Historical Catalog Archive</text>
-      <text x="15" y="50" fill="#94a3b8" font-size="11">• 8,807 Titles (1925-2024)</text>
-      <text x="15" y="68" fill="#94a3b8" font-size="11">• Baseline Quality Anchor</text>
+    <!-- Source 3: IMDb External Ratings CSV -->
+    <g transform="translate(16, 310)">
+      <rect width="218" height="115" rx="8" fill="#1e293b" stroke="#facc15" stroke-width="1" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Audience Ratings Feed</text>
+      <text x="14" y="44" fill="#94a3b8" font-size="10">• Periodic IMDb User Scores</text>
+      <text x="14" y="60" fill="#94a3b8" font-size="10">• Vote Multipliers (M / K)</text>
+      <text x="14" y="76" fill="#94a3b8" font-size="10">• Critic Metascores &amp; Sentiment</text>
+      <text x="14" y="98" fill="#facc15" font-size="10" font-weight="700">⭐ Rating Snapshots</text>
     </g>
 
-    <!-- Source 4: Dirty External Training Datasets -->
-    <g transform="translate(18, 430)">
-      <rect width="214" height="210" rx="10" fill="#1e293b" stroke="#facc15" stroke-width="1.5" />
-      <circle cx="20" cy="22" r="6" fill="#facc15" />
-      <text x="35" y="26" fill="#ffffff" font-size="13" font-weight="700">Unmerged Dirty Datasets</text>
-      
-      <text x="15" y="50" fill="#facc15" font-size="11" font-weight="600">A. CSV IMDb Ratings</text>
-      <text x="25" y="66" fill="#94a3b8" font-size="10">Shorthand '1.4M', duplicate rows</text>
-      
-      <text x="15" y="90" fill="#facc15" font-size="11" font-weight="600">B. Wide Parquet Viewership</text>
-      <text x="25" y="106" fill="#94a3b8" font-size="10">Wide monthly cols, dirty country</text>
-      
-      <text x="15" y="130" fill="#facc15" font-size="11" font-weight="600">C. JSON Budget Feed</text>
-      <text x="25" y="146" fill="#94a3b8" font-size="10">Dirty currencies '$150M', nested</text>
+    <!-- Source 4: Viewership Parquet -->
+    <g transform="translate(16, 440)">
+      <rect width="218" height="115" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="1" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Streaming Telemetry</text>
+      <text x="14" y="44" fill="#94a3b8" font-size="10">• Wide Monthly Hours (Parquet)</text>
+      <text x="14" y="60" fill="#94a3b8" font-size="10">• Completion Rates &amp; Retention</text>
+      <text x="14" y="76" fill="#94a3b8" font-size="10">• Territory &amp; Device Profiles</text>
+      <text x="14" y="98" fill="#4ade80" font-size="10" font-weight="700">📊 Lakehouse Columnar</text>
+    </g>
 
-      <rect x="15" y="170" width="184" height="24" rx="4" fill="#422006" stroke="#ca8a04" />
-      <text x="107" y="186" fill="#fde047" font-size="10" font-weight="700" text-anchor="middle">POWER QUERY TRAINING</text>
+    <!-- Source 5: Box Office Budget JSON -->
+    <g transform="translate(16, 570)">
+      <rect width="218" height="115" rx="8" fill="#1e293b" stroke="#c084fc" stroke-width="1" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Budget &amp; Box Office Feed</text>
+      <text x="14" y="44" fill="#94a3b8" font-size="10">• Nested Production JSON</text>
+      <text x="14" y="60" fill="#94a3b8" font-size="10">• Multi-Currency Strings ($/€)</text>
+      <text x="14" y="76" fill="#94a3b8" font-size="10">• Creative Talent &amp; Warnings</text>
+      <text x="14" y="98" fill="#c084fc" font-size="10" font-weight="700">💰 Financial Telemetry</text>
     </g>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- LAYER 2: TRANSFORMATION & DATA PROFILING (X: 350 to 570) -->
+  <!-- 2. SILVER LAYER: PROCESSING & AIRBYTE REPLICATION (X: 350, Y: 110) -->
   <!-- ========================================================================= -->
-  <g transform="translate(350, 120)">
-    <rect width="230" height="660" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
-    <rect width="230" height="40" rx="16" fill="#1e293b" />
-    <text x="20" y="25" fill="#f8fafc" font-size="14" font-weight="700">2. TRANSFORMATION &amp; DQ</text>
+  <g transform="translate(350, 110)">
+    <rect width="260" height="740" rx="14" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
+    <rect width="260" height="38" rx="14" fill="#1e293b" />
+    <text x="18" y="24" fill="#f8fafc" font-size="13" font-weight="800">2. SILVER CONFORMATION</text>
 
-    <!-- Entity Resolution Engine -->
-    <g transform="translate(15, 55)">
-      <rect width="200" height="150" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
-      <text x="15" y="25" fill="#38bdf8" font-size="13" font-weight="700">Entity Resolution</text>
-      <text x="15" y="48" fill="#94a3b8" font-size="11">• Fuzzy RapidFuzz Matching</text>
-      <text x="15" y="66" fill="#94a3b8" font-size="11">• Title Normalization (NFKD)</text>
-      <text x="15" y="84" fill="#94a3b8" font-size="11">• Match Confidence Scoring</text>
-      <text x="15" y="102" fill="#94a3b8" font-size="11">• Release Window Validation</text>
-      <rect x="15" y="118" width="170" height="20" rx="4" fill="#0c4a6e" />
-      <text x="100" y="132" fill="#7dd3fc" font-size="10" font-weight="700" text-anchor="middle">98.5% HIGH CONFIDENCE</text>
+    <!-- Processing Box 1: Airbyte ELT -->
+    <g transform="translate(16, 50)">
+      <rect width="228" height="150" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="1.5" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Airbyte 0.50.36 ELT Engine</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• Automated Daily Replication</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• Incremental Sync + Dedup</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• Schema Evolution Guards</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• REST API &amp; Webhook Control</text>
+      <text x="14" y="130" fill="#a5b4fc" font-size="10" font-weight="700">🔄 Managed Docker Cluster</text>
     </g>
 
-    <!-- Data Quality & Profiling Engine -->
-    <g transform="translate(15, 220)">
-      <rect width="200" height="175" rx="10" fill="#1e293b" stroke="#4ade80" stroke-width="1" />
-      <text x="15" y="25" fill="#4ade80" font-size="13" font-weight="700">Automated DQ Profiler</text>
-      <text x="15" y="48" fill="#94a3b8" font-size="11">• Completeness &amp; Uniqueness</text>
-      <text x="15" y="66" fill="#94a3b8" font-size="11">• Range &amp; Outlier Telemetry</text>
-      <text x="15" y="84" fill="#94a3b8" font-size="11">• Schema Drift Detection</text>
-      <text x="15" y="102" fill="#94a3b8" font-size="11">• Catalog Era Tagging</text>
-      <rect x="15" y="120" width="170" height="42" rx="6" fill="#052e16" stroke="#15803d" />
-      <text x="100" y="136" fill="#86efac" font-size="11" font-weight="700" text-anchor="middle">QUALITY SCORE: 100%</text>
-      <text x="100" y="152" fill="#4ade80" font-size="9" text-anchor="middle">Zero Unhandled Nulls</text>
+    <!-- Processing Box 2: Power Query M Transformations -->
+    <g transform="translate(16, 220)">
+      <rect width="228" height="230" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Advanced M Transformations</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• Non-Breaking Space Scrubbing</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• Null-Safe Logic &amp; Fallbacks</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• Runtime Minutes Parsing</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• Multi-Currency USD Conversion</text>
+      <text x="14" y="118" fill="#cbd5e1" font-size="10">• Telemetry Unpivoting</text>
+      <text x="14" y="136" fill="#cbd5e1" font-size="10">• Negative Sentinel Removal</text>
+      <text x="14" y="154" fill="#cbd5e1" font-size="10">• Deterministic Surrogate Indexing</text>
+      <text x="14" y="172" fill="#cbd5e1" font-size="10">• Dynamic Calendar Offsets</text>
+      <text x="14" y="205" fill="#38bdf8" font-size="10" font-weight="700">🧪 Resilient ETL Pipeline</text>
     </g>
 
-    <!-- Real-Time Streaming Daemon -->
-    <g transform="translate(15, 410)">
-      <rect width="200" height="230" rx="10" fill="#1e293b" stroke="#c084fc" stroke-width="1" />
-      <text x="15" y="25" fill="#c084fc" font-size="13" font-weight="700">Real-Time Daemon</text>
-      <text x="15" y="48" fill="#94a3b8" font-size="11">• Continuous Polling Cycle</text>
-      <text x="15" y="66" fill="#94a3b8" font-size="11">• Trending Velocity Calc</text>
-      <text x="15" y="84" fill="#94a3b8" font-size="11">• Days to Streaming Lag</text>
-      <text x="15" y="102" fill="#94a3b8" font-size="11">• Viewership Calibration</text>
-      <text x="15" y="120" fill="#94a3b8" font-size="11">• Automated Schema Sync</text>
-
-      <rect x="15" y="145" width="170" height="65" rx="6" fill="#2e1065" stroke="#7e22ce" />
-      <text x="100" y="165" fill="#e9d5ff" font-size="11" font-weight="700" text-anchor="middle">REPLICATION FREQ</text>
-      <text x="100" y="182" fill="#c084fc" font-size="13" font-weight="800" text-anchor="middle">EVERY 24 HOURS</text>
-      <text x="100" y="198" fill="#a855f7" font-size="9" text-anchor="middle">Cron: 0 6 * * * (6:00 AM UTC)</text>
+    <!-- Processing Box 3: Data Quality & Profiling -->
+    <g transform="translate(16, 470)">
+      <rect width="228" height="215" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="1.5" />
+      <text x="14" y="24" fill="#ffffff" font-size="12" font-weight="700">Entity Resolution &amp; Quality</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• RapidFuzz Levenshtein Matching</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• TMDb ID Metadata Mapping</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• Statistical Completeness Audit</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• Quality Score ($0-100\%$) Gauge</text>
+      <text x="14" y="118" fill="#cbd5e1" font-size="10">• Streaming Velocity Profiling</text>
+      <text x="14" y="136" fill="#cbd5e1" font-size="10">• data_profiling_report.json</text>
+      <text x="14" y="185" fill="#4ade80" font-size="10" font-weight="700">✅ 100% Validated Upsert</text>
     </g>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- LAYER 3: STORAGE & WAREHOUSE LAYER (X: 620 to 920) -->
+  <!-- 3. GOLD LAYER: KIMBALL GALAXY STAR SCHEMA (X: 650, Y: 110) -->
   <!-- ========================================================================= -->
-  <g transform="translate(620, 120)">
-    <rect width="310" height="660" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
-    <rect width="310" height="40" rx="16" fill="#1e293b" />
-    <text x="20" y="25" fill="#f8fafc" font-size="14" font-weight="700">3. WAREHOUSE &amp; LAKEHOUSE</text>
+  <g transform="translate(650, 110)">
+    <rect width="360" height="740" rx="14" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
+    <rect width="360" height="38" rx="14" fill="#1e293b" />
+    <text x="18" y="24" fill="#f8fafc" font-size="13" font-weight="800">3. GOLD KIMBALL GALAXY MODEL (10 TABLES)</text>
 
-    <!-- PostgreSQL Kimball Galaxy Schema -->
-    <g transform="translate(15, 55)">
-      <rect width="280" height="340" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
-      <rect x="10" y="10" width="260" height="26" rx="6" fill="#1d4ed8" />
-      <text x="140" y="27" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">PostgreSQL 15 Kimball Galaxy Model</text>
-
-      <text x="15" y="55" fill="#60a5fa" font-size="11" font-weight="700">DIMENSIONS (SCD Type 1 &amp; Bridges):</text>
-      <text x="25" y="73" fill="#f8fafc" font-size="11">• <tspan fill="#38bdf8">dim_titles</tspan> (PK: title_key, budget, era)</text>
-      <text x="25" y="91" fill="#f8fafc" font-size="11">• <tspan fill="#38bdf8">dim_genres</tspan> + <tspan fill="#94a3b8">bridge_title_genre</tspan></text>
-      <text x="25" y="109" fill="#f8fafc" font-size="11">• <tspan fill="#38bdf8">dim_crew</tspan> + <tspan fill="#94a3b8">bridge_title_crew</tspan></text>
-      <text x="25" y="127" fill="#f8fafc" font-size="11">• <tspan fill="#38bdf8">dim_date</tspan> (2,922 calendar days)</text>
-
-      <text x="15" y="152" fill="#4ade80" font-size="11" font-weight="700">FACT TABLES (Multi-Granularity):</text>
-      <text x="25" y="170" fill="#f8fafc" font-size="11">• <tspan fill="#4ade80">fact_catalog_ratings</tspan> (Snapshot)</text>
-      <text x="25" y="188" fill="#f8fafc" font-size="11">• <tspan fill="#4ade80">fact_streaming_performance</tspan> (Views)</text>
-
-      <text x="15" y="215" fill="#facc15" font-size="11" font-weight="700">DIRECTQUERY REPORTING VIEWS:</text>
-      <rect x="15" y="225" width="250" height="42" rx="4" fill="#0f172a" stroke="#ca8a04" />
-      <text x="25" y="242" fill="#fde047" font-size="10" font-weight="700">• vw_powerbi_catalog_pulse</text>
-      <text x="25" y="258" fill="#fde047" font-size="10" font-weight="700">• vw_powerbi_performance_matrix</text>
-
-      <rect x="15" y="280" width="250" height="45" rx="6" fill="#1e1b4b" stroke="#4338ca" />
-      <text x="140" y="298" fill="#a5b4fc" font-size="10" font-weight="700" text-anchor="middle">AIRBYTE 0.50.36 REPLICATION</text>
-      <text x="140" y="314" fill="#c7d2fe" font-size="9" text-anchor="middle">Automated CDC / File-to-Staging Ingestion</text>
+    <!-- Conformed Dimensions Box -->
+    <g transform="translate(16, 50)">
+      <rect width="328" height="200" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="14" y="24" fill="#38bdf8" font-size="12" font-weight="700">5 Conformed Dimensions</text>
+      <text x="14" y="48" fill="#ffffff" font-size="11" font-weight="600">• Dim_Titles (PK title_key, netflix_id, era, runtime)</text>
+      <text x="14" y="68" fill="#ffffff" font-size="11" font-weight="600">• Dim_Date (PK date_key, fiscal, offsets, quarter_end)</text>
+      <text x="14" y="88" fill="#ffffff" font-size="11" font-weight="600">• Dim_Genres (PK genre_key, tmdb_id, category)</text>
+      <text x="14" y="108" fill="#ffffff" font-size="11" font-weight="600">• Dim_Territory (PK territory_key, ISO, currency)</text>
+      <text x="14" y="128" fill="#ffffff" font-size="11" font-weight="600">• Dim_Talent_Crew (PK crew_key, role, star_tier)</text>
+      <text x="14" y="165" fill="#38bdf8" font-size="10" font-weight="700">⚡ Conformed Shared Attributes across All Facts</text>
     </g>
 
-    <!-- Parquet Lakehouse Layer -->
-    <g transform="translate(15, 410)">
-      <rect width="280" height="230" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="1.5" />
-      <rect x="10" y="10" width="260" height="26" rx="6" fill="#047857" />
-      <text x="140" y="27" fill="#ffffff" font-size="12" font-weight="700" text-anchor="middle">Columnar Parquet Lakehouse</text>
+    <!-- Bridge Tables Box -->
+    <g transform="translate(16, 265)">
+      <rect width="328" height="130" rx="8" fill="#1e293b" stroke="#c084fc" stroke-width="1.5" />
+      <text x="14" y="24" fill="#c084fc" font-size="12" font-weight="700">2 Many-to-Many Bridge Tables</text>
+      <text x="14" y="48" fill="#ffffff" font-size="11" font-weight="600">• Bridge_Title_Genre (title_key, genre_key, weight 1.0)</text>
+      <text x="14" y="68" fill="#ffffff" font-size="11" font-weight="600">• Bridge_Title_Talent (title_key, crew_key, billing_order)</text>
+      <text x="14" y="100" fill="#c084fc" font-size="10" font-weight="700">🔗 Zero Duplicate Inflation Bridge Architecture</text>
+    </g>
 
-      <text x="15" y="55" fill="#34d399" font-size="11" font-weight="700">Partitioned Snappy Parquet Datasets:</text>
-      <text x="25" y="75" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">dim_titles.parquet</tspan></text>
-      <text x="25" y="93" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">dim_date.parquet</tspan></text>
-      <text x="25" y="111" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">dim_genres.parquet</tspan></text>
-      <text x="25" y="129" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">fact_catalog_ratings.parquet</tspan></text>
-      <text x="25" y="147" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">fact_streaming_performance.parquet</tspan></text>
-      <text x="25" y="165" fill="#f8fafc" font-size="11">• <tspan fill="#6ee7b7">powerbi_reporting_pulse.parquet</tspan></text>
+    <!-- Multi-Grain Fact Tables Box -->
+    <g transform="translate(16, 410)">
+      <rect width="328" height="200" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="1.5" />
+      <text x="14" y="24" fill="#4ade80" font-size="12" font-weight="700">3 Multi-Grain Fact Tables</text>
+      <text x="14" y="48" fill="#ffffff" font-size="11" font-weight="600">• Fact_Streaming_Performance (Hours, Completion, Reach)</text>
+      <text x="14" y="68" fill="#ffffff" font-size="11" font-weight="600">• Fact_Catalog_Ratings (IMDb/TMDb, Votes, Critic Score)</text>
+      <text x="14" y="88" fill="#ffffff" font-size="11" font-weight="600">• Fact_Financial_ROI (Budget USD, Gross, ROI Tier)</text>
+      <text x="14" y="165" fill="#4ade80" font-size="10" font-weight="700">📈 Additive &amp; Semi-Additive Business Facts</text>
+    </g>
 
-      <rect x="15" y="185" width="250" height="32" rx="4" fill="#064e3b" stroke="#059669" />
-      <text x="140" y="205" fill="#a7f3d0" font-size="10" font-weight="700" text-anchor="middle">PyArrow High Compression Engine</text>
+    <!-- DirectQuery SQL Views -->
+    <g transform="translate(16, 625)">
+      <rect width="328" height="95" rx="8" fill="#1e293b" stroke="#e50914" stroke-width="1.5" />
+      <text x="14" y="24" fill="#e50914" font-size="12" font-weight="700">PostgreSQL DirectQuery Views</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• vw_powerbi_galaxy_master &amp; vw_powerbi_catalog_pulse</text>
+      <text x="14" y="70" fill="#e50914" font-size="10" font-weight="700">⚡ Sub-Second Live Canvas DirectQuery Querying</text>
     </g>
   </g>
 
   <!-- ========================================================================= -->
-  <!-- LAYER 4: POWER BI ANALYTICS & DAX (X: 970 to 1340) -->
+  <!-- 4. POWER BI LAYER: NATIVE NETFLIX WEB-APP (X: 1050, Y: 110) -->
   <!-- ========================================================================= -->
-  <g transform="translate(970, 120)">
-    <rect width="370" height="660" rx="16" fill="#0f172a" stroke="#334155" stroke-width="1.5" filter="url(#card-shadow)" />
-    <rect width="370" height="40" rx="16" fill="#1e293b" />
-    <text x="20" y="25" fill="#f8fafc" font-size="14" font-weight="700">4. POWER BI ANALYTICS &amp; DAX</text>
+  <g transform="translate(1050, 110)">
+    <rect width="390" height="740" rx="14" fill="#0f172a" stroke="#e50914" stroke-width="1.5" filter="url(#card-shadow)" />
+    <rect width="390" height="38" rx="14" fill="#1e293b" />
+    <text x="18" y="24" fill="#f8fafc" font-size="13" font-weight="800">4. POWER BI NATIVE NETFLIX WEB-APP</text>
 
-    <!-- Power Query M ETL Layer -->
-    <g transform="translate(15, 55)">
-      <rect width="340" height="150" rx="10" fill="#1e293b" stroke="#facc15" stroke-width="1.5" />
-      <text x="15" y="25" fill="#facc15" font-size="13" font-weight="700">Power Query (M Language) ETL</text>
-      <text x="15" y="48" fill="#94a3b8" font-size="11">• Dynamic Unpivot on Wide Monthly Metrics</text>
-      <text x="15" y="66" fill="#94a3b8" font-size="11">• Shorthand Vote String Parser ('1.4M' -> Int)</text>
-      <text x="15" y="84" fill="#94a3b8" font-size="11">• JSON Infobox &amp; Nested Record Expansion</text>
-      <text x="15" y="102" fill="#94a3b8" font-size="11">• Non-Breaking Whitespace &amp; Casing Scrubbing</text>
-      <text x="15" y="120" fill="#94a3b8" font-size="11">• Snapshot Deduplication via Timestamp Grouping</text>
-      <rect x="15" y="128" width="310" height="14" rx="3" fill="#422006" />
-      <text x="170" y="139" fill="#fde047" font-size="9" font-weight="700" text-anchor="middle">ZERO PYTHON DEPENDENCY IN FRONTEND</text>
+    <!-- Box 1: 45+ DAX Measures & Calculation Groups -->
+    <g transform="translate(16, 50)">
+      <rect width="358" height="175" rx="8" fill="#1e293b" stroke="#facc15" stroke-width="1.5" />
+      <text x="14" y="24" fill="#facc15" font-size="12" font-weight="700">45+ Enterprise DAX Measures (7 Folders)</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• Bayesian Shrinkage Quality ($m=25,000, C=7.0$)</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• Pareto 80/20 Concentration &amp; Tier A/B/C Classification</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• Time Intelligence (YoY, MoM, Rolling 28D Velocity)</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• Financial ROI Multiplier &amp; Cost Per View Hour (CPVH)</text>
+      <text x="14" y="118" fill="#cbd5e1" font-size="10">• Time Intelligence Matrix Calculation Group</text>
+      <text x="14" y="148" fill="#fde047" font-size="10" font-weight="700">🧠 Advanced VertiPaq Analytics Engine</text>
     </g>
 
-    <!-- Advanced DAX Measures Engine -->
-    <g transform="translate(15, 220)">
-      <rect width="340" height="230" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
-      <text x="15" y="25" fill="#38bdf8" font-size="13" font-weight="700">25+ Enterprise DAX Measures</text>
-      
-      <text x="15" y="48" fill="#e2e8f0" font-size="11" font-weight="600">1. Bayesian Audience Index:</text>
-      <text x="25" y="64" fill="#94a3b8" font-size="10">Calibrated weighted score vs small sample size</text>
-
-      <text x="15" y="84" fill="#e2e8f0" font-size="11" font-weight="600">2. Budget ROI &amp; Cost Per View Hour:</text>
-      <text x="25" y="100" fill="#94a3b8" font-size="10">Effective $/hr &amp; Budget Efficiency Multiplier</text>
-
-      <text x="15" y="120" fill="#e2e8f0" font-size="11" font-weight="600">3. Time Intelligence &amp; Velocity:</text>
-      <text x="25" y="136" fill="#94a3b8" font-size="10">YTD Growth %, Rolling 28-Day, Lag Days to Drop</text>
-
-      <text x="15" y="156" fill="#e2e8f0" font-size="11" font-weight="600">4. Pareto 80/20 Concentration:</text>
-      <text x="25" y="172" fill="#94a3b8" font-size="10">Cumulative Viewership Share % Dynamic Filter</text>
-
-      <text x="15" y="192" fill="#e2e8f0" font-size="11" font-weight="600">5. USERELATIONSHIP &amp; TREATAS:</text>
-      <text x="25" y="208" fill="#94a3b8" font-size="10">Theatrical vs Drop Date &amp; Cross-Genre Affinity</text>
+    <!-- Box 2: Native HTML5 & CSS3 Embedded Visuals -->
+    <g transform="translate(16, 240)">
+      <rect width="358" height="190" rx="8" fill="#1e293b" stroke="#e50914" stroke-width="1.5" />
+      <text x="14" y="24" fill="#e50914" font-size="12" font-weight="700">Embedded HTML5 &amp; CSS3 Components</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• HTML_Netflix_Navbar (Top Navigation with Live Status)</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• HTML_Netflix_Hero_Card (Trailer Player &amp; 4K Badges)</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• HTML_Movie_Card_Card (Glowing Red Hover Poster)</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• HTML_Glass_KPI_Scorecard (Glassmorphism + YoY %)</text>
+      <text x="14" y="118" fill="#cbd5e1" font-size="10">• HTML_Modal_Detail_Tooltip (Pop-up Title Synopsis)</text>
+      <text x="14" y="160" fill="#e50914" font-size="10" font-weight="700">🎬 Full Streaming Web Platform UX in Power BI</text>
     </g>
 
-    <!-- Executive Dashboard Views -->
-    <g transform="translate(15, 465)">
-      <rect width="340" height="175" rx="10" fill="#1e293b" stroke="#4ade80" stroke-width="1.5" />
-      <text x="15" y="25" fill="#4ade80" font-size="13" font-weight="700">Executive Dashboard Experience</text>
+    <!-- Box 3: Dynamic SVG Measures & Dark Theme -->
+    <g transform="translate(16, 445)">
+      <rect width="358" height="160" rx="8" fill="#1e293b" stroke="#00D2D2" stroke-width="1.5" />
+      <text x="14" y="24" fill="#00D2D2" font-size="12" font-weight="700">Dynamic SVG Vector Visuals &amp; Theme</text>
+      <text x="14" y="46" fill="#cbd5e1" font-size="10">• SVG_Completion_ProgressBar (Gradient Teal/Red Bars)</text>
+      <text x="14" y="64" fill="#cbd5e1" font-size="10">• SVG_Viewership_Sparkline (Real-Time Trajectory)</text>
+      <text x="14" y="82" fill="#cbd5e1" font-size="10">• SVG_Rating_Star_Badge (Golden Star Rating)</text>
+      <text x="14" y="100" fill="#cbd5e1" font-size="10">• SVG_ROI_Bullet_Meter (2.5x Break-Even Indicator)</text>
+      <text x="14" y="135" fill="#00D2D2" font-size="10" font-weight="700">🎨 Netflix Cinematic Dark JSON Theme (#0B0B0B)</text>
+    </g>
 
-      <rect x="15" y="38" width="150" height="55" rx="6" fill="#0f172a" stroke="#334155" />
-      <text x="25" y="56" fill="#94a3b8" font-size="10">TOTAL VIEW HOURS</text>
-      <text x="25" y="80" fill="#38bdf8" font-size="18" font-weight="800">1.84 B hrs</text>
-
-      <rect x="175" y="38" width="150" height="55" rx="6" fill="#0f172a" stroke="#334155" />
-      <text x="185" y="56" fill="#94a3b8" font-size="10">BUDGET ROI MULTIPLIER</text>
-      <text x="185" y="80" fill="#4ade80" font-size="18" font-weight="800">2.65 x</text>
-
-      <rect x="15" y="102" width="310" height="55" rx="6" fill="#064e3b" stroke="#10b981" />
-      <text x="170" y="124" fill="#a7f3d0" font-size="11" font-weight="700" text-anchor="middle">DIRECTQUERY LIVE AUTO-REFRESH</text>
-      <text x="170" y="142" fill="#ffffff" font-size="10" text-anchor="middle">Real-time sub-second visual updates on schema sync</text>
+    <!-- Box 4: 5-Page Streaming Architecture -->
+    <g transform="translate(16, 620)">
+      <rect width="358" height="100" rx="8" fill="#1e293b" stroke="#ffffff" stroke-width="1" />
+      <text x="14" y="22" fill="#ffffff" font-size="12" font-weight="700">5-Page Dedicated Report Canvas</text>
+      <text x="14" y="44" fill="#cbd5e1" font-size="10">1. Executive Pulse | 2. Catalog Galaxy | 3. Viewership</text>
+      <text x="14" y="60" fill="#cbd5e1" font-size="10">4. Financial ROI Matrix | 5. Talent Creative Hub</text>
+      <text x="14" y="82" fill="#46d369" font-size="10" font-weight="700">🚀 Production Ready in Desktop &amp; Power BI Service</text>
     </g>
   </g>
 
-  <!-- ========================================================================= -->
-  <!-- CONNECTORS & FLOW ARROWS -->
-  <!-- ========================================================================= -->
-  <!-- Ingestion to Transformation -->
-  <path d="M 310,230 L 350,230" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-blue)" />
-  <path d="M 310,400 L 350,400" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-blue)" />
-  <path d="M 310,550 L 350,550" fill="none" stroke="#facc15" stroke-width="2" marker-end="url(#arrow-yellow)" stroke-dasharray="4,4" />
-
-  <!-- Transformation to Warehouse -->
-  <path d="M 580,230 L 620,230" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#arrow-green)" />
-  <path d="M 580,500 L 620,500" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#arrow-green)" />
-
-  <!-- Warehouse to Power BI -->
-  <path d="M 930,280 L 970,280" fill="none" stroke="#facc15" stroke-width="2.5" marker-end="url(#arrow-yellow)" />
-  <path d="M 930,520 L 970,520" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#arrow-green)" />
-
-  <!-- DirectQuery Live Indicator -->
-  <g transform="translate(935, 255)">
-    <rect x="-10" y="-12" width="65" height="18" rx="4" fill="#78350f" />
-    <text x="22" y="1" fill="#fde047" font-size="9" font-weight="800" text-anchor="middle">DirectQuery</text>
-  </g>
+  <!-- Connectors -->
+  <line x1="310" y1="480" x2="350" y2="480" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <line x1="610" y1="480" x2="650" y2="480" stroke="#4ade80" stroke-width="2" marker-end="url(#arrow-green)" />
+  <line x1="1010" y1="480" x2="1050" y2="480" stroke="#e50914" stroke-width="2" marker-end="url(#arrow-red)" />
 </svg>

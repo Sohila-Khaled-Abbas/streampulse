@@ -1,0 +1,131 @@
+table Fact_Streaming_Performance
+	lineageTag: 2651190d-8710-4a79-8655-b07788108321
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: b36cee46-3f75-4db8-9f45-426b85dde21e
+		summarizeBy: none
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 4262f375-68db-495e-99f4-eb58dd75f166
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column territory_standardized
+		dataType: string
+		lineageTag: 4c52a6f5-a9c1-41cb-8646-c62bc4b3a0c4
+		summarizeBy: none
+		sourceColumn: territory_standardized
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_category
+		dataType: string
+		lineageTag: cb201da9-fdf8-4914-811a-7a7ba5152149
+		summarizeBy: none
+		sourceColumn: device_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column global_view_hours_millions
+		dataType: double
+		lineageTag: 8006f9de-f284-4177-92bb-86cbdb707294
+		summarizeBy: sum
+		sourceColumn: global_view_hours_millions
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column avg_completion_pct
+		dataType: double
+		lineageTag: 471e1fd6-0d7f-4bcc-afe0-61d325c432c3
+		summarizeBy: sum
+		sourceColumn: avg_completion_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column subscribers_reached_thousands
+		dataType: int64
+		formatString: 0
+		lineageTag: d11f4b1d-68b8-4ae5-a453-c45ee6129cc2
+		summarizeBy: sum
+		sourceColumn: subscribers_reached_thousands
+
+		annotation SummarizationSetBy = Automatic
+
+	column performance_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 975c21a2-44a3-4f61-a6b5-2de08291ed72
+		summarizeBy: sum
+		sourceColumn: performance_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Streaming_Performance = m
+		mode: import
+		queryGroup: Facts
+		source =
+				let
+				    Source = Raw_Viewership_Parquet,
+				
+				    // 1. Unpivot Monthly Columns to Rows
+				    Unpivoted = Table.Unpivot(Source, {"Hours_2026_01", "Hours_2026_02", "Hours_2026_03"}, "Month_Col", "global_view_hours_millions"),
+				
+				    // 2. Replace Sentinel Negative Values (-999, -1) with 0.0
+				    CleanHours = Table.TransformColumns(Unpivoted, {
+				        {"global_view_hours_millions", each if _ < 0 then 0.0 else _, type number}
+				    }),
+				
+				    // 3. Extract Clean Date Key (e.g. "Hours_2026_01" -> 20260101)
+				    AddDateKey = Table.AddColumn(CleanHours, "date_key", each
+				        let
+				            m_str = Text.AfterDelimiter([Month_Col], "Hours_"),
+				            y = Number.FromText(Text.Start(m_str, 4)),
+				            m = Number.FromText(Text.End(m_str, 2))
+				        in
+				            y * 10000 + m * 100 + 1,
+				        Int64.Type
+				    ),
+				
+				    // 4. Standardize Country Names
+				    StandardizeCountry = Table.AddColumn(AddDateKey, "territory_standardized", each
+				        let
+				            c = Text.Upper(Text.Trim(Text.From([territory_region])))
+				        in
+				            if c = "USA" or c = "US" or c = "UNITED STATES" or c = "U.S.A." then "United States"
+				            else if c = "UK" or c = "GBR" or c = "GREAT BRITAIN" then "United Kingdom"
+				            else if c = "KOR" or c = "SOUTH KOREA" then "South Korea"
+				            else if c = "JPN" or c = "JAPAN" then "Japan"
+				            else "Global",
+				        type text
+				    ),
+				
+				    // 5. Map surrogate title_key
+				    MergedTitles = Table.NestedJoin(StandardizeCountry, {"catalog_ref_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+				
+				    // 6. Select Fact Columns
+				    SelectFact = Table.SelectColumns(ExpandedTitleKey, {
+				        "title_key", "date_key", "territory_standardized", "device_category",
+				        "global_view_hours_millions", "avg_completion_pct", "subscribers_reached_thousands"
+				    }),
+				    AddSurrogateFactKey = Table.AddIndexColumn(SelectFact, "performance_key", 1, 1, Int64.Type)
+				in
+				    AddSurrogateFactKey
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

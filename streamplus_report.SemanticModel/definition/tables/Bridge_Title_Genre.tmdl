@@ -1,0 +1,90 @@
+table Bridge_Title_Genre
+	lineageTag: 771abb96-1bd2-4f5b-9893-f51c91e41f21
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 18923f5a-38e4-4ff1-b65d-f7b43d9e4762
+		summarizeBy: none
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column genre_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 9afb0f9d-2af5-4f3d-8ace-7fa0ce72c5e9
+		summarizeBy: none
+		sourceColumn: genre_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column genre_weight
+		dataType: double
+		lineageTag: 4890a8f4-f4d6-472a-8440-4e0596c189a4
+		summarizeBy: sum
+		sourceColumn: genre_weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Bridge_Title_Genre = m
+		mode: import
+		queryGroup: Bridge_Tables
+		source =
+				let
+				    // 1. JSON Source Genres
+				    SourceJSON = Json.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json")),
+				    DataJSON = SourceJSON[data],
+				    TableJSON = Table.FromList(DataJSON, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    ExpandedJSON = Table.ExpandRecordColumn(TableJSON, "Column1", {"stream_id", "categorization"}, {"netflix_id", "categorization"}),
+				    ExpandedCat = Table.ExpandRecordColumn(ExpandedJSON, "categorization", {"genres"}, {"genres_raw"}),
+				
+				    AddListJSON = Table.AddColumn(ExpandedCat, "Genre_List", each
+				        if Value.Is([genres_raw], type list) then [genres_raw]
+				        else Text.Split(Text.From([genres_raw]), "|"),
+				        type list
+				    ),
+				    ExpandedRowsJSON = Table.ExpandListColumn(AddListJSON, "Genre_List"),
+				    CleanGenreNameJSON = Table.TransformColumns(ExpandedRowsJSON, {
+				        {"Genre_List", each Text.Trim(Text.From(_)), type text}
+				    }),
+				    SelectJSONBridge = Table.SelectColumns(CleanGenreNameJSON, {"netflix_id", "Genre_List"}),
+				
+				    // 2. Historical CSV Source Genres (7,786 Kaggle records)
+				    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+				    CleanHistGenres = Table.AddColumn(PromotedHist, "Genre_List", each
+				        let
+				            raw = Text.Replace(Text.Replace(Text.Replace(Text.From([genres]), "[", ""), "]", ""), "'", ""),
+				            items = Text.Split(raw, ",")
+				        in
+				            List.Transform(items, each Text.Proper(Text.Trim(_))),
+				        type list
+				    ),
+				    ExpandedHistRows = Table.ExpandListColumn(CleanHistGenres, "Genre_List"),
+				    RenameHistBridge = Table.RenameColumns(ExpandedHistRows, {{"id", "netflix_id"}}),
+				    SelectHistBridge = Table.SelectColumns(RenameHistBridge, {"netflix_id", "Genre_List"}),
+				
+				    // 3. Combine Bridges
+				    CombinedBridges = Table.Combine({SelectJSONBridge, SelectHistBridge}),
+				    FilteredEmpty = Table.SelectRows(CombinedBridges, each [Genre_List] <> "" and [Genre_List] <> null),
+				
+				    // 4. Map surrogate keys
+				    MergedTitles = Table.NestedJoin(FilteredEmpty, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+				
+				    MergedGenres = Table.NestedJoin(ExpandedTitleKey, {"Genre_List"}, Dim_Genres, {"genre_name"}, "Dim_Genres", JoinKind.Inner),
+				    ExpandedGenreKey = Table.ExpandTableColumn(MergedGenres, "Dim_Genres", {"genre_key"}, {"genre_key"}),
+				
+				    SelectFinal = Table.SelectColumns(ExpandedGenreKey, {"title_key", "genre_key"}),
+				    AddWeight = Table.AddColumn(SelectFinal, "genre_weight", each 1.0, type number),
+				    Deduplicated = Table.Distinct(AddWeight)
+				in
+				    Deduplicated
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

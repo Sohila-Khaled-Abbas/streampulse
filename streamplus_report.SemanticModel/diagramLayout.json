@@ -1,0 +1,113 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1167.2616947423926,
+            "y": 233.06868491285567
+          },
+          "nodeIndex": "Bridge_Title_Genre",
+          "nodeLineageTag": "771abb96-1bd2-4f5b-9893-f51c91e41f21",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 210.65235289823556,
+            "y": 316.11313135186452
+          },
+          "nodeIndex": "Dim_Date",
+          "nodeLineageTag": "c795c4fb-3458-413e-92c4-1dea7e693c7a",
+          "size": {
+            "height": 520,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 855.46461942112148,
+            "y": 0
+          },
+          "nodeIndex": "Dim_Genres",
+          "nodeLineageTag": "0f3846a7-9444-41cb-8c70-a300ccaed604",
+          "size": {
+            "height": 186,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 850.39350873238448,
+            "y": 524.60320612770261
+          },
+          "nodeIndex": "Dim_Titles",
+          "nodeLineageTag": "cb8308b0-1152-46c9-9f77-d78cd44a935c",
+          "size": {
+            "height": 326,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 861.66666666666652,
+            "y": 220.99999999999994
+          },
+          "nodeIndex": "Fact_Catalog_Ratings",
+          "nodeLineageTag": "85ba46d4-088d-4ae8-affd-e45cea1dafb6",
+          "size": {
+            "height": 206.66666666666669,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 532.8595612371679,
+            "y": 171.60300602552991
+          },
+          "nodeIndex": "Fact_Streaming_Performance",
+          "nodeLineageTag": "2651190d-8710-4a79-8655-b07788108321",
+          "size": {
+            "height": 298.66666666666663,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1174.0800104433422,
+            "y": 422.75605395741923
+          },
+          "nodeIndex": "vw_powerbi_catalog_pulse",
+          "nodeLineageTag": "995c8446-101b-4979-8b8a-868f4120ddcd",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 7
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 56.965637978103111,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

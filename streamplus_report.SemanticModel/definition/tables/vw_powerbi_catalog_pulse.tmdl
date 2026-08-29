@@ -1,0 +1,228 @@
+table vw_powerbi_catalog_pulse
+	lineageTag: 995c8446-101b-4979-8b8a-868f4120ddcd
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 4de2aaf3-2f17-4dcf-bffa-411677e52254
+		summarizeBy: sum
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column netflix_id
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 24af2cb3-0e4b-46e6-940b-c7e3da82cd59
+		summarizeBy: none
+		sourceColumn: netflix_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column title
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 7a6fa92a-8805-4a85-8c40-d237b9494b32
+		summarizeBy: none
+		sourceColumn: title
+
+		annotation SummarizationSetBy = Automatic
+
+	column media_type
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 8373a803-fc3c-4212-bb48-f21ebb73698e
+		summarizeBy: none
+		sourceColumn: media_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column release_year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8a68e6e3-d66c-4fc8-85c8-87ed0b9127aa
+		summarizeBy: sum
+		sourceColumn: release_year
+
+		annotation SummarizationSetBy = Automatic
+
+	column catalog_era
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: e61dda86-d095-4f81-badd-bad66a4358b9
+		summarizeBy: none
+		sourceColumn: catalog_era
+
+		annotation SummarizationSetBy = Automatic
+
+	column release_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 081f1e64-a45e-454b-bda7-a982363850cc
+		summarizeBy: none
+		sourceColumn: release_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column netflix_date_added
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: ec46faf0-807e-4a6e-8e43-5748e8866e9f
+		summarizeBy: none
+		sourceColumn: netflix_date_added
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column maturity_rating
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3b18cfc8-46a8-4074-a9f9-441e6324f0dc
+		summarizeBy: none
+		sourceColumn: maturity_rating
+
+		annotation SummarizationSetBy = Automatic
+
+	column runtime_minutes
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8a3558c4-b945-4fcd-a3fa-6d561cd428da
+		summarizeBy: sum
+		sourceColumn: runtime_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column budget_usd
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: e7f13b1a-f35d-4237-8023-34cd24f4297d
+		summarizeBy: sum
+		sourceColumn: budget_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column original_language
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: fecbd7b0-fa3c-4f66-9f23-21696a9eb303
+		summarizeBy: none
+		sourceColumn: original_language
+
+		annotation SummarizationSetBy = Automatic
+
+	column production_country
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6a9a34ae-583b-4982-9b7b-9144a765488d
+		summarizeBy: none
+		sourceColumn: production_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column match_confidence
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: ec481838-da1b-42df-88df-5e4b5259eee5
+		summarizeBy: sum
+		sourceColumn: match_confidence
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vote_average
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 8516da27-92c8-4256-a870-562beb4a9ef1
+		summarizeBy: sum
+		sourceColumn: vote_average
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column vote_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 21c3333e-a071-4a5b-a51e-162334f07678
+		summarizeBy: sum
+		sourceColumn: vote_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column popularity_score
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: f6c230b1-2204-4220-910a-76c6da136faa
+		summarizeBy: sum
+		sourceColumn: popularity_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column critic_score
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: cfa055d4-f525-434b-90d8-ff2c6b8860f0
+		summarizeBy: sum
+		sourceColumn: critic_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column days_to_streaming
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: bb3f7854-7de0-4456-a951-dbc6378a7287
+		summarizeBy: sum
+		sourceColumn: days_to_streaming
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_trending
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 045be787-6131-40b4-9f7c-44506c94c5aa
+		summarizeBy: none
+		sourceColumn: is_trending
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating_tier
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 43d546dc-10ec-47a3-a5bc-f9e56382b2a0
+		summarizeBy: none
+		sourceColumn: rating_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	partition vw_powerbi_catalog_pulse = m
+		mode: directQuery
+		queryGroup: Views
+		source =
+				let
+				  Source = PostgreSQL.Database("localhost:5432", "streampulse"),
+				  #"Navigation 1" = Source{[Schema = "reporting", Item = "vw_powerbi_catalog_pulse"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,30 @@
+relationship 9df922f5-3995-112c-619f-b9cb657d538b
+	fromColumn: Fact_Streaming_Performance.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 61090f08-fe6c-0350-f6e6-113798629a64
+	fromColumn: Fact_Streaming_Performance.date_key
+	toColumn: Dim_Date.date_key
+
+relationship 25b4bc45-45e1-3896-d4ad-c1b135a68f6e
+	fromColumn: Fact_Catalog_Ratings.date_key
+	toColumn: Dim_Date.date_key
+
+relationship 1f9107c5-a290-ec1f-67c3-b5ffc871d8f3
+	fromColumn: Bridge_Title_Genre.genre_key
+	toColumn: Dim_Genres.genre_key
+
+relationship 58150aa0-5c99-7961-6cdf-1444f44e8946
+	fromColumn: Bridge_Title_Genre.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 7c2590c2-234c-386f-950e-2a78294e3aa8
+	isActive: false
+	fromColumn: Dim_Titles.title_key
+	toColumn: Fact_Catalog_Ratings.title_key
+
+relationship db7604cc-61ad-cb2e-36fd-971aa02345d7
+	isActive: false
+	fromColumn: Dim_Titles.netflix_date_added_clean
+	toColumn: Dim_Date.full_date
+

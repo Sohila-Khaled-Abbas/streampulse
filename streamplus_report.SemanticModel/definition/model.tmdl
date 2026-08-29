@@ -4,12 +4,51 @@ model Model
 	sourceQueryCulture: en-001
 	valueFilterBehavior: independent
 	dataAccessOptions
+		fastCombine
 		legacyRedirects
 		returnErrorValuesAsNull
+
+queryGroup Staging_DB
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup Raw_Data
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup Parameters
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Dimensions
+
+	annotation PBI_QueryGroupOrder = 4
+
+queryGroup Bridge_Tables
+
+	annotation PBI_QueryGroupOrder = 5
+
+queryGroup Facts
+
+	annotation PBI_QueryGroupOrder = 3
+
+queryGroup Views
+
+	annotation PBI_QueryGroupOrder = 6
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["stg_netflix_titles","Raw_Historical_Archive","Raw_IMDb_Ratings","Raw_Viewership_Parquet","Raw_Budget_JSON","File_Path","Dim_Titles","Dim_Genres","Dim_Date","Fact_Catalog_Ratings","Bridge_Title_Genre","Fact_Streaming_Performance","vw_powerbi_catalog_pulse"]
+
+ref table Dim_Titles
+ref table Dim_Genres
+ref table Dim_Date
+ref table Fact_Catalog_Ratings
+ref table Bridge_Title_Genre
+ref table Fact_Streaming_Performance
+ref table vw_powerbi_catalog_pulse
 
 ref cultureInfo en-US
 

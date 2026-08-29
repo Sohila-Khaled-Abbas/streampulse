@@ -1,0 +1,186 @@
+table Dim_Titles
+	lineageTag: cb8308b0-1152-46c9-9f77-d78cd44a935c
+
+	column netflix_id
+		dataType: string
+		lineageTag: a08cac5d-3c72-47b4-90e7-c4d315a100cf
+		summarizeBy: none
+		sourceColumn: netflix_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column title
+		dataType: string
+		lineageTag: 0658c0cc-a51d-4da3-b302-e5493e257e07
+		summarizeBy: none
+		sourceColumn: title
+
+		annotation SummarizationSetBy = Automatic
+
+	column title_type
+		dataType: string
+		lineageTag: 3651d13e-479f-4953-8e7d-8dc2b3619f7d
+		summarizeBy: none
+		sourceColumn: title_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column release_year
+		dataType: double
+		lineageTag: ed3733e6-0f76-4fa8-83f9-e735c16e145f
+		summarizeBy: sum
+		sourceColumn: release_year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column netflix_date_added_clean
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7cd55a00-8486-49aa-95c7-0211e9baf55f
+		summarizeBy: none
+		sourceColumn: netflix_date_added_clean
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column runtime_minutes_clean
+		dataType: int64
+		formatString: 0
+		lineageTag: 697f6867-632b-4c73-afbb-3a617adc4cca
+		summarizeBy: sum
+		sourceColumn: runtime_minutes_clean
+
+		annotation SummarizationSetBy = Automatic
+
+	column maturity_rating
+		dataType: string
+		lineageTag: a90a8e10-51e5-40f0-8c30-3f093fc96172
+		summarizeBy: none
+		sourceColumn: maturity_rating
+
+		annotation SummarizationSetBy = Automatic
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 31e2dc60-39de-4cdf-a5c7-8e01a160fe88
+		summarizeBy: none
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column catalog_era
+		dataType: string
+		lineageTag: 969d0b3c-a5ae-43df-85e2-855f8cf13077
+		summarizeBy: none
+		sourceColumn: catalog_era
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Titles = m
+		mode: import
+		queryGroup: Dimensions
+		source =
+				let
+				    // -------------------------------------------------------------
+				    // Part A: Extract & Clean Live 2026/2025 Scraped Releases
+				    // -------------------------------------------------------------
+				    SourceLive = PostgreSQL.Database("localhost:5432", "streampulse"),
+				    stg_data = SourceLive{[Schema="staging", Item="stg_netflix_titles"]}[Data],
+				
+				    ScrubLive = Table.TransformColumns(stg_data, {
+				        {"title", each Text.Proper(Text.Trim(Text.Replace(Text.From(_), Character.FromNumber(160), " "))), type text},
+				        {"netflix_id", each Text.Trim(Text.From(_)), type text}
+				    }),
+				
+				    AddCleanDateLive = Table.AddColumn(ScrubLive, "netflix_date_added_clean", each
+				        try Date.From(DateTimeZone.From([date_added]))
+				        otherwise try Date.FromText([date_added], "en-US")
+				        otherwise try Date.FromText([date_added], "en-GB")
+				        otherwise #date(2026, 1, 1),
+				        type date
+				    ),
+				
+				    AddCleanRuntimeLive = Table.AddColumn(AddCleanDateLive, "runtime_minutes_clean", each
+				        let
+				            txt = Text.Lower(Text.From([runtime_seconds])),
+				            mins = if Text.Contains(txt, "mins") or Text.Contains(txt, "min") then
+				                       Number.From(Text.Select(txt, {"0".."9"}))
+				                   else if Text.Contains(txt, "h") then
+				                       let
+				                           parts = Text.Split(txt, "h"),
+				                           hours = Number.From(Text.Select(parts{0}, {"0".."9"})),
+				                           rem_mins = Number.From(Text.Select(parts{1}, {"0".."9"}))
+				                       in
+				                           (hours * 60) + rem_mins
+				                   else if try Number.FromText(txt) > 500 otherwise false then
+				                       Number.Round(Number.FromText(txt) / 60)
+				                   else
+				                       try Number.FromText(txt) otherwise 90
+				        in
+				            if mins <= 0 then 90 else mins,
+				        Int64.Type
+				    ),
+				
+				    CleanRatingLive = Table.TransformColumns(AddCleanRuntimeLive, {
+				        {"maturity_rating", each Text.Upper(Text.Trim(Text.Replace(Text.From(_), " ", "-"))), type text}
+				    }),
+				
+				    SelectLiveCols = Table.SelectColumns(CleanRatingLive, {
+				        "netflix_id", "title", "title_type", "release_year", "netflix_date_added_clean", "runtime_minutes_clean", "maturity_rating"
+				    }),
+				
+				    // -------------------------------------------------------------
+				    // Part B: Extract & Clean 7,786 Historical Benchmark Records
+				    // -------------------------------------------------------------
+				    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeadersHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+				
+				    ScrubHist = Table.TransformColumns(PromotedHeadersHist, {
+				        {"id", each Text.Trim(Text.From(_)), type text},
+				        {"title", each Text.Proper(Text.Trim(Text.Replace(Text.From(_), Character.FromNumber(160), " "))), type text},
+				        {"type", each if Text.Upper(Text.From(_)) = "MOVIE" then "Movie" else "TV Show", type text},
+				        {"release_year", each try Number.FromText(Text.From(_)) otherwise 2020, Int64.Type},
+				        {"runtime", each try Number.FromText(Text.From(_)) otherwise 90, Int64.Type},
+				        {"age_certification", each if _ = null or _ = "" then "TV-MA" else Text.Upper(Text.Trim(Text.From(_))), type text}
+				    }),
+				
+				    AddCleanDateHist = Table.AddColumn(ScrubHist, "netflix_date_added_clean", each #date([release_year], 1, 1), type date),
+				
+				    RenameHist = Table.RenameColumns(AddCleanDateHist, {
+				        {"id", "netflix_id"},
+				        {"type", "title_type"},
+				        {"runtime", "runtime_minutes_clean"},
+				        {"age_certification", "maturity_rating"}
+				    }),
+				
+				    SelectHistCols = Table.SelectColumns(RenameHist, {
+				        "netflix_id", "title", "title_type", "release_year", "netflix_date_added_clean", "runtime_minutes_clean", "maturity_rating"
+				    }),
+				
+				    // -------------------------------------------------------------
+				    // Part C: Combine Live 2026/2025 & Historical Catalog Records
+				    // -------------------------------------------------------------
+				    Combined = Table.Combine({SelectLiveCols, SelectHistCols}),
+				    Deduplicated = Table.Distinct(Combined, {"netflix_id"}),
+				
+				    // Add Surrogate Title Key
+				    AddTitleKey = Table.AddIndexColumn(Deduplicated, "title_key", 1, 1, Int64.Type),
+				
+				    // Add Era Segmentation
+				    AddEra = Table.AddColumn(AddTitleKey, "catalog_era", each
+				        if [release_year] = 2026 then "2026 Live Releases"
+				        else if [release_year] >= 2024 then "2024-2025 Modern"
+				        else "Historical Archive (<2024)",
+				        type text
+				    )
+				in
+				    AddEra
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

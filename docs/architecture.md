@@ -1,82 +1,103 @@
-# ⚡ StreamPulse: Architecture & Technical Design
+# ⚡ StreamPulse: Enterprise Architecture & Platform Technical Design
 
 ## 1. System Overview
 
-StreamPulse is an enterprise-grade, modern ELT (Extract, Load, Transform) data engineering pipeline designed to ingest streaming catalog updates from Netflix, scrape live 2026 releases and streaming feeds, enrich those records with real-time metadata and audience ratings from The Movie Database (TMDb) and web sources, perform algorithmic fuzzy entity resolution, audit quality via automated statistical profiling, and expose dimensional star-schema models to Power BI in DirectQuery mode for zero-lag analytics.
+StreamPulse is an enterprise-grade streaming analytics and data intelligence platform. It ingests multi-source streaming telemetry, scraped 2026 releases, external audience ratings, production budget feeds, and historical benchmarks into a **Medallion Data Lakehouse & Kimball Galaxy Star Schema Data Warehouse**, exposing high-performance reporting views and native HTML/CSS streaming web applications inside **Power BI**.
 
 ```mermaid
 flowchart TD
-    subgraph Sources["1. Ingestion Layer (Hybrid Scraper + API)"]
-        A1["Wikipedia 2026 Netflix Originals (since 2026)"]
-        A2["Wikipedia 2025/2024 Catalogs & TV Programming"]
-        A3["What's on Netflix Real-Time RSS Feed"]
-        A4["Kaggle Enriched Benchmark (5,800+ Historical Titles)"]
-        A5["RapidAPI Netflix UnoGS Connector (Optional)"]
+    subgraph Sources["1. Bronze Ingestion Layer (Disparate Multi-Source Feeds)"]
+        A1["PostgreSQL Staging (stg_netflix_titles)"]
+        A2["Historical Catalog Archive (7,786 Kaggle Records CSV)"]
+        A3["Live External IMDb / TMDb Ratings Snapshots (CSV)"]
+        A4["Streaming Viewership Telemetry (Wide Parquet)"]
+        A5["Production Budget & Box Office Feed (Nested JSON)"]
     end
 
-    subgraph Staging["2. Staging Landing Zone (PostgreSQL)"]
-        B1[("staging.stg_netflix_titles")]
-        B2[("staging.stg_tmdb_metadata")]
+    subgraph Silver["2. Silver Processing & Conformed Modeling (ETL / Power Query M)"]
+        B1["Text Scrubbing & Non-Breaking Space Sanitization"]
+        B2["Multi-Currency Budget & Gross Parsing ($/€/M/k)"]
+        B3["Time-Series Telemetry Unpivoting & Sentinel Cleansing"]
+        B4["Surrogate Key Generation & Conformed Dimensions"]
     end
 
-    subgraph Processing["3. Entity Resolution & Web Enrichment"]
-        C1["Title Normalization & Cleaning"]
-        C2["Fuzzy Matching Engine (RapidFuzz Token Sort)"]
-        C3["Release Year Windowing & Validation Heuristics"]
-        C4["WebEnricher (Audience Ratings, Velocity & Infoboxes)"]
+    subgraph Gold["3. Gold Kimball Galaxy Star Schema (Semantic Model / PostgreSQL)"]
+        C1[("Dim_Titles")]
+        C2[("Dim_Date")]
+        C3[("Dim_Genres")]
+        C4[("Dim_Territory")]
+        C5[("Dim_Talent_Crew")]
+        C6[("Bridge_Title_Genre")]
+        C7[("Bridge_Title_Talent")]
+        C8[("Fact_Streaming_Performance")]
+        C9[("Fact_Catalog_Ratings")]
+        C10[("Fact_Financial_ROI")]
     end
 
-    subgraph Profiling["4. Data Quality & Profiling Engine"]
-        P1["DataProfiler Completeness Audit"]
-        P2["Quality Score & Anomaly Detection"]
-        P3["data/processed/data_profiling_report.json"]
+    subgraph PowerBI["4. Power BI Native Web-App & Semantic Layer"]
+        D1["45+ Enterprise DAX Measures (7 Display Folders)"]
+        D2["Calculation Groups (Time Intelligence Matrix)"]
+        D3["Dynamic SVG Visuals (Sparklines, Progress Bars, Badges)"]
+        D4["Native HTML5 / CSS3 Netflix Web UI Components"]
+        D5["5-Page Netflix Streaming App Report Layout"]
     end
 
-    subgraph Warehouse["5. Reporting Star Schema (PostgreSQL)"]
-        D1[("reporting.dim_titles (Upsert)")]
-        D2[("reporting.dim_genres")]
-        D3[("reporting.bridge_title_genre")]
-        D4[("reporting.fact_catalog_ratings")]
-        D5["reporting.vw_powerbi_catalog_pulse (DirectQuery View)"]
-    end
-
-    subgraph BI["6. Business Intelligence & Master Export"]
-        E1["Power BI Desktop (DirectQuery Mode)"]
-        E2["data/processed/netflix_catalog_enriched_master.csv"]
-        E3["data/processed/live_2026_pulse.json"]
-    end
-
-    Sources -->|Scrapers & Extractors| Processing
-    Processing -->|Staging Ingestion| Staging
-    Processing -->|Quality Validation| Profiling
-    Profiling -->|Validated Upserts| Warehouse
-    Warehouse -->|DirectQuery SQL| E1
-    Warehouse -->|Export| E2 & E3
+    Sources --> Silver
+    Silver --> Gold
+    Gold --> PowerBI
 ```
 
 ---
 
-## 2. Core Architectural Pillars
+## 2. Medallion Architecture Specification
 
-### A. Zero-Cost 2026 Ingestion Layer (EL)
-- **Multi-Source 2026 Web Scraping**: Extracts 2026 films directly from Wikipedia's structured tables (`List of Netflix original films (since 2026)`), active TV programming, and *What's on Netflix* live streaming RSS feeds.
-- **Continuous Ingestion Daemon**: Supports real-time streaming mode polling for delta releases and streaming updates.
-- **Historical Baseline**: Merges 5,800+ Kaggle historical benchmark titles for multi-year trend analysis.
+### 🥉 Bronze Layer: Raw Ingestion
+- **PostgreSQL Live Staging**: Captures real-time 2026/2025 scraped releases via `staging.stg_netflix_titles`.
+- **Historical Catalog CSV**: Baseline benchmark of 7,786 titles with metadata, release decades, and country origins.
+- **Audience Ratings CSV**: Periodic snapshot of user scores, vote counts, and review sentiments.
+- **Viewership Telemetry Parquet**: High-volume, wide columnar telemetry records across monthly streaming metrics.
+- **Production Budget JSON**: Complex hierarchical JSON with nested talent, content warnings, and multi-currency financials.
 
-### B. Raw Storage & Isolation (PostgreSQL Staging)
-- Raw JSON payloads and tabular extracts land directly into `staging.stg_netflix_titles` and `staging.stg_tmdb_metadata`.
-- Immutable raw data ensures idempotency, auditability, and replayability without re-hitting external sources.
+### 🥈 Silver Layer: Cleaning, Normalization & Enrichment
+- **Power Query (M Language)** and Python transformation pipelines scrub string anomalies (`\xa0`, HTML entities), parse multi-currency strings into clean float numbers, unpivot wide monthly telemetry into vertical facts, and map conformed dimension keys.
+- Implements resilient error handling (`try-otherwise`) and deterministic surrogate indexing.
 
-### C. Entity Resolution & Live Web Enrichment (T)
-- **Title Normalization**: Lowercasing, removing punctuation, handling Roman numerals (`Part II` $\to$ `Part 2`), and standardizing casing.
-- **Multi-Pass Fuzzy Matching**: Computes Levenshtein token sort ratio using RapidFuzz with release year window penalties/boosts to achieve $>90\%$ matching accuracy.
-- **WebEnricher**: Extracts Wikipedia infoboxes (directors, cast, budget, synopsis) and computes streaming velocity (`days_to_streaming`).
+### 🥇 Gold Layer: Kimball Galaxy Constellation Model
+- **Conformed Dimensions**: `Dim_Titles`, `Dim_Date`, `Dim_Genres`, `Dim_Territory`, `Dim_Talent_Crew`.
+- **Bridge Tables**: `Bridge_Title_Genre`, `Bridge_Title_Talent` with explicit fractional weighting (`1.00`).
+- **Multi-Grain Facts**:
+  - `Fact_Streaming_Performance`: Monthly grain by title, territory, and device.
+  - `Fact_Catalog_Ratings`: Periodic snapshot grain by title and timestamp.
+  - `Fact_Financial_ROI`: Financial title grain for production budget, worldwide gross, and unit profitability.
 
-### D. Data Quality Validation & Catalog Profiling
-- **Statistical Profiler (`src/transform/profiler.py`)**: Audits completeness across 12 critical attributes, calculates a composite data quality score ($0-100\%$), computes era distributions (2026 Live vs Modern vs Historical), and saves `data_profiling_report.json`.
+---
 
-### E. Kimball Star Schema Data Warehouse
-- **`reporting.dim_titles`**: Conformed title dimension with idempotent `ON CONFLICT (netflix_id) DO UPDATE`.
-- **`reporting.dim_genres` & `reporting.bridge_title_genre`**: Normalized many-to-many genre associations.
-- **`reporting.fact_catalog_ratings`**: Time-series snapshot of ratings, vote counts, popularity, velocity, and trending status.
-- **`reporting.vw_powerbi_catalog_pulse`**: DirectQuery-optimized reporting view with `catalog_era` segmentation.
+## 3. Power BI Semantic & Native Web-App Layer
+
+### A. 45+ Enterprise DAX Measure Library
+Structured into 7 logical display folders:
+1. `01. Core Streaming & Catalog KPIs`
+2. `02. Time Intelligence (YoY / MoM / YTD / Rolling Velocity)`
+3. `03. Advanced Analytics & Pareto 80/20 Concentration`
+4. `04. Bayesian Rating & Quality Scoring`
+5. `05. Financial ROI & Unit Economics`
+6. `06. Dynamic SVG Visual Measures (Image URL Data Category)`
+7. `07. Netflix UI Dynamic Cards & HTML/CSS Badges`
+
+### B. Native HTML5 & CSS3 Web Components
+Rendered directly inside Power BI visuals:
+- `HTML_Netflix_Navbar`: Top web navigation bar with active tab indicators and live status badges.
+- `HTML_Netflix_Hero_Card`: Full featured trailer and title card with 4K/5.1 audio badges and Bayesian quality rating.
+- `HTML_Movie_Card_Card`: Carousel poster cards with animated hover glowing effects.
+- `HTML_Glass_KPI_Scorecard`: Glassmorphic scorecard containers with dynamic year-over-year indicators.
+- `HTML_Modal_Detail_Tooltip`: Interactive movie detail popup modal for report page tooltips.
+
+### C. Dynamic SVG Vector Graphics
+- `SVG_Completion_ProgressBar`: Dynamic progress bars for matrix and table rows.
+- `SVG_Viewership_Sparkline`: Real-time vector trajectory sparkline curves.
+- `SVG_Rating_Star_Badge`: Golden star badge with Bayesian score scaling.
+- `SVG_ROI_Bullet_Meter`: Radial bullet meter with 2.5x break-even indicator.
+
+---
+
+*StreamPulse Enterprise Technical Architecture Document 2026.*

@@ -1,10 +1,10 @@
 table Bridge_Title_Genre
-	lineageTag: 771abb96-1bd2-4f5b-9893-f51c91e41f21
+	lineageTag: 05a39172-334d-456b-8111-66f7ece3bfbc
 
 	column title_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 18923f5a-38e4-4ff1-b65d-f7b43d9e4762
+		lineageTag: ed587ed2-37ea-43b6-af59-3385d488b748
 		summarizeBy: none
 		sourceColumn: title_key
 
@@ -13,7 +13,7 @@ table Bridge_Title_Genre
 	column genre_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 9afb0f9d-2af5-4f3d-8ace-7fa0ce72c5e9
+		lineageTag: fe88c4e7-562d-40ab-acfe-e6e7c6cc8ef4
 		summarizeBy: none
 		sourceColumn: genre_key
 
@@ -21,7 +21,7 @@ table Bridge_Title_Genre
 
 	column genre_weight
 		dataType: double
-		lineageTag: 4890a8f4-f4d6-472a-8440-4e0596c189a4
+		lineageTag: 53daee06-f352-44ef-9f6d-3611214dcc45
 		summarizeBy: sum
 		sourceColumn: genre_weight
 
@@ -34,8 +34,7 @@ table Bridge_Title_Genre
 		queryGroup: Bridge_Tables
 		source =
 				let
-				    // 1. JSON Source Genres
-				    SourceJSON = Json.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json")),
+				    SourceJSON = Json.Document(File.Contents(File_Path & "boxoffice_budget_feed.json")),
 				    DataJSON = SourceJSON[data],
 				    TableJSON = Table.FromList(DataJSON, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
 				    ExpandedJSON = Table.ExpandRecordColumn(TableJSON, "Column1", {"stream_id", "categorization"}, {"netflix_id", "categorization"}),
@@ -47,18 +46,15 @@ table Bridge_Title_Genre
 				        type list
 				    ),
 				    ExpandedRowsJSON = Table.ExpandListColumn(AddListJSON, "Genre_List"),
-				    CleanGenreNameJSON = Table.TransformColumns(ExpandedRowsJSON, {
-				        {"Genre_List", each Text.Trim(Text.From(_)), type text}
-				    }),
+				    CleanGenreNameJSON = Table.TransformColumns(ExpandedRowsJSON, {{"Genre_List", each Text.Trim(Text.From(_)), type text}}),
 				    SelectJSONBridge = Table.SelectColumns(CleanGenreNameJSON, {"netflix_id", "Genre_List"}),
 				
-				    // 2. Historical CSV Source Genres (7,786 Kaggle records)
-				    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    SourceHist = Csv.Document(File.Contents(File_Path & "netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
 				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
 				    CleanHistGenres = Table.AddColumn(PromotedHist, "Genre_List", each
 				        let
 				            raw = Text.Replace(Text.Replace(Text.Replace(Text.From([genres]), "[", ""), "]", ""), "'", ""),
-				            items = Text.Split(raw, ",")
+				            items = Text.Split(raw, ";")
 				        in
 				            List.Transform(items, each Text.Proper(Text.Trim(_))),
 				        type list
@@ -67,15 +63,32 @@ table Bridge_Title_Genre
 				    RenameHistBridge = Table.RenameColumns(ExpandedHistRows, {{"id", "netflix_id"}}),
 				    SelectHistBridge = Table.SelectColumns(RenameHistBridge, {"netflix_id", "Genre_List"}),
 				
-				    // 3. Combine Bridges
 				    CombinedBridges = Table.Combine({SelectJSONBridge, SelectHistBridge}),
 				    FilteredEmpty = Table.SelectRows(CombinedBridges, each [Genre_List] <> "" and [Genre_List] <> null),
 				
-				    // 4. Map surrogate keys
-				    MergedTitles = Table.NestedJoin(FilteredEmpty, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    StandardizedGenreName = Table.AddColumn(FilteredEmpty, "genre_name_clean", each
+				        let g = if [Genre_List] = null then "" else Text.Proper(Text.From([Genre_List])) in
+				        if Text.Contains(g, "Action") then "Action"
+				        else if Text.Contains(g, "Adventure") then "Adventure"
+				        else if Text.Contains(g, "Animation") or Text.Contains(g, "Anime") then "Animation"
+				        else if Text.Contains(g, "Comedy") or Text.Contains(g, "Comedies") then "Comedy"
+				        else if Text.Contains(g, "Crime") then "Crime"
+				        else if Text.Contains(g, "Docu") then "Documentary"
+				        else if Text.Contains(g, "Drama") then "Drama"
+				        else if Text.Contains(g, "Family") or Text.Contains(g, "Children") then "Family"
+				        else if Text.Contains(g, "Fantasy") then "Fantasy"
+				        else if Text.Contains(g, "Horror") then "Horror"
+				        else if Text.Contains(g, "Sci") then "Science Fiction"
+				        else if Text.Contains(g, "Thrill") then "Thriller"
+				        else if Text.Contains(g, "Romance") or Text.Contains(g, "Romantic") then "Romance"
+				        else "Drama",
+				        type text
+				    ),
+				
+				    MergedTitles = Table.NestedJoin(StandardizedGenreName, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
 				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
 				
-				    MergedGenres = Table.NestedJoin(ExpandedTitleKey, {"Genre_List"}, Dim_Genres, {"genre_name"}, "Dim_Genres", JoinKind.Inner),
+				    MergedGenres = Table.NestedJoin(ExpandedTitleKey, {"genre_name_clean"}, Dim_Genres, {"genre_name"}, "Dim_Genres", JoinKind.Inner),
 				    ExpandedGenreKey = Table.ExpandTableColumn(MergedGenres, "Dim_Genres", {"genre_key"}, {"genre_key"}),
 				
 				    SelectFinal = Table.SelectColumns(ExpandedGenreKey, {"title_key", "genre_key"}),

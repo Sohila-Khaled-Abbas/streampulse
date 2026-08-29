@@ -214,7 +214,7 @@ table vw_powerbi_catalog_pulse
 
 	partition vw_powerbi_catalog_pulse = m
 		mode: directQuery
-		queryGroup: Views
+		queryGroup: Views_DB
 		source =
 				let
 				  Source = PostgreSQL.Database("localhost:5432", "streampulse"),

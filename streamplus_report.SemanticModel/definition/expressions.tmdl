@@ -1,79 +1,8 @@
-expression File_Path = "D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\streaming_viewership_wide.parquet" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+expression File_Path = "D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: b78ab2da-4f75-4cf9-b294-a3073b747723
 	queryGroup: Parameters
 
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Text
-
-expression stg_netflix_titles =
-		let
-		  Source = PostgreSQL.Database("localhost:5432", "streampulse"),
-		  #"Navigation 1" = Source{[Schema = "staging", Item = "stg_netflix_titles"]}[Data]
-		in
-		  #"Navigation 1"
-	lineageTag: 15ed2f7e-6f44-452f-b561-af134283f226
-	queryGroup: Staging_DB
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Table
-
-expression Raw_Historical_Archive =
-		let
-		  Source = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter = ",", Columns = 47, Encoding = 65001, QuoteStyle = QuoteStyle.None]),
-		  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-		  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"content_id", type text}, {"title", type text}, {"type", type text}, {"release_year", Int64.Type}, {"release_decade", Int64.Type}, {"release_year_group", type text}, {"content_age", Int64.Type}, {"date_added", type date}, {"rating", type text}, {"duration", type text}, {"runtime_minutes", Int64.Type}, {"description", type text}, {"genres", type text}, {"countries", type text}, {"languages", type text}, {"original_language", type text}, {"cast", type text}, {"directors", type text}, {"imdb_id", type text}, {"tmdb_id", Int64.Type}, {"imdb_rating", type number}, {"imdb_votes", Int64.Type}, {"tmdb_rating", type number}, {"tmdb_popularity", type number}, {"imdb_rating_category", type text}, {"tmdb_rating_category", type text}, {"popularity_category", type text}, {"popularity_percentile", type number}, {"primary_genre", type text}, {"genre_count", Int64.Type}, {"primary_country", type text}, {"country_count", Int64.Type}, {"is_original", type logical}, {"is_recent_release", type logical}, {"has_rating", type logical}, {"has_cast", type logical}, {"has_director", type logical}, {"data_completeness_score", type number}, {"match_method", type text}, {"match_confidence", type number}, {"id", type text}, {"imdb_score", type number}, {"tmdb_score", type number}, {"age_certification", type text}, {"runtime", Int64.Type}, {"production_countries", type text}, {"director", type text}}, "en-US")
-		in
-		  #"Changed column type"
-	lineageTag: 7c5f9760-cb90-488e-ab27-cf6cc67d0768
-	queryGroup: Raw_Data
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Table
-
-expression Raw_IMDb_Ratings =
-		let
-		  Source = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\imdb_external_ratings.csv"), [Delimiter = ",", Columns = 8, QuoteStyle = QuoteStyle.None]),
-		  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-		  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"title_id", Int64.Type}, {"imdb_code", type text}, {"title_name", type text}, {"user_score", type text}, {"vote_count_raw", type text}, {"critic_metascore", Int64.Type}, {"review_sentiment", type text}, {"snapshot_timestamp", type datetime}}, "en-US")
-		in
-		  #"Changed column type"
-	lineageTag: aa1a63a0-077d-4758-9286-64c3c75c4074
-	queryGroup: Raw_Data
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Table
-
-expression Raw_Viewership_Parquet =
-		let
-		    Source = Parquet.Document(File.Contents(File_Path), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
-		in
-		    Source
-	lineageTag: c64f9c5f-c6da-4625-9f50-dfc9cf496f54
-	queryGroup: Raw_Data
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Table
-
-expression Raw_Budget_JSON =
-		let
-		  Source = Json.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\boxoffice_budget_feed.json")),
-		  #"Converted to table" = Table.FromRecords({Source}),
-		  #"Expanded data" = Table.ExpandListColumn(#"Converted to table", "data"),
-		  #"Expanded data1" = Table.ExpandRecordColumn(#"Expanded data", "data", {"stream_id", "production_info", "categorization", "financial_roi_tier", "last_synced_utc"}, {"data.stream_id", "data.production_info", "data.categorization", "data.financial_roi_tier", "data.last_synced_utc"}),
-		  #"Expanded data.production_info" = Table.ExpandRecordColumn(#"Expanded data1", "data.production_info", {"title", "studio", "producer", "production_budget_raw", "worldwide_gross_raw"}, {"data.production_info.title", "data.production_info.studio", "data.production_info.producer", "data.production_info.production_budget_raw", "data.production_info.worldwide_gross_raw"}),
-		  #"Expanded data.categorization" = Table.ExpandRecordColumn(#"Expanded data.production_info", "data.categorization", {"genres", "content_warnings"}, {"data.categorization.genres", "data.categorization.content_warnings"}),
-		  #"Changed column type" = Table.TransformColumnTypes(#"Expanded data.categorization", {{"api_version", type text}, {"total_records", Int64.Type}, {"data.stream_id", Int64.Type}, {"data.production_info.title", type text}, {"data.production_info.studio", type text}, {"data.production_info.producer", type text}, {"data.production_info.production_budget_raw", type text}, {"data.production_info.worldwide_gross_raw", type text}, {"data.financial_roi_tier", type text}, {"data.last_synced_utc", type datetime}}, "en-US")
-		in
-		  #"Changed column type"
-	lineageTag: 12b74a45-878b-48a4-87e1-e0aafabf33a7
-	queryGroup: Raw_Data
-
-	annotation PBI_NavigationStepName = Navigation
-
-	annotation PBI_ResultType = Table
 

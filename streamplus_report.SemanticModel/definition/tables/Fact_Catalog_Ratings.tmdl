@@ -1,11 +1,11 @@
 table Fact_Catalog_Ratings
-	lineageTag: 85ba46d4-088d-4ae8-affd-e45cea1dafb6
+	lineageTag: 58012a6f-6d71-441c-8b54-50c96593775f
 
 	column title_key
 		dataType: int64
 		formatString: 0
-		lineageTag: d3ad50b1-2529-4f52-bbf3-85832a7af62b
-		summarizeBy: sum
+		lineageTag: cfeb4591-b4f2-41cb-a7f6-6201396f0fae
+		summarizeBy: none
 		sourceColumn: title_key
 
 		annotation SummarizationSetBy = Automatic
@@ -13,7 +13,7 @@ table Fact_Catalog_Ratings
 	column date_key
 		dataType: int64
 		formatString: 0
-		lineageTag: b45f8147-3d11-4703-ab41-cb17ddc5bf26
+		lineageTag: 5fea53ca-a24e-4b08-8424-90d964180b98
 		summarizeBy: none
 		sourceColumn: date_key
 
@@ -21,7 +21,7 @@ table Fact_Catalog_Ratings
 
 	column vote_average
 		dataType: double
-		lineageTag: 81c58375-f955-46fa-af09-3bb4492ef15d
+		lineageTag: f21f7de1-7a66-4113-b066-69ed3f9e7f2b
 		summarizeBy: sum
 		sourceColumn: vote_average
 
@@ -32,68 +32,77 @@ table Fact_Catalog_Ratings
 	column vote_count
 		dataType: int64
 		formatString: 0
-		lineageTag: fa6ded27-4ac4-4030-a40b-4d44c4a2c831
+		lineageTag: 9819c0f0-5bc0-46b5-997f-07c6bc9b46e1
 		summarizeBy: sum
 		sourceColumn: vote_count
 
 		annotation SummarizationSetBy = Automatic
 
 	column critic_score
-		dataType: double
-		lineageTag: 93546980-8e1b-433a-9ce2-037a737b9f55
-		summarizeBy: sum
+		dataType: string
+		lineageTag: 242a4a72-eb1c-4e34-872f-7e19eff51e3a
+		summarizeBy: none
 		sourceColumn: critic_score
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
+	column fact_rating_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e799edf-7cc0-4557-b2e5-4f3b20a4d324
+		summarizeBy: sum
+		sourceColumn: fact_rating_key
+
+		annotation SummarizationSetBy = Automatic
 
 	partition Fact_Catalog_Ratings = m
 		mode: import
 		queryGroup: Facts
 		source =
 				let
-				    // -------------------------------------------------------------
-				    // Part A: Live Snapshot Ratings (from Raw_IMDb_Ratings)
-				    // -------------------------------------------------------------
-				    SourceLive = Raw_IMDb_Ratings,
+				    // Part A: Live Snapshot Ratings (from Raw_IMDb_Ratings CSV)
+				    SourceLive = Csv.Document(File.Contents(File_Path & "imdb_external_ratings.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedLive = Table.PromoteHeaders(SourceLive, [PromoteAllScalars=true]),
 				
-				    ParseLiveVotes = Table.AddColumn(SourceLive, "vote_count_clean", each
+				    ParseLiveVotes = Table.AddColumn(PromotedLive, "vote_count_clean", each
 				        let
-				            v = Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
-				            num = if Text.EndsWith(v, "M") then
-				                      Number.FromText(Text.Remove(v, "M")) * 1000000
+				            v = if [vote_count_raw] = null then "" else Text.Upper(Text.Trim(Text.From([vote_count_raw]))),
+				            num = if v = "" or v = "NULL" or v = "N/A" then
+				                      1000
+				                  else if Text.EndsWith(v, "M") then
+				                      (try Number.FromText(Text.Remove(v, "M")) otherwise 1.0) * 1000000
 				                  else if Text.EndsWith(v, "K") then
-				                      Number.FromText(Text.Remove(v, "K")) * 1000
+				                      (try Number.FromText(Text.Remove(v, "K")) otherwise 1.0) * 1000
 				                  else
-				                      try Number.FromText(Text.Replace(v, ",", "")) otherwise 0
+				                      try Number.FromText(Text.Replace(v, ",", "")) otherwise 1000
 				        in
-				            Int64.From(num),
+				            Int64.From(if num = null or num < 0 then 1000 else num),
 				        Int64.Type
 				    ),
 				
 				    ParseLiveScore = Table.AddColumn(ParseLiveVotes, "vote_average_clean", each
 				        let
-				            raw = Text.Trim(Text.From([user_score])),
-				            score = if Text.Contains(raw, "/10") then
-				                        Number.FromText(Text.BeforeDelimiter(raw, "/10"))
+				            raw = if [user_score] = null then "" else Text.Upper(Text.Trim(Text.From([user_score]))),
+				            score = if raw = "" or raw = "NULL" or raw = "N/A" then
+				                        7.0
+				                    else if Text.Contains(raw, "/10") then
+				                        try Number.FromText(Text.BeforeDelimiter(raw, "/10")) otherwise 7.0
 				                    else if Text.EndsWith(raw, "%") then
-				                        Number.FromText(Text.Remove(raw, "%")) / 10.0
+				                        (try Number.FromText(Text.Remove(raw, "%")) otherwise 70.0) / 10.0
 				                    else
-				                        try Number.FromText(raw) otherwise 7.0
+				                        try Number.FromText(raw) otherwise 7.0,
+				            valid_score = if score = null then 7.0 else score
 				        in
-				            if score > 10.0 then 10.0 else if score < 0.0 then 0.0 else Number.Round(score, 1),
+				            if valid_score > 10.0 then 10.0 else if valid_score < 0.0 then 0.0 else Number.Round(valid_score, 1),
 				        type number
 				    ),
 				
 				    SortedLive = Table.Sort(ParseLiveScore, {{"title_id", Order.Ascending}, {"snapshot_timestamp", Order.Descending}}),
 				    DeduplicatedLive = Table.Distinct(SortedLive, {"title_id"}),
 				
-				    AddLiveDateKey = Table.AddColumn(SortedLive, "date_key", each
-				        let
-				            d = try Date.From(DateTimeZone.From([snapshot_timestamp])) otherwise #date(2026, 2, 1)
-				        in
-				            Date.Year(d) * 10000 + Date.Month(d) * 100 + Date.Day(d),
+				    AddLiveDateKey = Table.AddColumn(DeduplicatedLive, "date_key", each
+				        let d = try Date.From(DateTimeZone.From([snapshot_timestamp])) otherwise #date(2026, 2, 1) in
+				        Date.Year(d) * 10000 + Date.Month(d) * 100 + Date.Day(d),
 				        Int64.Type
 				    ),
 				
@@ -108,41 +117,55 @@ table Fact_Catalog_Ratings
 				        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
 				    }),
 				
-				    // -------------------------------------------------------------
-				    // Part B: Historical Ratings (from Raw_Historical_Archive, 7,786 records)
-				    // -------------------------------------------------------------
-				    SourceHist = Csv.Document(File.Contents("D:\courses\Data Science\Data Engineering\Projects\streampulse\data\raw\netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    // Part B: Historical Kaggle Ratings (7,786 records)
+				    SourceHist = Csv.Document(File.Contents(File_Path & "netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
 				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
 				
 				    AddHistDateKey = Table.AddColumn(PromotedHist, "date_key", each
-				        let
-				            y = try Number.FromText(Text.From([release_year])) otherwise 2020
-				        in
-				            y * 10000 + 101,
+				        let y = try Number.FromText(Text.From([release_year])) otherwise 2020 in
+				        (if y = null or y < 1900 or y > 2100 then 2020 else y) * 10000 + 101,
 				        Int64.Type
 				    ),
 				
-				    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each try Number.FromText(Text.From([imdb_score])) otherwise 7.0, type number),
-				    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000, Int64.Type),
-				    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70, type number),
-				
+				    CleanHistRatings = Table.AddColumn(AddHistDateKey, "vote_average", each
+				        let
+				            s = try Number.FromText(Text.From([imdb_score])) otherwise 7.0,
+				            valid_s = if s = null then 7.0 else s
+				        in
+				            if valid_s > 10.0 then 10.0 else if valid_s <= 0.0 then 7.0 else Number.Round(valid_s, 1),
+				        type number
+				    ),
+				    CleanHistVotes = Table.AddColumn(CleanHistRatings, "vote_count", each
+				        let
+				            v = try Int64.From(Number.FromText(Text.From([imdb_votes]))) otherwise 1000
+				        in
+				            if v = null or v <= 0 then 1000 else v,
+				        Int64.Type
+				    ),
+				    CleanHistMetascore = Table.AddColumn(CleanHistVotes, "critic_score", each
+				        let
+				            m = try Number.FromText(Text.From([tmdb_score])) * 10 otherwise 70.0,
+				            valid_m = if m = null then 70.0 else m
+				        in
+				            if valid_m > 100.0 then 100.0 else if valid_m <= 0.0 then 70.0 else Number.Round(valid_m, 1),
+				        type number
+				    ),
 				    RenameHistFact = Table.RenameColumns(CleanHistMetascore, {{"id", "netflix_id"}}),
 				    SelectHistFact = Table.SelectColumns(RenameHistFact, {
 				        "netflix_id", "date_key", "vote_average", "vote_count", "critic_score"
 				    }),
 				
-				    // -------------------------------------------------------------
 				    // Part C: Combine & Map Surrogate Title Key
-				    // -------------------------------------------------------------
 				    CombinedFacts = Table.Combine({SelectLiveFact, SelectHistFact}),
 				    MergedTitles = Table.NestedJoin(CombinedFacts, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
 				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
 				
 				    FinalFact = Table.SelectColumns(ExpandedTitleKey, {
 				        "title_key", "date_key", "vote_average", "vote_count", "critic_score"
-				    })
+				    }),
+				    AddRatingFactKey = Table.AddIndexColumn(FinalFact, "fact_rating_key", 1, 1, Int64.Type)
 				in
-				    FinalFact
+				    AddRatingFactKey
 
 	annotation PBI_NavigationStepName = Navigation
 

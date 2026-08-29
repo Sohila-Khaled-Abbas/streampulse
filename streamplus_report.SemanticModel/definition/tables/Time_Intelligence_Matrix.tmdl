@@ -1,0 +1,33 @@
+table Time_Intelligence_Matrix
+	lineageTag: 4314c25c-c651-4181-ab0b-b36204dfdc09
+
+	calculationGroup
+
+		calculationItem 'Current Value' = SELECTEDMEASURE()
+
+		calculationItem YTD = CALCULATE(SELECTEDMEASURE(), DATESYTD(Dim_Date[full_date]))
+
+		calculationItem 'YoY Growth' = SELECTEDMEASURE() - CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(Dim_Date[full_date]))
+
+		calculationItem 'YoY %' = DIVIDE(SELECTEDMEASURE() - CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(Dim_Date[full_date])), CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(Dim_Date[full_date])), BLANK())
+
+		calculationItem 'Rolling 28D' = CALCULATE(SELECTEDMEASURE(), DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -28, DAY))
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: ebb862ba-584d-4623-bbf8-9a422459f43d
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 44ce1d78-a194-43e5-95c7-f768e2ebc30b
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

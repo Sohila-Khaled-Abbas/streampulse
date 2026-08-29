@@ -1,0 +1,86 @@
+table Dim_Territory
+	lineageTag: 80cd9334-606d-49b2-96d8-a5d0cf096222
+
+	column territory_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 8b9e9785-ee79-4479-81a0-89f4149dff1d
+		summarizeBy: none
+		sourceColumn: territory_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column territory_code
+		dataType: string
+		lineageTag: c99c03a7-83cf-4172-8372-2f663f0b0f91
+		summarizeBy: none
+		sourceColumn: territory_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column territory_name
+		dataType: string
+		lineageTag: 727ed5da-af30-4e8f-aaeb-5f15b1aac1be
+		summarizeBy: none
+		sourceColumn: territory_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_group
+		dataType: string
+		lineageTag: 33e97299-d826-4062-ba11-832866f119d2
+		summarizeBy: none
+		sourceColumn: region_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency_code
+		dataType: string
+		lineageTag: 7791d2d7-0ff3-4c0a-95df-3ddff4efee42
+		summarizeBy: none
+		sourceColumn: currency_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column market_maturity
+		dataType: string
+		lineageTag: 7ba330ec-318f-48fb-ae6c-2b4b0b6e64ad
+		summarizeBy: none
+		sourceColumn: market_maturity
+
+		annotation SummarizationSetBy = Automatic
+
+	column streaming_penetration_pct
+		dataType: double
+		lineageTag: 3aad1d7f-1bb5-4db7-96fa-6156e3d5b313
+		summarizeBy: none
+		sourceColumn: streaming_penetration_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Dim_Territory = m
+		mode: import
+		queryGroup: Dimensions
+		source =
+				let
+				    TerritoryRecords = {
+				        [territory_key = 1, territory_code = "US", territory_name = "United States", region_group = "North America", currency_code = "USD", market_maturity = "Mature Hub", streaming_penetration_pct = 0.85],
+				        [territory_key = 2, territory_code = "GB", territory_name = "United Kingdom", region_group = "EMEA", currency_code = "GBP", market_maturity = "Mature Hub", streaming_penetration_pct = 0.78],
+				        [territory_key = 3, territory_code = "KR", territory_name = "South Korea", region_group = "APAC", currency_code = "KRW", market_maturity = "High Growth", streaming_penetration_pct = 0.72],
+				        [territory_key = 4, territory_code = "JP", territory_name = "Japan", region_group = "APAC", currency_code = "JPY", market_maturity = "Mature Hub", streaming_penetration_pct = 0.65],
+				        [territory_key = 5, territory_code = "GL", territory_name = "Global / Rest of World", region_group = "Worldwide", currency_code = "USD", market_maturity = "Emerging Markets", streaming_penetration_pct = 0.45]
+				    },
+				    TableFromRecords = Table.FromRecords(TerritoryRecords),
+				    TypedTable = Table.TransformColumnTypes(TableFromRecords, {
+				        {"territory_key", Int64.Type}, {"territory_code", type text}, {"territory_name", type text},
+				        {"region_group", type text}, {"currency_code", type text}, {"market_maturity", type text}, {"streaming_penetration_pct", type number}
+				    })
+				in
+				    TypedTable
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

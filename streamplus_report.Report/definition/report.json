@@ -9,6 +9,15 @@
         "page": "2.3.1"
       },
       "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
+      "reportVersionAtImport": {
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
     }
   },
   "objects": {
@@ -24,8 +33,24 @@
           }
         }
       }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
     ]
   },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6855"
+  ],
   "resourcePackages": [
     {
       "name": "SharedResources",
@@ -35,6 +60,17 @@
           "name": "Fluent2-CY26SU08",
           "path": "BaseThemes/Fluent2-CY26SU08.json",
           "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
+          "path": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
+          "type": "CustomTheme"
         }
       ]
     }

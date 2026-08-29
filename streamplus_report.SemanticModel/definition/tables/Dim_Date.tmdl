@@ -1,10 +1,10 @@
 table Dim_Date
-	lineageTag: c795c4fb-3458-413e-92c4-1dea7e693c7a
+	lineageTag: c011dcb7-54c8-483f-872a-c2f6d7cafd4c
 
 	column full_date
 		dataType: dateTime
-		formatString: Long Date
-		lineageTag: fe9bd168-fa42-4a6c-a753-b915c4e8daa4
+		formatString: d mmmm yyyy
+		lineageTag: bbc1f624-9e80-4a9e-80f3-ae5ccd16cadf
 		summarizeBy: none
 		sourceColumn: full_date
 
@@ -12,10 +12,12 @@ table Dim_Date
 
 		annotation UnderlyingDateTimeDataType = Date
 
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
 	column date_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 9b4368e5-2e30-4532-8d10-e2e8c184950d
+		lineageTag: c5af374a-1bb4-4df2-ad78-d6b124d4a8c8
 		summarizeBy: none
 		sourceColumn: date_key
 
@@ -24,7 +26,7 @@ table Dim_Date
 	column year
 		dataType: int64
 		formatString: 0
-		lineageTag: 4db19a2c-d05b-4dd5-876c-f1bff978e651
+		lineageTag: b02c64e9-d6ba-4fa1-85d4-66519602cae8
 		summarizeBy: sum
 		sourceColumn: year
 
@@ -33,7 +35,7 @@ table Dim_Date
 	column quarter
 		dataType: int64
 		formatString: 0
-		lineageTag: fec3cfdd-5ab9-4457-9314-b123247812d8
+		lineageTag: 0f3a4118-2dea-42ff-b74a-35758e16f806
 		summarizeBy: sum
 		sourceColumn: quarter
 
@@ -41,16 +43,19 @@ table Dim_Date
 
 	column quarter_name
 		dataType: string
-		lineageTag: 7951bee3-8798-4754-be6d-4ebbd70863e7
+		lineageTag: ec29caa5-2c69-4a31-81b3-0d7c64c7f864
 		summarizeBy: none
 		sourceColumn: quarter_name
+		sortByColumn: quarter
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column month_number
 		dataType: int64
 		formatString: 0
-		lineageTag: 56b66afa-a136-4170-b9c6-979b80dcf0b3
+		lineageTag: b65e947f-f29a-4f97-bc3d-8869e216f9ed
 		summarizeBy: sum
 		sourceColumn: month_number
 
@@ -58,24 +63,29 @@ table Dim_Date
 
 	column month_name
 		dataType: string
-		lineageTag: 56946eac-df82-44d8-a1ff-28750f37207e
+		lineageTag: db3a6e81-4e7f-465b-823c-15a0aab58db3
 		summarizeBy: none
 		sourceColumn: month_name
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column month_short
 		dataType: string
-		lineageTag: 4141d28f-00d7-4c94-8302-3488a4ae99e5
+		lineageTag: 8a7ba997-9f9b-4e58-b661-6488c5d649de
 		summarizeBy: none
 		sourceColumn: month_short
+		sortByColumn: month_number
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column day_of_week
 		dataType: int64
 		formatString: 0
-		lineageTag: d0b4824e-3f3b-4a4f-bd1c-a3b149ab88bd
+		lineageTag: 3d55c301-5a81-4030-a65f-79eb9557dbcd
 		summarizeBy: sum
 		sourceColumn: day_of_week
 
@@ -83,16 +93,19 @@ table Dim_Date
 
 	column day_name
 		dataType: string
-		lineageTag: 293c8420-6593-4169-8001-5114daa83810
+		lineageTag: e8f88538-eb1b-428f-9e7b-c6b01d49b684
 		summarizeBy: none
 		sourceColumn: day_name
+		sortByColumn: day_of_week
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column is_weekend
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 8360d836-0cf0-4abb-afee-b149e674a971
+		lineageTag: 52b9f9c6-76bd-442d-8270-5ed23e1c25fe
 		summarizeBy: none
 		sourceColumn: is_weekend
 
@@ -100,7 +113,7 @@ table Dim_Date
 
 	column fiscal_period
 		dataType: string
-		lineageTag: 81aadce6-8dcb-42ef-a40c-c839b858f119
+		lineageTag: dd1bdc5f-8715-4386-a360-d9dc17e23b28
 		summarizeBy: none
 		sourceColumn: fiscal_period
 
@@ -109,7 +122,7 @@ table Dim_Date
 	column is_current_year
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: e90ee879-da9f-442b-b30f-edd4522f6e65
+		lineageTag: 7a0be934-beed-4b08-8bc2-bdb735e128c7
 		summarizeBy: none
 		sourceColumn: is_current_year
 
@@ -118,7 +131,7 @@ table Dim_Date
 	column is_past_or_current
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: c43800cd-1580-496e-ab60-b03fdc233b65
+		lineageTag: a4759d47-25a3-4271-9f8a-6c5e50715137
 		summarizeBy: none
 		sourceColumn: is_past_or_current
 
@@ -127,7 +140,7 @@ table Dim_Date
 	column relative_year_offset
 		dataType: int64
 		formatString: 0
-		lineageTag: 68f30b2c-03d7-43fa-a216-ef1c441aab37
+		lineageTag: d07d2129-0b0c-4b38-8048-c429fce3bdcf
 		summarizeBy: sum
 		sourceColumn: relative_year_offset
 
@@ -136,7 +149,7 @@ table Dim_Date
 	column relative_month_offset
 		dataType: int64
 		formatString: 0
-		lineageTag: 2444ade7-80c7-4ae3-9056-7efda7b01a25
+		lineageTag: f3dc4239-6653-4616-ba19-22e5f9d04aa2
 		summarizeBy: sum
 		sourceColumn: relative_month_offset
 
@@ -145,7 +158,7 @@ table Dim_Date
 	column is_netflix_quarter_end
 		dataType: boolean
 		formatString: """TRUE"";""TRUE"";""FALSE"""
-		lineageTag: 036f2d7e-cb91-4ee0-8cd1-500d25c7bde5
+		lineageTag: 46479f5d-ecf2-42ac-b0f5-0eabb1ce9cf8
 		summarizeBy: none
 		sourceColumn: is_netflix_quarter_end
 
@@ -156,27 +169,21 @@ table Dim_Date
 		queryGroup: Dimensions
 		source = ```
 				let
-				    // 1. Dynamically fetch all dates from Dim_Titles
 				    DatasetDates = List.RemoveNulls(Dim_Titles[netflix_date_added_clean]),
-				
-				    // 2. Compute dynamic Min and Max dates with fallback defaults
-				    MinDateRaw = if List.IsEmpty(DatasetDates) then #date(2020, 1, 1) else List.Min(DatasetDates),
+				    MinDateRaw = if List.IsEmpty(DatasetDates) then #date(2015, 1, 1) else List.Min(DatasetDates),
 				    MaxDateRaw = if List.IsEmpty(DatasetDates) then #date(2026, 12, 31) else List.Max(DatasetDates),
 				    CurrentDate = DateTime.Date(DateTime.LocalNow()),
 				
-				    // 3. Expand boundaries to full calendar years
 				    StartYear = Date.Year(MinDateRaw),
 				    EndYear = Date.Year(List.Max({MaxDateRaw, CurrentDate})),
 				    StartDate = #date(StartYear, 1, 1),
 				    EndDate = #date(EndYear, 12, 31),
 				
-				    // 4. Generate continuous daily dates list
 				    NumberOfDays = Duration.Days(EndDate - StartDate) + 1,
 				    DateList = List.Dates(StartDate, NumberOfDays, #duration(1, 0, 0, 0)),
 				    DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"full_date"}, null, ExtraValues.Error),
 				    TypedDate = Table.TransformColumnTypes(DateTable, {{"full_date", type date}}),
 				
-				    // 5. Standard Calendar Attributes
 				    AddDateKey = Table.AddColumn(TypedDate, "date_key", each Date.Year([full_date]) * 10000 + Date.Month([full_date]) * 100 + Date.Day([full_date]), Int64.Type),
 				    AddYear = Table.AddColumn(AddDateKey, "year", each Date.Year([full_date]), Int64.Type),
 				    AddQuarter = Table.AddColumn(AddYear, "quarter", each Date.QuarterOfYear([full_date]), Int64.Type),
@@ -186,22 +193,24 @@ table Dim_Date
 				    AddMonthShort = Table.AddColumn(AddMonthName, "month_short", each Text.Start([month_name], 3), type text),
 				    AddDayOfWeek = Table.AddColumn(AddMonthShort, "day_of_week", each Date.DayOfWeek([full_date], Day.Monday) + 1, Int64.Type),
 				    AddDayName = Table.AddColumn(AddDayOfWeek, "day_name", each Date.DayOfWeekName([full_date]), type text),
-				    AddIsWeekend = Table.AddColumn(AddDayName, "is_weekend", each if [day_of_week] >= 6 then true else false, type logical),
-				    AddFiscalPeriod = Table.AddColumn(AddIsWeekend, "fiscal_period", each "FY" & Text.From([year]) & "-Q" & Text.From([quarter]), type text),
-				
-				    // 6. Dynamic Streaming & Time-Intelligence Offsets
-				    AddIsCurrentYear = Table.AddColumn(AddFiscalPeriod, "is_current_year", each Date.Year([full_date]) = Date.Year(CurrentDate), type logical),
-				    AddIsPastOrCurrent = Table.AddColumn(AddIsCurrentYear, "is_past_or_current", each [full_date] <= CurrentDate, type logical),
-				    AddYearOffset = Table.AddColumn(AddIsPastOrCurrent, "relative_year_offset", each Date.Year([full_date]) - Date.Year(CurrentDate), Int64.Type),
+				    AddIsWeekend = Table.AddColumn(AddDayName, "is_weekend", each if [day_of_week] <> null and [day_of_week] >= 6 then true else false, type logical),
+				    AddFiscalPeriod = Table.AddColumn(AddIsWeekend, "fiscal_period", each "FY" & Text.From(try [year] otherwise 2026) & "-Q" & Text.From(try [quarter] otherwise 1), type text),
+				    AddIsCurrentYear = Table.AddColumn(AddFiscalPeriod, "is_current_year", each if [full_date] <> null then Date.Year([full_date]) = Date.Year(CurrentDate) else false, type logical),
+				    AddIsPastOrCurrent = Table.AddColumn(AddIsCurrentYear, "is_past_or_current", each if [full_date] <> null then [full_date] <= CurrentDate else false, type logical),
+				    AddYearOffset = Table.AddColumn(AddIsPastOrCurrent, "relative_year_offset", each if [full_date] <> null then Date.Year([full_date]) - Date.Year(CurrentDate) else 0, Int64.Type),
 				    AddMonthOffset = Table.AddColumn(AddYearOffset, "relative_month_offset", each 
-				        ((Date.Year([full_date]) - Date.Year(CurrentDate)) * 12) + (Date.Month([full_date]) - Date.Month(CurrentDate)),
+				        if [full_date] <> null then
+				            ((Date.Year([full_date]) - Date.Year(CurrentDate)) * 12) + (Date.Month([full_date]) - Date.Month(CurrentDate))
+				        else 0,
 				        Int64.Type
 				    ),
 				    AddNetflixQuarterEnd = Table.AddColumn(AddMonthOffset, "is_netflix_quarter_end", each 
-				        (Date.Month([full_date]) = 3 and Date.Day([full_date]) = 31) or
-				        (Date.Month([full_date]) = 6 and Date.Day([full_date]) = 30) or
-				        (Date.Month([full_date]) = 9 and Date.Day([full_date]) = 30) or
-				        (Date.Month([full_date]) = 12 and Date.Day([full_date]) = 31),
+				        if [full_date] <> null then
+				            (Date.Month([full_date]) = 3 and Date.Day([full_date]) = 31) or
+				            (Date.Month([full_date]) = 6 and Date.Day([full_date]) = 30) or
+				            (Date.Month([full_date]) = 9 and Date.Day([full_date]) = 30) or
+				            (Date.Month([full_date]) = 12 and Date.Day([full_date]) = 31)
+				        else false,
 				        type logical
 				    )
 				in

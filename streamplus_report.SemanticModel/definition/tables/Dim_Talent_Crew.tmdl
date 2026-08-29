@@ -1,0 +1,80 @@
+table Dim_Talent_Crew
+	lineageTag: 56bc69bb-1b08-4959-a9e0-6661b67eab57
+
+	column person_name
+		dataType: string
+		lineageTag: b2024421-d563-422c-8747-2f7f3ba06aa1
+		summarizeBy: none
+		sourceColumn: person_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_role
+		dataType: string
+		lineageTag: e9d33c0d-6318-4744-a6ed-338461f54506
+		summarizeBy: none
+		sourceColumn: primary_role
+
+		annotation SummarizationSetBy = Automatic
+
+	column crew_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 33658a58-adea-4e38-958e-3d3503b30025
+		summarizeBy: none
+		sourceColumn: crew_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column star_power_tier
+		dataType: string
+		lineageTag: 47a64a3e-f558-4f77-a71d-8f1edb5160c2
+		summarizeBy: none
+		sourceColumn: star_power_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Talent_Crew = m
+		mode: import
+		queryGroup: Dimensions
+		source = ```
+				let
+				    SourceHist = Csv.Document(File.Contents(File_Path & "netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+				    
+				    DirectorsList = Table.SelectColumns(PromotedHist, {"director"}),
+				    SplitDirectors = Table.ExpandListColumn(Table.AddColumn(DirectorsList, "name_split", each Text.Split(Text.From([director]), ",")), "name_split"),
+				    CleanDirectors = Table.TransformColumns(SplitDirectors, {{"name_split", each Text.Proper(Text.Trim(_)), type text}}),
+				    FilteredDirectors = Table.SelectRows(CleanDirectors, each [name_split] <> "" and [name_split] <> null and [name_split] <> "None"),
+				    DirectorsTable = Table.Distinct(Table.SelectColumns(FilteredDirectors, {"name_split"})),
+				    AddDirectorRole = Table.AddColumn(DirectorsTable, "primary_role", each "Director", type text),
+				
+				    SourceJSON = Json.Document(File.Contents(File_Path & "boxoffice_budget_feed.json")),
+				    DataJSON = SourceJSON[data],
+				    TableJSON = Table.FromList(DataJSON, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    ExpandedJSON = Table.ExpandRecordColumn(TableJSON, "Column1", {"production_info"}, {"production_info"}),
+				    ExpandedProd = Table.ExpandRecordColumn(ExpandedJSON, "production_info", {"producer"}, {"producer"}),
+				    CleanProducers = Table.TransformColumns(ExpandedProd, {{"producer", each Text.Proper(Text.Trim(Text.From(_))), type text}}),
+				    FilteredProducers = Table.SelectRows(CleanProducers, each [producer] <> "" and [producer] <> null),
+				    ProducersTable = Table.RenameColumns(Table.Distinct(FilteredProducers), {{"producer", "name_split"}}),
+				    AddProducerRole = Table.AddColumn(ProducersTable, "primary_role", each "Producer", type text),
+				
+				    CombinedTalent = Table.Combine({AddDirectorRole, AddProducerRole}),
+				    DeduplicatedTalent = Table.Distinct(CombinedTalent, {"name_split"}),
+				    AddCrewKey = Table.AddIndexColumn(DeduplicatedTalent, "crew_key", 1, 1, Int64.Type),
+				    RenameTalent = Table.RenameColumns(AddCrewKey, {{"name_split", "person_name"}}),
+				    
+				    AddTalentTier = Table.AddColumn(RenameTalent, "star_power_tier", each
+				        if [person_name] = "Christopher Nolan" or [person_name] = "James Cameron" or [person_name] = "Jerry Bruckheimer" then "Tier 1 - Global A-List"
+				        else if [person_name] = "Kathleen Kennedy" or [person_name] = "David Fincher" or [person_name] = "Martin Scorsese" then "Tier 1 - Global A-List"
+				        else "Tier 2 - Established Talent",
+				        type text
+				    )
+				in
+				    AddTalentTier
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

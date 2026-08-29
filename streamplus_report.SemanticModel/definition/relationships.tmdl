@@ -1,30 +1,44 @@
-relationship 9df922f5-3995-112c-619f-b9cb657d538b
-	fromColumn: Fact_Streaming_Performance.title_key
-	toColumn: Dim_Titles.title_key
-
-relationship 61090f08-fe6c-0350-f6e6-113798629a64
-	fromColumn: Fact_Streaming_Performance.date_key
-	toColumn: Dim_Date.date_key
-
-relationship 25b4bc45-45e1-3896-d4ad-c1b135a68f6e
-	fromColumn: Fact_Catalog_Ratings.date_key
-	toColumn: Dim_Date.date_key
-
-relationship 1f9107c5-a290-ec1f-67c3-b5ffc871d8f3
-	fromColumn: Bridge_Title_Genre.genre_key
-	toColumn: Dim_Genres.genre_key
-
-relationship 58150aa0-5c99-7961-6cdf-1444f44e8946
+relationship 900c15f4-0108-82e8-a133-2b7c1f3141d9
 	fromColumn: Bridge_Title_Genre.title_key
 	toColumn: Dim_Titles.title_key
 
-relationship 7c2590c2-234c-386f-950e-2a78294e3aa8
-	isActive: false
-	fromColumn: Dim_Titles.title_key
-	toColumn: Fact_Catalog_Ratings.title_key
+relationship e1eadbcb-2727-4264-40d3-1a8847b9c03e
+	fromColumn: Bridge_Title_Genre.genre_key
+	toColumn: Dim_Genres.genre_key
 
-relationship db7604cc-61ad-cb2e-36fd-971aa02345d7
-	isActive: false
-	fromColumn: Dim_Titles.netflix_date_added_clean
-	toColumn: Dim_Date.full_date
+relationship 22e2cdb0-ab13-9b64-8d41-8ac62f78ba32
+	fromColumn: Bridge_Title_Talent.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 4113b6d5-dbd3-11e9-7adc-e8ed085331fa
+	fromColumn: Bridge_Title_Talent.crew_key
+	toColumn: Dim_Talent_Crew.crew_key
+
+relationship 1a808f0b-23e5-55f8-c0aa-32bcccc13425
+	fromColumn: Fact_Streaming_Performance.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 1d94257b-c6a6-cb69-bbd2-aebf735ed3a4
+	fromColumn: Fact_Streaming_Performance.date_key
+	toColumn: Dim_Date.date_key
+
+relationship 04cd83ea-afb9-e304-fe55-c8cf6f68a4ad
+	fromColumn: Fact_Streaming_Performance.territory_key
+	toColumn: Dim_Territory.territory_key
+
+relationship fb8ddcaa-b043-8038-eb6b-041a664f6190
+	fromColumn: Fact_Catalog_Ratings.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 9a88674e-4b32-8052-cd20-790132efc252
+	fromColumn: Fact_Catalog_Ratings.date_key
+	toColumn: Dim_Date.date_key
+
+relationship e9217512-b723-b949-f410-744555dc113d
+	fromColumn: Fact_Financial_ROI.title_key
+	toColumn: Dim_Titles.title_key
+
+relationship 8c9f55c6-f8fe-b1ed-eb80-fd44aee3d8b0
+	fromColumn: Fact_Financial_ROI.date_key
+	toColumn: Dim_Date.date_key
 

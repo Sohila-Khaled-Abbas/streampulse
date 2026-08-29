@@ -1,0 +1,116 @@
+table Fact_Financial_ROI
+	lineageTag: dabdf3c8-ead5-48c2-ac54-013d51dd6fcc
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: ef83568a-c4ec-4759-ae62-0dc56e979a56
+		summarizeBy: none
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a1e9420-3218-4ae9-8cff-3afd4e4c48a2
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column production_budget_usd
+		dataType: double
+		lineageTag: 403ae98e-5753-42ba-8416-859df39fe88d
+		summarizeBy: sum
+		sourceColumn: production_budget_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column worldwide_gross_usd
+		dataType: double
+		lineageTag: f8db56eb-200f-416f-bf5e-a9390848208f
+		summarizeBy: sum
+		sourceColumn: worldwide_gross_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column financial_roi_tier
+		dataType: string
+		lineageTag: de2cdd98-1b20-4271-850e-1505821e4cc0
+		summarizeBy: none
+		sourceColumn: financial_roi_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column financial_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 3137b4b9-81a9-41da-93d3-a329f9fe350e
+		summarizeBy: sum
+		sourceColumn: financial_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Financial_ROI = m
+		mode: import
+		queryGroup: Facts
+		source =
+				let
+				    SourceJSON = Json.Document(File.Contents(File_Path & "boxoffice_budget_feed.json")),
+				    DataJSON = SourceJSON[data],
+				    TableJSON = Table.FromList(DataJSON, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    ExpandedData = Table.ExpandRecordColumn(TableJSON, "Column1", {"stream_id", "production_info", "financial_roi_tier"}, {"netflix_id", "production_info", "financial_roi_tier"}),
+				    ExpandedProd = Table.ExpandRecordColumn(ExpandedData, "production_info", {"production_budget_raw", "worldwide_gross_raw"}, {"budget_raw", "gross_raw"}),
+				
+				    ParseBudgetUSD = Table.AddColumn(ExpandedProd, "production_budget_usd", each
+				        let
+				            txt = if [budget_raw] = null then "" else Text.Upper(Text.Trim(Text.From([budget_raw]))),
+				            num = if txt = "" or txt = "NULL" or txt = "N/A" or Text.Contains(txt, "DIRECT TO SVOD") or Text.Contains(txt, "TBD") then
+				                      25000000.0
+				                  else if Text.Contains(txt, "M") then
+				                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) otherwise 50.0) * 1000000
+				                  else if Text.Contains(txt, "MILLION") then
+				                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "MILLION"), {"0".."9", "."})) otherwise 45.0) * 1000000 * 1.08
+				                  else
+				                      try Number.FromText(Text.Select(txt, {"0".."9"})) otherwise 25000000.0
+				        in
+				            if num = null or num <= 0 then 25000000.0 else num,
+				        type number
+				    ),
+				
+				    ParseGrossUSD = Table.AddColumn(ParseBudgetUSD, "worldwide_gross_usd", each
+				        let
+				            txt = if [gross_raw] = null then "" else Text.Upper(Text.Trim(Text.From([gross_raw]))),
+				            num = if txt = "" or txt = "NULL" or txt = "N/A" or Text.Contains(txt, "DIRECT TO SVOD") or Text.Contains(txt, "TBD") then
+				                      0.0
+				                  else if Text.Contains(txt, "M") then
+				                      (try Number.FromText(Text.Select(Text.BeforeDelimiter(txt, "M"), {"0".."9", "."})) otherwise 0.0) * 1000000
+				                  else
+				                      try Number.FromText(Text.Select(txt, {"0".."9"})) otherwise 0.0
+				        in
+				            if num = null or num < 0 then 0.0 else num,
+				        type number
+				    ),
+				
+				    MergedTitles = Table.NestedJoin(ParseGrossUSD, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+				
+				    AddDateKey = Table.AddColumn(ExpandedTitleKey, "date_key", each 20260101, Int64.Type),
+				
+				    SelectFact = Table.SelectColumns(AddDateKey, {
+				        "title_key", "date_key", "production_budget_usd", "worldwide_gross_usd", "financial_roi_tier"
+				    }),
+				    AddFinancialKey = Table.AddIndexColumn(SelectFact, "financial_key", 1, 1, Int64.Type),
+				    #"Changed Type" = Table.TransformColumnTypes(AddFinancialKey,{{"financial_roi_tier", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

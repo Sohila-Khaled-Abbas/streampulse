@@ -1,0 +1,71 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "98203ee4bc6e8cd4a40f",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "height": 670.88411412469179,
+    "width": 3839.1884466361394,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "HTML_Netflix_Hero_Card"
+                }
+              },
+              "queryRef": "_Measures.HTML_Netflix_Hero_Card",
+              "nativeQueryRef": "HTML_Netflix_Hero_Card"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "2326805c249b49982c26",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "HTML_Netflix_Hero_Card"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

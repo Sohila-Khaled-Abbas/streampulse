@@ -1,0 +1,59 @@
+table Bridge_Title_Talent
+	lineageTag: c8b86fa4-cdfe-4130-aff4-6ab279ad39d5
+
+	column title_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 65c1b092-ef90-41d1-9aaf-73715fd0fcb8
+		summarizeBy: none
+		sourceColumn: title_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column crew_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 7987ec5f-6930-4806-90af-5f9b57a1849f
+		summarizeBy: none
+		sourceColumn: crew_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column billing_order
+		dataType: int64
+		formatString: 0
+		lineageTag: e717714a-4854-4301-ac55-34ba2bd49410
+		summarizeBy: sum
+		sourceColumn: billing_order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Bridge_Title_Talent = m
+		mode: import
+		queryGroup: Bridge_Tables
+		source =
+				let
+				    SourceHist = Csv.Document(File.Contents(File_Path & "netflix_enriched_historical.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHist = Table.PromoteHeaders(SourceHist, [PromoteAllScalars=true]),
+				    SelectCols = Table.SelectColumns(PromotedHist, {"id", "director"}),
+				    RenameId = Table.RenameColumns(SelectCols, {{"id", "netflix_id"}}),
+				    ExpandDirectors = Table.ExpandListColumn(Table.AddColumn(RenameId, "person_name", each Text.Split(Text.From([director]), ",")), "person_name"),
+				    CleanName = Table.TransformColumns(ExpandDirectors, {{"person_name", each Text.Proper(Text.Trim(_)), type text}}),
+				    Filtered = Table.SelectRows(CleanName, each [person_name] <> "" and [person_name] <> null and [person_name] <> "None"),
+				
+				    MergedTitles = Table.NestedJoin(Filtered, {"netflix_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    ExpandedTitle = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
+				
+				    MergedTalent = Table.NestedJoin(ExpandedTitle, {"person_name"}, Dim_Talent_Crew, {"person_name"}, "Dim_Talent", JoinKind.Inner),
+				    ExpandedTalent = Table.ExpandTableColumn(MergedTalent, "Dim_Talent", {"crew_key"}, {"crew_key"}),
+				
+				    SelectFinal = Table.SelectColumns(ExpandedTalent, {"title_key", "crew_key"}),
+				    AddBillingOrder = Table.AddColumn(SelectFinal, "billing_order", each 1, Int64.Type),
+				    Deduplicated = Table.Distinct(AddBillingOrder)
+				in
+				    Deduplicated
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

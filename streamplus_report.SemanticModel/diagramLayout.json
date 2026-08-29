@@ -4,92 +4,92 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
+        "x": 84.777475747847561,
         "y": 0
       },
       "nodes": [
         {
           "location": {
-            "x": 1167.2616947423926,
-            "y": 233.06868491285567
+            "x": 1109.5053492283305,
+            "y": 586.30470428533613
           },
           "nodeIndex": "Bridge_Title_Genre",
-          "nodeLineageTag": "771abb96-1bd2-4f5b-9893-f51c91e41f21",
+          "nodeLineageTag": "05a39172-334d-456b-8111-66f7ece3bfbc",
           "size": {
             "height": 152,
-            "width": 234
-          },
-          "zIndex": 1
-        },
-        {
-          "location": {
-            "x": 210.65235289823556,
-            "y": 316.11313135186452
-          },
-          "nodeIndex": "Dim_Date",
-          "nodeLineageTag": "c795c4fb-3458-413e-92c4-1dea7e693c7a",
-          "size": {
-            "height": 520,
-            "width": 234
-          },
-          "zIndex": 6
-        },
-        {
-          "location": {
-            "x": 855.46461942112148,
-            "y": 0
-          },
-          "nodeIndex": "Dim_Genres",
-          "nodeLineageTag": "0f3846a7-9444-41cb-8c70-a300ccaed604",
-          "size": {
-            "height": 186,
-            "width": 234
-          },
-          "zIndex": 2
-        },
-        {
-          "location": {
-            "x": 850.39350873238448,
-            "y": 524.60320612770261
-          },
-          "nodeIndex": "Dim_Titles",
-          "nodeLineageTag": "cb8308b0-1152-46c9-9f77-d78cd44a935c",
-          "size": {
-            "height": 326,
-            "width": 234
-          },
-          "zIndex": 3
-        },
-        {
-          "location": {
-            "x": 861.66666666666652,
-            "y": 220.99999999999994
-          },
-          "nodeIndex": "Fact_Catalog_Ratings",
-          "nodeLineageTag": "85ba46d4-088d-4ae8-affd-e45cea1dafb6",
-          "size": {
-            "height": 206.66666666666669,
             "width": 234
           },
           "zIndex": 5
         },
         {
           "location": {
-            "x": 532.8595612371679,
-            "y": 171.60300602552991
+            "x": 286.79928302356211,
+            "y": 150.5999836901342
           },
-          "nodeIndex": "Fact_Streaming_Performance",
-          "nodeLineageTag": "2651190d-8710-4a79-8655-b07788108321",
+          "nodeIndex": "Dim_Date",
+          "nodeLineageTag": "c011dcb7-54c8-483f-872a-c2f6d7cafd4c",
           "size": {
-            "height": 298.66666666666663,
+            "height": 300,
             "width": 234
           },
-          "zIndex": 4
+          "zIndex": 9
         },
         {
           "location": {
-            "x": 1174.0800104433422,
-            "y": 422.75605395741923
+            "x": 1281.490633226447,
+            "y": 790.76688419668835
+          },
+          "nodeIndex": "Dim_Genres",
+          "nodeLineageTag": "979dd878-ef2d-4ee9-b31c-c4e792bb413a",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 901.818532158962,
+            "y": 230.49484057674181
+          },
+          "nodeIndex": "Dim_Titles",
+          "nodeLineageTag": "3c6eb7fa-f635-4244-87ec-cd841fdf882e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 576.41454378253115,
+            "y": 228.7237581045033
+          },
+          "nodeIndex": "Fact_Catalog_Ratings",
+          "nodeLineageTag": "58012a6f-6d71-441c-8b54-50c96593775f",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 338.87506930695679,
+            "y": 508.88369931047635
+          },
+          "nodeIndex": "Fact_Streaming_Performance",
+          "nodeLineageTag": "c8734d91-57c8-499c-ab38-6f9bcf0a77f5",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 1664.2155590072969,
+            "y": 314.30831390363323
           },
           "nodeIndex": "vw_powerbi_catalog_pulse",
           "nodeLineageTag": "995c8446-101b-4979-8b8a-868f4120ddcd",
@@ -97,11 +97,88 @@
             "height": 300,
             "width": 234
           },
-          "zIndex": 7
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 1678.0353958873259,
+            "y": 667.1952602432284
+          },
+          "nodeIndex": "_Measures",
+          "nodeLineageTag": "18e00bf9-8da7-4512-9fb9-37d3c4ca2b04",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1191.8099693391855,
+            "y": 121.42505848392739
+          },
+          "nodeIndex": "Bridge_Title_Talent",
+          "nodeLineageTag": "c8b86fa4-cdfe-4130-aff4-6ab279ad39d5",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 1478.6440788118198,
+            "y": -46.037406360765772
+          },
+          "nodeIndex": "Dim_Talent_Crew",
+          "nodeLineageTag": "56bc69bb-1b08-4959-a9e0-6661b67eab57",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 503.87775907752427
+          },
+          "nodeIndex": "Dim_Territory",
+          "nodeLineageTag": "80cd9334-606d-49b2-96d8-a5d0cf096222",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 702.73501847782916,
+            "y": -50
+          },
+          "nodeIndex": "Fact_Financial_ROI",
+          "nodeLineageTag": "dabdf3c8-ead5-48c2-ac54-013d51dd6fcc",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 1912.0353958873259,
+            "y": 456.38344209834418
+          },
+          "nodeIndex": "Time_Intelligence_Matrix",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "All tables",
-      "zoomValue": 56.965637978103111,
+      "zoomValue": 45.295051765980254,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

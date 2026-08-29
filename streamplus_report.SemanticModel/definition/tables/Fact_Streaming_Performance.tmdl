@@ -1,10 +1,10 @@
 table Fact_Streaming_Performance
-	lineageTag: 2651190d-8710-4a79-8655-b07788108321
+	lineageTag: c8734d91-57c8-499c-ab38-6f9bcf0a77f5
 
 	column title_key
 		dataType: int64
 		formatString: 0
-		lineageTag: b36cee46-3f75-4db8-9f45-426b85dde21e
+		lineageTag: b782af71-f8af-4818-9932-0a38427f97d8
 		summarizeBy: none
 		sourceColumn: title_key
 
@@ -13,23 +13,24 @@ table Fact_Streaming_Performance
 	column date_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 4262f375-68db-495e-99f4-eb58dd75f166
+		lineageTag: 0a7ba4b8-a0f4-4aaa-bf0d-e16a465dae68
 		summarizeBy: none
 		sourceColumn: date_key
 
 		annotation SummarizationSetBy = Automatic
 
-	column territory_standardized
-		dataType: string
-		lineageTag: 4c52a6f5-a9c1-41cb-8646-c62bc4b3a0c4
+	column territory_key
+		dataType: int64
+		formatString: 0
+		lineageTag: e5934b79-287a-4b52-8ebb-13ccdb0e212b
 		summarizeBy: none
-		sourceColumn: territory_standardized
+		sourceColumn: territory_key
 
 		annotation SummarizationSetBy = Automatic
 
 	column device_category
 		dataType: string
-		lineageTag: cb201da9-fdf8-4914-811a-7a7ba5152149
+		lineageTag: b2d7a204-997d-4530-adfa-02d3c3453926
 		summarizeBy: none
 		sourceColumn: device_category
 
@@ -37,7 +38,7 @@ table Fact_Streaming_Performance
 
 	column global_view_hours_millions
 		dataType: double
-		lineageTag: 8006f9de-f284-4177-92bb-86cbdb707294
+		lineageTag: 1e1cc882-5cea-4fd5-9143-e62e9a2b20cd
 		summarizeBy: sum
 		sourceColumn: global_view_hours_millions
 
@@ -47,7 +48,7 @@ table Fact_Streaming_Performance
 
 	column avg_completion_pct
 		dataType: double
-		lineageTag: 471e1fd6-0d7f-4bcc-afe0-61d325c432c3
+		lineageTag: aa95e871-8f17-4429-916f-f0f6cfdb5bad
 		summarizeBy: sum
 		sourceColumn: avg_completion_pct
 
@@ -58,7 +59,7 @@ table Fact_Streaming_Performance
 	column subscribers_reached_thousands
 		dataType: int64
 		formatString: 0
-		lineageTag: d11f4b1d-68b8-4ae5-a453-c45ee6129cc2
+		lineageTag: 9ae5b1b3-70af-4c21-9241-0d005a64269c
 		summarizeBy: sum
 		sourceColumn: subscribers_reached_thousands
 
@@ -67,7 +68,7 @@ table Fact_Streaming_Performance
 	column performance_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 975c21a2-44a3-4f61-a6b5-2de08291ed72
+		lineageTag: df8804b8-4eb5-4729-8d9a-03d9fdeccc39
 		summarizeBy: sum
 		sourceColumn: performance_key
 
@@ -78,17 +79,11 @@ table Fact_Streaming_Performance
 		queryGroup: Facts
 		source =
 				let
-				    Source = Raw_Viewership_Parquet,
+				    Source = Parquet.Document(File.Contents(File_Path & "streaming_viewership_wide.parquet")),
 				
-				    // 1. Unpivot Monthly Columns to Rows
 				    Unpivoted = Table.Unpivot(Source, {"Hours_2026_01", "Hours_2026_02", "Hours_2026_03"}, "Month_Col", "global_view_hours_millions"),
+				    CleanHours = Table.TransformColumns(Unpivoted, {{"global_view_hours_millions", each if _ = null then 0.0 else if _ < 0 then 0.0 else _, type number}}),
 				
-				    // 2. Replace Sentinel Negative Values (-999, -1) with 0.0
-				    CleanHours = Table.TransformColumns(Unpivoted, {
-				        {"global_view_hours_millions", each if _ < 0 then 0.0 else _, type number}
-				    }),
-				
-				    // 3. Extract Clean Date Key (e.g. "Hours_2026_01" -> 20260101)
 				    AddDateKey = Table.AddColumn(CleanHours, "date_key", each
 				        let
 				            m_str = Text.AfterDelimiter([Month_Col], "Hours_"),
@@ -99,31 +94,26 @@ table Fact_Streaming_Performance
 				        Int64.Type
 				    ),
 				
-				    // 4. Standardize Country Names
-				    StandardizeCountry = Table.AddColumn(AddDateKey, "territory_standardized", each
-				        let
-				            c = Text.Upper(Text.Trim(Text.From([territory_region])))
-				        in
-				            if c = "USA" or c = "US" or c = "UNITED STATES" or c = "U.S.A." then "United States"
-				            else if c = "UK" or c = "GBR" or c = "GREAT BRITAIN" then "United Kingdom"
-				            else if c = "KOR" or c = "SOUTH KOREA" then "South Korea"
-				            else if c = "JPN" or c = "JAPAN" then "Japan"
-				            else "Global",
-				        type text
+				    AddTerritoryKey = Table.AddColumn(AddDateKey, "territory_key", each
+				        let c = Text.Upper(Text.Trim(Text.From([territory_region]))) in
+				        if c = "USA" or c = "US" or c = "UNITED STATES" then 1
+				        else if c = "UK" or c = "GBR" or c = "GREAT BRITAIN" then 2
+				        else if c = "KOR" or c = "SOUTH KOREA" then 3
+				        else if c = "JPN" or c = "JAPAN" then 4
+				        else 5,
+				        Int64.Type
 				    ),
 				
-				    // 5. Map surrogate title_key
-				    MergedTitles = Table.NestedJoin(StandardizeCountry, {"catalog_ref_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
+				    MergedTitles = Table.NestedJoin(AddTerritoryKey, {"catalog_ref_id"}, Dim_Titles, {"netflix_id"}, "Dim_Titles", JoinKind.Inner),
 				    ExpandedTitleKey = Table.ExpandTableColumn(MergedTitles, "Dim_Titles", {"title_key"}, {"title_key"}),
 				
-				    // 6. Select Fact Columns
 				    SelectFact = Table.SelectColumns(ExpandedTitleKey, {
-				        "title_key", "date_key", "territory_standardized", "device_category",
+				        "title_key", "date_key", "territory_key", "device_category",
 				        "global_view_hours_millions", "avg_completion_pct", "subscribers_reached_thousands"
 				    }),
-				    AddSurrogateFactKey = Table.AddIndexColumn(SelectFact, "performance_key", 1, 1, Int64.Type)
+				    AddPerformanceKey = Table.AddIndexColumn(SelectFact, "performance_key", 1, 1, Int64.Type)
 				in
-				    AddSurrogateFactKey
+				    AddPerformanceKey
 
 	annotation PBI_NavigationStepName = Navigation
 

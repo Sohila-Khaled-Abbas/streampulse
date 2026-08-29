@@ -1,10 +1,10 @@
 table Dim_Genres
-	lineageTag: 0f3846a7-9444-41cb-8c70-a300ccaed604
+	lineageTag: 979dd878-ef2d-4ee9-b31c-c4e792bb413a
 
 	column genre_key
 		dataType: int64
 		formatString: 0
-		lineageTag: 25b3bd61-25fb-4de4-abad-e124197227cd
+		lineageTag: d498e906-0bb7-4f55-81e2-518906475e88
 		summarizeBy: none
 		sourceColumn: genre_key
 
@@ -13,7 +13,7 @@ table Dim_Genres
 	column tmdb_genre_id
 		dataType: int64
 		formatString: 0
-		lineageTag: 8b08133c-b97c-4a3f-9111-c922f84a1c69
+		lineageTag: c38ede62-2a5e-4ca6-9ef4-ae37afbf14da
 		summarizeBy: none
 		sourceColumn: tmdb_genre_id
 
@@ -21,17 +21,29 @@ table Dim_Genres
 
 	column genre_name
 		dataType: string
-		lineageTag: 316d0a11-ec53-41d5-826f-b8ce9c5fb64c
+		lineageTag: 44f22b74-5ab7-4edd-af3b-cb10ac6281cd
 		summarizeBy: none
 		sourceColumn: genre_name
+		sortByColumn: sort_order
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column genre_category
 		dataType: string
-		lineageTag: 1c1b5c41-eefd-42b5-a119-44685925271f
+		lineageTag: 15880bf2-b2e3-480f-8646-cd65644687ff
 		summarizeBy: none
 		sourceColumn: genre_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: int64
+		formatString: 0
+		lineageTag: 19c4cfa8-ba56-4f56-86b8-0533e7ef8c69
+		summarizeBy: none
+		sourceColumn: sort_order
 
 		annotation SummarizationSetBy = Automatic
 
@@ -40,24 +52,24 @@ table Dim_Genres
 		queryGroup: Dimensions
 		source =
 				let
-				    GenreList = {
-				        [genre_key = 1, tmdb_genre_id = 28, genre_name = "Action", genre_category = "Mainstream"],
-				        [genre_key = 2, tmdb_genre_id = 12, genre_name = "Adventure", genre_category = "Mainstream"],
-				        [genre_key = 3, tmdb_genre_id = 16, genre_name = "Animation", genre_category = "Family & Youth"],
-				        [genre_key = 4, tmdb_genre_id = 35, genre_name = "Comedy", genre_category = "Mainstream"],
-				        [genre_key = 5, tmdb_genre_id = 80, genre_name = "Crime", genre_category = "Prestige Drama"],
-				        [genre_key = 6, tmdb_genre_id = 99, genre_name = "Documentary", genre_category = "Prestige & Non-Fiction"],
-				        [genre_key = 7, tmdb_genre_id = 18, genre_name = "Drama", genre_category = "Prestige Drama"],
-				        [genre_key = 8, tmdb_genre_id = 10751, genre_name = "Family", genre_category = "Family & Youth"],
-				        [genre_key = 9, tmdb_genre_id = 14, genre_name = "Fantasy", genre_category = "Genre & Sci-Fi"],
-				        [genre_key = 10, tmdb_genre_id = 27, genre_name = "Horror", genre_category = "Genre & Sci-Fi"],
-				        [genre_key = 11, tmdb_genre_id = 878, genre_name = "Science Fiction", genre_category = "Genre & Sci-Fi"],
-				        [genre_key = 12, tmdb_genre_id = 53, genre_name = "Thriller", genre_category = "Prestige Drama"],
-				        [genre_key = 13, tmdb_genre_id = 10749, genre_name = "Romance", genre_category = "Mainstream"]
+				    GenreRecords = {
+				        [genre_key = 1, tmdb_genre_id = 28, genre_name = "Action", genre_category = "Mainstream Commercial", sort_order = 1],
+				        [genre_key = 2, tmdb_genre_id = 12, genre_name = "Adventure", genre_category = "Mainstream Commercial", sort_order = 2],
+				        [genre_key = 3, tmdb_genre_id = 16, genre_name = "Animation", genre_category = "Family & Youth", sort_order = 3],
+				        [genre_key = 4, tmdb_genre_id = 35, genre_name = "Comedy", genre_category = "Mainstream Commercial", sort_order = 4],
+				        [genre_key = 5, tmdb_genre_id = 80, genre_name = "Crime", genre_category = "Prestige & Thriller", sort_order = 5],
+				        [genre_key = 6, tmdb_genre_id = 99, genre_name = "Documentary", genre_category = "Prestige & Non-Fiction", sort_order = 6],
+				        [genre_key = 7, tmdb_genre_id = 18, genre_name = "Drama", genre_category = "Prestige & Thriller", sort_order = 7],
+				        [genre_key = 8, tmdb_genre_id = 10751, genre_name = "Family", genre_category = "Family & Youth", sort_order = 8],
+				        [genre_key = 9, tmdb_genre_id = 14, genre_name = "Fantasy", genre_category = "Sci-Fi & Genre", sort_order = 9],
+				        [genre_key = 10, tmdb_genre_id = 27, genre_name = "Horror", genre_category = "Sci-Fi & Genre", sort_order = 10],
+				        [genre_key = 11, tmdb_genre_id = 878, genre_name = "Science Fiction", genre_category = "Sci-Fi & Genre", sort_order = 11],
+				        [genre_key = 12, tmdb_genre_id = 53, genre_name = "Thriller", genre_category = "Prestige & Thriller", sort_order = 12],
+				        [genre_key = 13, tmdb_genre_id = 10749, genre_name = "Romance", genre_category = "Mainstream Commercial", sort_order = 13]
 				    },
-				    TableFromRecords = Table.FromRecords(GenreList),
+				    TableFromRecords = Table.FromRecords(GenreRecords),
 				    TypedTable = Table.TransformColumnTypes(TableFromRecords, {
-				        {"genre_key", Int64.Type}, {"tmdb_genre_id", Int64.Type}, {"genre_name", type text}, {"genre_category", type text}
+				        {"genre_key", Int64.Type}, {"tmdb_genre_id", Int64.Type}, {"genre_name", type text}, {"genre_category", type text}, {"sort_order", Int64.Type}
 				    })
 				in
 				    TypedTable

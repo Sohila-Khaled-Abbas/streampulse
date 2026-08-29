@@ -48,6 +48,8 @@ ref table Fact_Streaming_Performance
 ref table Fact_Catalog_Ratings
 ref table Fact_Financial_ROI
 ref table Time_Intelligence_Matrix
+ref table Dim_Navigation
 
 ref cultureInfo en-US
+
 

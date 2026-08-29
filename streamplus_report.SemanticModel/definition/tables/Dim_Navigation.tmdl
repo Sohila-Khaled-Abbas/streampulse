@@ -1,0 +1,61 @@
+table Dim_Navigation
+	lineageTag: 8816c801-4475-40ea-9bf8-9218d6a8a301
+
+	column page_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 712dae72-23c2-48a0-8f92-564506c4b810
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [page_id]
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_name
+		dataType: string
+		lineageTag: 4899ce9b-7da2-466d-9226-c22f03fce581
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [page_name]
+		sortByColumn: page_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_order
+		dataType: int64
+		formatString: 0
+		lineageTag: da94e2ab-ec09-411a-8c54-473d09a3bf34
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [page_order]
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_icon
+		dataType: string
+		lineageTag: bf2e6904-8b1c-4b92-80cf-010e97282b01
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [page_icon]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Navigation = calculated
+		mode: import
+		source = 
+				DATATABLE(
+				    "page_id", INTEGER,
+				    "page_name", STRING,
+				    "page_order", INTEGER,
+				    "page_icon", STRING,
+				    {
+				        { 0, "Portal Home", 0, "🏠" },
+				        { 1, "Executive Pulse", 1, "🎬" },
+				        { 2, "Catalog Galaxy", 2, "🌌" },
+				        { 3, "Viewership Telemetry", 3, "📊" },
+				        { 4, "Financial ROI", 4, "💰" },
+				        { 5, "Talent Creative Hub", 5, "🎭" }
+				    }
+				)
+
+	annotation PBI_Id = 9b932c0201d44ea095c5b46d51923055

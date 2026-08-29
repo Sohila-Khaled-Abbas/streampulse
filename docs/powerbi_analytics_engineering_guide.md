@@ -1764,56 +1764,95 @@ Save the following clean, schema-compliant JSON as [`dashboard/netflix_cinematic
 
 ---
 
-## 8. 6-Page Native Web-App Layout & Navigation Architecture
+## 8. 4K UHD (3840 x 2160) 6-Page Native Web-App Construction Guide
 
-Set your page canvas to **1920 x 1080 (16:9)**. Place the `[HTML_Netflix_Navbar]` measure at $(X=0, Y=0, W=1920, H=60)$ on all pages.
+To achieve an ultra-crisp, broadcast-grade streaming web platform experience in Power BI:
 
-### Page 0: Streaming Platform Command Center & Home Portal (Landing Page)
-```
-+---------------------------------------------------------------------------------------------------------------+
-| [N] STREAMPULSE  [Portal Home]   Executive Pulse   Catalog Galaxy   Viewership Telemetry   ROI   Talent [LIVE]|
-+---------------------------------------------------------------------------------------------------------------+
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  | HERO HOME COMMAND BANNER (HTML/CSS Dynamic Greeting, DirectQuery Pulse, Total Catalog Vitals)           |  |
-|  | "Good Evening • StreamPulse 2026 Platform" | 7,786 Titles | 1.25B Hours Streamed | 98.4% Quality Index  |  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  | LIVE REAL-TIME MARQUEE TICKER (HTML/CSS Keyframes Continuous News Ticker)                               |  |
-|  | [LIVE DROPS] 🔥 Avatar: Fire & Ash 2.1B Hrs • 🔄 Airbyte 0.50.36 Active • 💰 Avengers 4 $1.2B Worldwide|  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  | INTERACTIVE 5-MODULE NAVIGATION PORTAL HUB (Hover Glow Web Route Cards)                                 |  |
-|  | [🎬 Page 1: Executive] [🌌 Page 2: Catalog] [📊 Page 3: Telemetry] [💰 Page 4: ROI] [🎭 Page 5: Talent] |  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-|  | PLATFORM ARCHITECTURE & METADATA VITALS DRAWER (4 Glassmorphic Architecture Cards)                      |  |
-|  | 1. Lakehouse Ingestion  | 2. Airbyte ELT 0.50.36 | 3. Kimball Galaxy Star | 4. Power BI DirectQuery SLA|  |
-|  +---------------------------------------------------------------------------------------------------------+  |
-+---------------------------------------------------------------------------------------------------------------+
-```
+### 🖥️ 4K Canvas Setup Instructions
+1. In Power BI Desktop, go to **Format Page** (brush icon) $\to$ expand **Canvas settings**.
+2. Set **Type** to **`Custom`**.
+3. Set **Width** to **`3840 px`** and **Height** to **`2160 px`** (16:9 Ultra HD).
+4. Go to the top ribbon $\to$ **View** tab $\to$ set **Page View** to **`Fit to page`** while editing on standard monitors.
+5. Apply the `dashboard/netflix_cinematic_dark.json` theme.
+6. Place the `[HTML_Netflix_Navbar]` measure at $(X=0, Y=0, W=3840, H=120)$ on every page.
 
 ---
 
-### Page 1: Executive Pulse & Live Radar
-```
-+---------------------------------------------------------------------------------------------------------------+
-| [N] STREAMPULSE   Portal Home  [Executive Pulse]  Catalog Galaxy   Viewership Telemetry   Financial ROI [LIVE]|
-+---------------------------------------------------------------------------------------------------------------+
-|  +-------------------------------------------------------------------+  +------------------------------------+|
-|  | HERO STREAMING FEATURED PLAYER (HTML/CSS Embedded Visual)         |  | GLOBAL TOP 10 RANKINGS MATRIX      ||
-|  | Avatar: Fire and Ash | 2.1B Hours | ⭐ 8.8 Bayesian | 98% Match   |  | 1. Avatar: Fire and Ash     2.1B   ||
-|  | [▶ Watch Telemetry] [ⓘ Title Metrics]                             |  | 2. Stranger Things S5       1.8B   ||
-|  +-------------------------------------------------------------------+  | 3. Avengers: Doomsday       1.6B   ||
-|  +-------------------+  +-------------------+  +---------------------+  | 4. Wednesday Season 2       1.2B   ||
-|  | GLOBAL VIEW HOURS |  | BAYESIAN QUALITY  |  | AVG COMPLETION RATE |  | 5. Squid Game Season 2      1.1B   ||
-|  | 4.8B Hours (+14%) |  | 7.84 / 10.0 ⭐    |  | 74.2% [SVG Bar]     |  | 6. Dune: Part Three         950M   ||
-|  +-------------------+  +-------------------+  +---------------------+  +------------------------------------+|
-|  +-------------------------------------------------------------------+  +------------------------------------+|
-|  | VIEWERSHIP VELOCITY TREND (Area / Line Chart with Sparkline)      |  | REGIONAL SHARE (Donut / Matrix)    ||
-|  | [ Jan 2026 ===================> Feb 2026 ====================> ]  |  | USA 42% | EMEA 28% | APAC 22%       ||
-|  +-------------------------------------------------------------------+  +------------------------------------+|
-+---------------------------------------------------------------------------------------------------------------+
-```
+### 🌐 Page 0: Streaming Platform Command Center & Home Portal (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V0.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Fixed top navigation bar with active "Portal Home" tab and live DirectQuery beacon. |
+| **V0.2** | `HTML Content` | $X: 60, Y: 150, W: 3720, H: 340$ | `[HTML_Home_Hero_Banner]` | Dynamic time-based greeting, live platform telemetry, total catalog count & Bayesian quality. |
+| **V0.3** | `HTML Content` | $X: 60, Y: 510, W: 3720, H: 80$ | `[HTML_Home_Marquee_Ticker]` | Animated CSS `@keyframes marquee` continuous streaming news and data pipeline ticker. |
+| **V0.4** | `HTML Content` | $X: 60, Y: 610, W: 3720, H: 460$ | `[HTML_Home_Navigation_Hub]` | 5 interactive module route cards with glowing red hover borders and launch bookmarks. |
+| **V0.5** | `HTML Content` | $X: 60, Y: 1090, W: 3720, H: 540$ | `[HTML_Home_Platform_Vitals]` | 4-column architecture drawer (Bronze Ingestion, Airbyte 0.50.36, Galaxy Star, Power BI SLA). |
+| **V0.6** | `New Card` | $X: 60, Y: 1650, W: 1840, H: 450$ | `[Total_Titles_Ingested]`, `[Total_View_Hours_Formatted]`, `[Avg_Completion_Rate_Pct]`, `[Bayesian_Weighted_Score]` | High-impact callout numbers with glowing borders and SVG progress bars. |
+| **V0.7** | `Table` | $X: 1940, Y: 1650, W: 1840, H: 450$ | `Dim_Titles[catalog_era]`, `[Total_Titles_Ingested]`, `[Total_View_Hours_M]`, `[Avg_IMDb_Rating]`, `[SVG_Completion_ProgressBar]` | Data warehouse conformed summary table across streaming eras. |
+
+---
+
+### 🎬 Page 1: Executive Pulse & Live Radar (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V1.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Top navigation bar with active "Executive Pulse" tab. |
+| **V1.2** | `HTML Content` | $X: 60, Y: 150, W: 2400, H: 520$ | `[HTML_Netflix_Hero_Card]` | Signature Netflix hero banner with trailer mockup, match %, audio/video badges, and action buttons. |
+| **V1.3** | `Table / Matrix` | $X: 2500, Y: 150, W: 1280, H: 960$ | `[SVG_Top10_Rank_Badge]`, `Dim_Titles[title]`, `Dim_Titles[maturity_rating]`, `[Total_View_Hours_M]`, `[Bayesian_Weighted_Score]` | Global Top 10 streaming chart sorted descending by `[Total_View_Hours_M]`. |
+| **V1.4** | `HTML Content` | $X: 60, Y: 690, W: 2400, H: 220$ | `[HTML_Glass_KPI_Scorecard]` | 4 glassmorphic KPI scorecards (Total Hours, Bayesian Score, Avg Completion %, Active Subscribers). |
+| **V1.5** | `Area Chart` | $X: 60, Y: 930, W: 2400, H: 680$ | **X**: `Dim_Date[month_name]`, **Y**: `[Total_View_Hours_M]`, **Legend**: `Dim_Titles[catalog_era]` | Real-time viewership trajectory curve with neon cyan gradient fill. |
+| **V1.6** | `Matrix` | $X: 60, Y: 1630, W: 2400, H: 470$ | **Rows**: `Dim_Genres[genre_name]`, **Values**: `[Total_Titles_Ingested]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`, `[SVG_Completion_ProgressBar]` | Multi-genre performance matrix with inline SVG progress bars. |
+| **V1.7** | `Donut Chart` | $X: 2500, Y: 1130, W: 1280, H: 470$ | **Legend**: `Dim_Territory[region_group]`, **Values**: `[Total_View_Hours_M]` | Global regional market share distribution (North America, EMEA, APAC, Worldwide). |
+| **V1.8** | `Table` | $X: 2500, Y: 1620, W: 1280, H: 480$ | `Dim_Titles[title]`, `Dim_Titles[release_year]`, `[Avg_IMDb_Rating]`, `[SVG_Rating_Star_Badge]` | DirectQuery live scraped releases with golden star badges. |
+
+---
+
+### 🌌 Page 2: Kimball Galaxy Catalog Explorer (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V2.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Top navigation bar with active "Catalog Galaxy" tab. |
+| **V2.2** | `Slicers Bar` | $X: 60, Y: 140, W: 3720, H: 100$ | `Dim_Titles[catalog_era]`, `Dim_Titles[maturity_category]`, `Dim_Genres[genre_category]`, `Dim_Titles[runtime_tier]` | Horizontal dark badge slicers for multi-dimensional catalog filtering. |
+| **V2.3** | `Clustered Bar` | $X: 60, Y: 260, W: 1800, H: 650$ | **Y**: `Dim_Titles[catalog_era]`, **X**: `[Total_Titles_Ingested]`, **Legend**: `Dim_Titles[title_type]` | Era distribution comparing Movies vs. TV Shows across the 7,786 conformed records. |
+| **V2.4** | `Column Chart` | $X: 1900, Y: 260, W: 1880, H: 650$ | **X**: `Fact_Catalog_Ratings[vote_average]`, **Y**: `[Total_Titles_Ingested]`, **Line**: `[Bayesian_Weighted_Score]` | Bayesian shrinkage quality score distribution curve against raw audience ratings. |
+| **V2.5** | `Matrix` | $X: 60, Y: 930, W: 2400, H: 1170$ | **Rows**: `Dim_Titles[title]`, `Dim_Genres[genre_name]`, **Values**: `Dim_Titles[release_year]`, `Dim_Titles[maturity_rating]`, `Dim_Titles[runtime_minutes_clean]`, `[Bayesian_Weighted_Score]`, `[Pareto_Catalog_Tier]`, `[SVG_Rating_Star_Badge]` | Detailed conformed title explorer with Pareto Tier A/B/C classification and hover synopsis tooltips (`[HTML_Modal_Detail_Tooltip]`). |
+| **V2.6** | `Donut Chart` | $X: 2500, Y: 930, W: 1280, H: 560$ | **Legend**: `[Pareto_Catalog_Tier]`, **Values**: `[Total_View_Hours_M]` | 80/20 Pareto rule visualization demonstrating core viewership concentration. |
+| **V2.7** | `HTML Content` | $X: 2500, Y: 1510, W: 1280, H: 590$ | `[HTML_Movie_Card_Card]` | Dynamic Netflix glowing card preview of selected catalog title. |
+
+---
+
+### 📊 Page 3: Viewership & Engagement Telemetry (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V3.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Top navigation bar with active "Viewership Telemetry" tab. |
+| **V3.2** | `Line Chart` | $X: 60, Y: 150, W: 2500, H: 800$ | **X**: `Dim_Date[month_name]`, **Y**: `[Total_View_Hours_M]`, **Small Multiples**: `Fact_Streaming_Performance[device_category]` | Unpivoted Lakehouse telemetry monthly trends broken down by Connected TV, Mobile, Desktop, and Tablet. |
+| **V3.3** | `New Card` | $X: 2600, Y: 150, W: 1180, H: 800$ | `[Total_View_Hours_M]`, `[View_Hours_MoM_Growth_M]`, `[View_Hours_MoM_Pct]`, `[Rolling_28D_View_Hours_M]`, `[SVG_Animated_Quality_Ring]` | Real-time viewership telemetry and velocity cards with animated circular SVG completion ring. |
+| **V3.4** | `Scatter Plot` | $X: 60, Y: 980, W: 2500, H: 1120$ | **X**: `[Avg_Completion_Rate_Pct]`, **Y**: `[Total_View_Hours_M]`, **Size**: `[Active_Subscribers_Reached_K]`, **Play Axis**: `Dim_Date[month_name]` | Quadrant analysis mapping engagement quality vs. global volume with playback animation. |
+| **V3.5** | `Matrix` | $X: 2600, Y: 980, W: 1180, H: 1120$ | **Rows**: `Dim_Territory[territory_name]`, **Columns**: `Fact_Streaming_Performance[device_category]`, **Values**: `[Total_View_Hours_M]`, `[SVG_Completion_ProgressBar]` | Territory vs. Device cross-tabulation with heatmap color bars. |
+
+---
+
+### 💰 Page 4: Financial ROI & Unit Economics (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V4.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Top navigation bar with active "Financial ROI" tab. |
+| **V4.2** | `Scatter Plot` | $X: 60, Y: 150, W: 2500, H: 900$ | **X**: `[Total_Production_Budget_M]`, **Y**: `[Total_Worldwide_Gross_M]`, **Details**: `Dim_Titles[title]`, **Color**: `Fact_Financial_ROI[financial_roi_tier]` | Budget vs. Worldwide Gross scatter plot with fixed **$Y = 2.5X$ Theatrical Break-Even Reference Line**. |
+| **V4.3** | `Matrix` | $X: 2600, Y: 150, W: 1180, H: 900$ | `[Total_Production_Budget_M]`, `[Total_Worldwide_Gross_M]`, `[Net_Box_Office_Profit_M]`, `[Financial_ROI_Multiplier]`, `[SVG_ROI_Bullet_Meter]` | Financial unit economics scorecard with dynamic SVG bullet meters. |
+| **V4.4** | `Clustered Column` | $X: 60, Y: 1080, W: 2500, H: 1020$ | **X**: `Dim_Titles[title]`, **Y**: `[Cost_Per_View_Hour_USD]`, **Line**: `[Budget_Efficiency_Index]` | Unit economics ranking showing Cost Per View Hour (CPVH) and viewership ROI efficiency. |
+| **V4.5** | `Waterfall Chart` | $X: 2600, Y: 1080, W: 1180, H: 1020$ | **Category**: `Dim_Titles[catalog_era]`, **Y**: `[Net_Box_Office_Profit_M]` | Net profit contribution waterfall by release era. |
+
+---
+
+### 🎭 Page 5: Creative Talent & Star Power Hub (4K UHD Layout)
+
+| Visual # | Visual Type | Position & Size (4K) | Primary Fields / DAX Measures | Purpose & Visual Styling |
+|---|---|---|---|---|
+| **V5.1** | `HTML Content` | $X: 0, Y: 0, W: 3840, H: 120$ | `[HTML_Netflix_Navbar]` | Top navigation bar with active "Talent Creative Hub" tab. |
+| **V5.2** | `Clustered Bar` | $X: 60, Y: 150, W: 1800, H: 850$ | **Y**: `Dim_Talent_Crew[person_name]`, **X**: `[Total_View_Hours_M]`, **Legend**: `Dim_Talent_Crew[star_power_tier]` | Top 15 creative directors and producers ranked by aggregate global streaming hours. |
+| **V5.3** | `Matrix` | $X: 1900, Y: 150, W: 1880, H: 850$ | **Rows**: `Dim_Talent_Crew[person_name]`, `Dim_Talent_Crew[primary_role]`, **Values**: `[Total_Titles_Ingested]`, `[Total_View_Hours_M]`, `[Bayesian_Weighted_Score]`, `[SVG_Rating_Star_Badge]` | Talent creative scorecard with star power tier ratings and golden star badges. |
+| **V5.4** | `Matrix Table` | $X: 60, Y: 1030, W: 3720, H: 1070$ | **Rows**: `Dim_Talent_Crew[person_name]`, `Dim_Titles[title]`, **Values**: `Dim_Titles[release_year]`, `Dim_Genres[genre_name]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`, `[SVG_Completion_ProgressBar]`, `[Total_Worldwide_Gross_M]`, `[SVG_Viewership_Sparkline]` | Complete creative filmography browser with inline SVG completion progress bars and sparkline trajectories. |
 
 ---
 
@@ -1822,6 +1861,7 @@ Set your page canvas to **1920 x 1080 (16:9)**. Place the `[HTML_Netflix_Navbar]
 1. **Enable Referential Integrity**: On all 1-to-many relationships from dimensions to fact tables, check **Assume Referential Integrity** in Power BI to ensure the engine issues fast `INNER JOIN` queries instead of `OUTER JOIN`.
 2. **Push Down Transformations to PostgreSQL Reporting Views**: Utilize `reporting.vw_powerbi_catalog_pulse` and `reporting.vw_powerbi_performance_matrix` to pre-aggregate heavy joins.
 3. **Avoid Row-Level Calculated Columns**: Implement all calculations as DAX measures or M columns during initial data loading.
+4. **Data Category for SVGs**: Always set the Data Category of SVG measures to `Image URL` in the Model view.
 
 ---
 

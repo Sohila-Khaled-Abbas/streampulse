@@ -1324,38 +1324,95 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 4: Interactive Glassmorphic KPI Scorecard (4K UHD)
+### HTML/CSS Web Component 4: Interactive 4-Card Glassmorphic KPI Scorecard (4K UHD)
+*Renders a 4-column glassmorphic KPI scorecard across the Executive Pulse page ($X: 60, Y: 690, W: 2400, H: 220$).*
+
 ```dax
 HTML_Glass_KPI_Scorecard = 
 VAR _Hours = [Total_View_Hours_Formatted]
 VAR _Growth = [View_Hours_YoY_Pct]
-VAR _Subtitle = 
+VAR _HoursSubtitle = 
     IF(
         NOT ISBLANK(_Growth),
-        IF(_Growth >= 0, "<span style='color:#46D369;'>▲ +" & FORMAT(_Growth, "0.0%") & "</span> vs prior year", "<span style='color:#E50914;'>▼ " & FORMAT(_Growth, "0.0%") & "</span> vs prior year"),
-        "Stable baseline"
+        IF(_Growth >= 0, "<span style='color:#46D369;'>▲ +" & FORMAT(_Growth, "0.0%") & "</span> vs PY", "<span style='color:#E50914;'>▼ " & FORMAT(_Growth, "0.0%") & "</span> vs PY"),
+        "<span style='color:#00D2D2;'>● Live Telemetry</span>"
+    )
+VAR _Bayesian = FORMAT([Bayesian_Weighted_Score], "0.0") & " / 10"
+VAR _Tier = [Quality_Tier_Classification]
+VAR _Completion = FORMAT([Avg_Completion_Rate_Pct], "0.0") & "%"
+VAR _CompletionSubtitle = 
+    SWITCH(
+        TRUE(),
+        [Avg_Completion_Rate_Pct] >= 80, "<span style='color:#46D369;'>★ High Retention</span>",
+        [Avg_Completion_Rate_Pct] >= 60, "<span style='color:#00D2D2;'>● Steady Stream</span>",
+        "<span style='color:#E50914;'>▼ Drop-off Warning</span>"
+    )
+VAR _SubscribersK = SUM(Fact_Streaming_Performance[subscribers_reached_thousands])
+VAR _SubscribersFormatted = 
+    SWITCH(
+        TRUE(),
+        _SubscribersK >= 1000, FORMAT(_SubscribersK / 1000, "#,##0.0") & "M",
+        _SubscribersK > 0, FORMAT(_SubscribersK, "#,##0") & "K",
+        "Direct SVOD"
     )
 RETURN
 "<!DOCTYPE html>
 <html>
 <head>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-  .kpi-box {
-    width: 100%; height: 180px; background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 26px 32px;
-    display: flex; flex-direction: column; justify-content: space-between; border-left: 6px solid #E50914;
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    width: 100%; height: 200px;
   }
-  .kpi-title { color: #9E9E9E; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
-  .kpi-val { color: #FFFFFF; font-size: 42px; font-weight: 900; letter-spacing: -0.8px; }
-  .kpi-sub { color: #888888; font-size: 16px; font-weight: 600; }
+  .kpi-box {
+    background: rgba(20, 20, 20, 0.88); backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 22px 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .kpi-box.crimson { border-left: 5px solid #E50914; }
+  .kpi-box.gold { border-left: 5px solid #F5C518; }
+  .kpi-box.teal { border-left: 5px solid #00D2D2; }
+  .kpi-box.green { border-left: 5px solid #46D369; }
+  .kpi-title { color: #8E8E93; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; }
+  .kpi-val { color: #FFFFFF; font-size: 38px; font-weight: 900; letter-spacing: -0.5px; margin: 4px 0; }
+  .kpi-val.gold { color: #F5C518; }
+  .kpi-val.teal { color: #00D2D2; }
+  .kpi-val.green { color: #46D369; }
+  .kpi-sub { color: #888888; font-size: 14px; font-weight: 600; }
 </style>
 </head>
 <body>
-  <div class='kpi-box'>
-    <div class='kpi-title'>GLOBAL VIEWERSHIP HOURS</div>
-    <div class='kpi-val'>" & _Hours & "</div>
-    <div class='kpi-sub'>" & _Subtitle & "</div>
+  <div class='kpi-grid'>
+    <!-- Card 1 -->
+    <div class='kpi-box crimson'>
+      <div class='kpi-title'>GLOBAL VIEWERSHIP HOURS</div>
+      <div class='kpi-val'>" & _Hours & "</div>
+      <div class='kpi-sub'>" & _HoursSubtitle & "</div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class='kpi-box gold'>
+      <div class='kpi-title'>BAYESIAN QUALITY INDEX</div>
+      <div class='kpi-val gold'>★ " & _Bayesian & "</div>
+      <div class='kpi-sub'>" & _Tier & "</div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class='kpi-box teal'>
+      <div class='kpi-title'>AVG COMPLETION RATE</div>
+      <div class='kpi-val teal'>" & _Completion & "</div>
+      <div class='kpi-sub'>" & _CompletionSubtitle & "</div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class='kpi-box green'>
+      <div class='kpi-title'>SUBSCRIBERS REACHED</div>
+      <div class='kpi-val green'>" & _SubscribersFormatted & "</div>
+      <div class='kpi-sub'><span style='color:#46D369;'>● Multi-Device Reach</span></div>
+    </div>
   </div>
 </body>
 </html>"

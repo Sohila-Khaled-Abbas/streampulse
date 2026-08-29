@@ -1663,11 +1663,10 @@ Create the **Time Intelligence Calculation Group** using Tabular Editor:
 
 ## 7. Netflix Cinematic Dark JSON Theme File
 
-Save the following schema-compliant JSON as [`dashboard/netflix_cinematic_dark.json`](file:///d:/courses/Data%20Science/Data%20Engineering/Projects/streampulse/dashboard/netflix_cinematic_dark.json) and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
+Save the following clean, 100% compliant JSON as [`dashboard/netflix_cinematic_dark.json`](file:///d:/courses/Data%20Science/Data%20Engineering/Projects/streampulse/dashboard/netflix_cinematic_dark.json) and import it into Power BI Desktop via **View > Themes > Browse for Themes**:
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/refs/heads/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.140.json",
   "name": "StreamPulse Netflix Cinematic Dark",
   "dataColors": [
     "#E50914",
@@ -1711,11 +1710,6 @@ Save the following schema-compliant JSON as [`dashboard/netflix_cinematic_dark.j
       "fontFace": "Segoe UI",
       "fontSize": 11,
       "color": "#CCCCCC"
-    },
-    "secondaryLabel": {
-      "fontFace": "Segoe UI",
-      "fontSize": 10,
-      "color": "#888888"
     }
   },
   "visualStyles": {
@@ -1729,7 +1723,7 @@ Save the following schema-compliant JSON as [`dashboard/netflix_cinematic_dark.j
         ],
         "outspace": [
           {
-            "color": { "solid": { "color": "#050505" } },
+            "color": { "solid": { "color": "#0B0B0B" } },
             "transparency": 0
           }
         ]
@@ -1764,146 +1758,7 @@ Save the following schema-compliant JSON as [`dashboard/netflix_cinematic_dark.j
             "show": true,
             "fontColor": { "solid": { "color": "#FFFFFF" } },
             "fontFamily": "Segoe UI Semibold",
-            "fontSize": 13,
-            "heading": "Heading3"
-          }
-        ],
-        "subTitle": [
-          {
-            "show": true,
-            "fontColor": { "solid": { "color": "#888888" } },
-            "fontFamily": "Segoe UI",
-            "fontSize": 10
-          }
-        ],
-        "divider": [
-          {
-            "show": true,
-            "color": { "solid": { "color": "#222222" } }
-          }
-        ],
-        "padding": [
-          {
-            "top": 12,
-            "bottom": 12,
-            "left": 12,
-            "right": 12
-          }
-        ],
-        "visualTooltip": [
-          {
-            "show": true,
-            "titleFontColor": { "solid": { "color": "#FFFFFF" } },
-            "valueFontColor": { "solid": { "color": "#CCCCCC" } },
-            "fontSize": 10,
-            "fontFamily": "Segoe UI",
-            "background": { "solid": { "color": "#1C1C1C" } },
-            "transparency": 5
-          }
-        ]
-      }
-    },
-    "tableEx": {
-      "*": {
-        "grid": [
-          {
-            "gridVertical": false,
-            "gridHorizontal": true,
-            "gridHorizontalColor": { "solid": { "color": "#242424" } },
-            "rowPadding": 6
-          }
-        ],
-        "columnHeaders": [
-          {
-            "fontColor": { "solid": { "color": "#FFFFFF" } },
-            "backColor": { "solid": { "color": "#1A1A1A" } },
-            "fontFamily": "Segoe UI Semibold",
-            "fontSize": 11,
-            "autoSizeColumnWidth": true
-          }
-        ],
-        "values": [
-          {
-            "fontColorPrimary": { "solid": { "color": "#CCCCCC" } },
-            "backColorPrimary": { "solid": { "color": "#141414" } },
-            "fontColorSecondary": { "solid": { "color": "#CCCCCC" } },
-            "backColorSecondary": { "solid": { "color": "#181818" } },
-            "fontSize": 11,
-            "fontFamily": "Segoe UI"
-          }
-        ],
-        "total": [
-          {
-            "fontColor": { "solid": { "color": "#E50914" } },
-            "backColor": { "solid": { "color": "#1A1A1A" } },
-            "fontFamily": "Segoe UI Bold",
-            "fontSize": 11
-          }
-        ]
-      }
-    },
-    "matrix": {
-      "*": {
-        "grid": [
-          {
-            "gridVertical": false,
-            "gridHorizontal": true,
-            "gridHorizontalColor": { "solid": { "color": "#242424" } },
-            "rowPadding": 6
-          }
-        ],
-        "columnHeaders": [
-          {
-            "fontColor": { "solid": { "color": "#FFFFFF" } },
-            "backColor": { "solid": { "color": "#1A1A1A" } },
-            "fontFamily": "Segoe UI Semibold",
-            "fontSize": 11
-          }
-        ],
-        "rowHeaders": [
-          {
-            "fontColor": { "solid": { "color": "#FFFFFF" } },
-            "backColor": { "solid": { "color": "#141414" } },
-            "fontFamily": "Segoe UI Semibold",
-            "fontSize": 11
-          }
-        ],
-        "values": [
-          {
-            "fontColorPrimary": { "solid": { "color": "#CCCCCC" } },
-            "backColorPrimary": { "solid": { "color": "#141414" } },
-            "fontColorSecondary": { "solid": { "color": "#CCCCCC" } },
-            "backColorSecondary": { "solid": { "color": "#181818" } },
-            "fontSize": 11,
-            "fontFamily": "Segoe UI"
-          }
-        ],
-        "subTotals": [
-          {
-            "fontColor": { "solid": { "color": "#E50914" } },
-            "backColor": { "solid": { "color": "#1A1A1A" } },
-            "fontFamily": "Segoe UI Bold",
-            "fontSize": 11
-          }
-        ]
-      }
-    },
-    "slicer": {
-      "*": {
-        "header": [
-          {
-            "show": true,
-            "fontColor": { "solid": { "color": "#FFFFFF" } },
-            "fontFamily": "Segoe UI Semibold",
-            "textSize": 11
-          }
-        ],
-        "items": [
-          {
-            "fontColor": { "solid": { "color": "#CCCCCC" } },
-            "background": { "solid": { "color": "#1C1C1C" } },
-            "textSize": 10,
-            "fontFamily": "Segoe UI"
+            "fontSize": 13
           }
         ]
       }

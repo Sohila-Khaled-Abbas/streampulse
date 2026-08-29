@@ -66,6 +66,7 @@ table Dim_Date
 		lineageTag: db3a6e81-4e7f-465b-823c-15a0aab58db3
 		summarizeBy: none
 		sourceColumn: month_name
+		sortByColumn: month_number
 
 		changedProperty = SortByColumn
 

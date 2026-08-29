@@ -373,9 +373,9 @@ table _Measures
 			</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: 78c59c7c-006f-4e80-b62f-5cc362fa780f
+		dataCategory: ImageUrl
 
 	measure SVG_Animated_Quality_Ring = ```
 			
@@ -402,13 +402,19 @@ table _Measures
 			</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: 1470f2b0-0bd9-4a52-bfde-971d80286cf8
+		dataCategory: ImageUrl
 
-	measure HTML_Netflix_Navbar = ```
+	measure HTML_Netflix_Navbar_Dynamic = ```
 			
-			VAR _CurrentYear = YEAR(TODAY())
+			VAR _CurrentPage = SELECTEDVALUE(Dim_Navigation[page_name], "Portal Home")
+			VAR _P0_Class = IF(_CurrentPage = "Portal Home" || ISBLANK(_CurrentPage), "nav-item active", "nav-item")
+			VAR _P1_Class = IF(_CurrentPage = "Executive Pulse", "nav-item active", "nav-item")
+			VAR _P2_Class = IF(_CurrentPage = "Catalog Galaxy", "nav-item active", "nav-item")
+			VAR _P3_Class = IF(_CurrentPage = "Viewership Telemetry", "nav-item active", "nav-item")
+			VAR _P4_Class = IF(_CurrentPage = "Financial ROI", "nav-item active", "nav-item")
+			VAR _P5_Class = IF(_CurrentPage = "Talent Creative Hub", "nav-item active", "nav-item")
 			RETURN
 			"<!DOCTYPE html>
 			<html>
@@ -423,8 +429,112 @@ table _Measures
 			  .left-group { display: flex; align-items: center; gap: 48px; }
 			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
 			  .nav-links { display: flex; gap: 36px; list-style: none; }
-			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: color 0.2s ease; cursor: pointer; }
-			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; padding-bottom: 6px; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='" & _P0_Class & "'>Portal Home</li>
+			        <li class='" & _P1_Class & "'>Executive Pulse</li>
+			        <li class='" & _P2_Class & "'>Catalog Galaxy</li>
+			        <li class='" & _P3_Class & "'>Viewership Telemetry</li>
+			        <li class='" & _P4_Class & "'>Financial ROI</li>
+			        <li class='" & _P5_Class & "'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 5e734846-ba00-48e4-9efa-010fcc248177
+
+	measure HTML_Navbar_Page0_Home = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item active'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 71b04603-9d41-456b-a2c6-ea8e9323c21a
+
+	measure HTML_Navbar_Page1_Executive = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
 			  .nav-item:hover { color: #E50914; }
 			  .right-group { display: flex; align-items: center; gap: 28px; }
 			  .live-badge {
@@ -458,7 +568,215 @@ table _Measures
 			
 			```
 		displayFolder: 00: SVG & HTML
-		lineageTag: 5e734846-ba00-48e4-9efa-010fcc248177
+		lineageTag: a776fa2e-cb40-42fe-ba08-8e6f30a9e7f8
+
+	measure HTML_Navbar_Page2_Catalog = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item active'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: c8820461-9d22-4fe1-ba09-8e6f30a9e7f9
+
+	measure HTML_Navbar_Page3_Telemetry = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item active'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: d9931572-8e33-4af2-cb10-9f7f41ba08fa
+
+	measure HTML_Navbar_Page4_Financial = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item active'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: e0042683-7f44-4b03-da21-0a8f52ca19fb
+
+	measure HTML_Navbar_Page5_Talent = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item active'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: f1153794-6e55-4c14-eb32-1b9f63da20fc
 
 	measure HTML_Netflix_Hero_Card = ```
 			
@@ -692,9 +1010,9 @@ table _Measures
 			    "</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: b00b4575-0562-4890-be17-c1393c7f586e
+		dataCategory: ImageUrl
 
 	measure SVG_Viewership_Sparkline = ```
 			
@@ -709,9 +1027,9 @@ table _Measures
 			    "</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: d7409b29-ec2d-4952-911c-effb626d8f7c
+		dataCategory: ImageUrl
 
 	measure SVG_Rating_Star_Badge = ```
 			
@@ -726,9 +1044,9 @@ table _Measures
 			    "</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: 15dc6c71-2142-48e8-b872-c94284f3153a
+		dataCategory: ImageUrl
 
 	measure SVG_Top10_Rank_Badge = ```
 			
@@ -741,9 +1059,9 @@ table _Measures
 			    "</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: 296031a8-0f1b-4956-ad0a-f445e7d87c25
+		dataCategory: ImageUrl
 
 	measure SVG_ROI_Bullet_Meter = ```
 			
@@ -759,9 +1077,9 @@ table _Measures
 			    "</svg>"
 			
 			```
-		dataCategory: ImageUrl
 		displayFolder: 00: SVG & HTML
 		lineageTag: d744a54c-f5f0-46d5-8814-7039e6f27a15
+		dataCategory: ImageUrl
 
 	measure Total_Catalog_Titles = DISTINCTCOUNT(Dim_Titles[title_key])
 		formatString: 0
@@ -784,7 +1102,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Total_View_Hours_Formatted = 
+	measure Total_View_Hours_Formatted =
 			VAR _Hours = [Total_View_Hours_M]
 			RETURN
 			    SWITCH(
@@ -825,7 +1143,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure View_Hours_YoY_Growth = 
+	measure View_Hours_YoY_Growth =
 			VAR _Current = [Total_View_Hours_M]
 			VAR _Prior = [View_Hours_PY]
 			RETURN IF(NOT ISBLANK(_Prior), _Current - _Prior, BLANK())
@@ -852,21 +1170,19 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Rolling_28D_View_Hours = 
-			CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -28, DAY))
+	measure Rolling_28D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -28, DAY))
 		displayFolder: 02: Time Intelligence
 		lineageTag: fb1ac521-d138-4fef-9209-f404c309f89b
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Rolling_90D_View_Hours = 
-			CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -90, DAY))
+	measure Rolling_90D_View_Hours = CALCULATE([Total_View_Hours_M], DATESINPERIOD(Dim_Date[full_date], MAX(Dim_Date[full_date]), -90, DAY))
 		displayFolder: 02: Time Intelligence
 		lineageTag: da0ece5a-ae11-43d4-a8ca-b4c331463b00
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Pareto_Cumulative_View_Hours = 
+	measure Pareto_Cumulative_View_Hours =
 			VAR _CurrentHours = [Total_View_Hours_M]
 			VAR _AllTitles = ALLSELECTED(Dim_Titles[title_key], Dim_Titles[title])
 			RETURN
@@ -879,14 +1195,13 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Pareto_Cumulative_Pct = 
-			DIVIDE([Pareto_Cumulative_View_Hours], CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles)), BLANK())
+	measure Pareto_Cumulative_Pct = DIVIDE([Pareto_Cumulative_View_Hours], CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles)), BLANK())
 		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
 		lineageTag: f4d62ed1-2389-48e9-9dcc-90dd5c79c633
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Pareto_Catalog_Tier = 
+	measure Pareto_Catalog_Tier =
 			VAR _CumPct = [Pareto_Cumulative_Pct]
 			RETURN
 			    SWITCH(
@@ -899,7 +1214,7 @@ table _Measures
 		displayFolder: 03: Advanced Analytics & Pareto 80/20 Concentration
 		lineageTag: 92864bfc-6925-448e-9852-7fbe672ec2f6
 
-	measure Top_10_Concentration_Share_Pct = 
+	measure Top_10_Concentration_Share_Pct =
 			VAR _Top10Hours = CALCULATE([Total_View_Hours_M], TOPN(10, ALLSELECTED(Dim_Titles), [Total_View_Hours_M], DESC))
 			VAR _TotalHours = CALCULATE([Total_View_Hours_M], ALLSELECTED(Dim_Titles))
 			RETURN DIVIDE(_Top10Hours, _TotalHours, BLANK())
@@ -919,7 +1234,7 @@ table _Measures
 		displayFolder: 04: Bayesian Rating & Quality Scoring
 		lineageTag: 8200a76c-f793-4cc9-9c99-2b675ffb9865
 
-	measure Bayesian_Weighted_Score = 
+	measure Bayesian_Weighted_Score =
 			VAR _R = [Avg_IMDb_Rating]
 			VAR _v = [Total_Vote_Count]
 			VAR _m = 25000.0
@@ -936,7 +1251,7 @@ table _Measures
 		displayFolder: 04: Bayesian Rating & Quality Scoring
 		lineageTag: 001f5116-2eb1-4b5e-bd97-b86d48a09c37
 
-	measure Critic_Audience_Gap = 
+	measure Critic_Audience_Gap =
 			VAR _AudienceScaled = [Avg_IMDb_Rating] * 10.0
 			VAR _Critic = [Avg_Critic_Score]
 			RETURN IF(NOT ISBLANK(_Critic) && NOT ISBLANK(_AudienceScaled), _AudienceScaled - _Critic, BLANK())
@@ -945,7 +1260,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Quality_Tier_Classification = 
+	measure Quality_Tier_Classification =
 			VAR _Score = [Bayesian_Weighted_Score]
 			RETURN
 			    SWITCH(
@@ -970,7 +1285,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Net_Box_Office_Profit_M = 
+	measure Net_Box_Office_Profit_M =
 			VAR _Gross = [Total_Worldwide_Gross_M]
 			VAR _Budget = [Total_Production_Budget_M]
 			RETURN IF(NOT ISBLANK(_Gross) && _Gross > 0, _Gross - _Budget, BLANK())
@@ -985,7 +1300,7 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Cost_Per_View_Hour_USD = 
+	measure Cost_Per_View_Hour_USD =
 			VAR _TotalBudgetUSD = SUM(Fact_Financial_ROI[production_budget_usd])
 			VAR _TotalViewHours = [Total_View_Hours_M] * 1000000
 			RETURN DIVIDE(_TotalBudgetUSD, _TotalViewHours, BLANK())
@@ -1000,9 +1315,16 @@ table _Measures
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
+	/// Total unique conformed titles ingested into the Kimball Galaxy catalog across Movies and TV Shows.
+	/// 
+	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: e03832b1-8643-4f46-a59f-74d4696e6881
+
 	partition _Measures = m
 		mode: import
-		source = 
+		source =
 				let
 				  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
 				    #"Removed Columns" = Table.RemoveColumns(Source,{"Column1"})
@@ -1012,3 +1334,4 @@ table _Measures
 	annotation PBI_NavigationStepName = Navigation
 
 	annotation PBI_ResultType = Table
+

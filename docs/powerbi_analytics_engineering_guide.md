@@ -1088,12 +1088,18 @@ RETURN
 
 ---
 
-### HTML/CSS Web Component 1: Netflix Top Navigation Header (4K UHD)
-*Add this measure to an HTML Content visual anchored across the top of every report page ($X: 0, Y: 0, W: 3840, H: 120$).*
+### HTML/CSS Web Component 1: Dynamic Netflix Top Navigation Header (4K UHD)
+*This measure dynamically highlights the active tab based on the selected report page or navigation context ($X: 0, Y: 0, W: 3840, H: 120$).*
 
 ```dax
-HTML_Netflix_Navbar = 
-VAR _CurrentYear = YEAR(TODAY())
+HTML_Netflix_Navbar_Dynamic = 
+VAR _CurrentPage = SELECTEDVALUE(Dim_Navigation[page_name], "Portal Home")
+VAR _P0_Class = IF(_CurrentPage = "Portal Home" || ISBLANK(_CurrentPage), "nav-item active", "nav-item")
+VAR _P1_Class = IF(_CurrentPage = "Executive Pulse", "nav-item active", "nav-item")
+VAR _P2_Class = IF(_CurrentPage = "Catalog Galaxy", "nav-item active", "nav-item")
+VAR _P3_Class = IF(_CurrentPage = "Viewership Telemetry", "nav-item active", "nav-item")
+VAR _P4_Class = IF(_CurrentPage = "Financial ROI", "nav-item active", "nav-item")
+VAR _P5_Class = IF(_CurrentPage = "Talent Creative Hub", "nav-item active", "nav-item")
 RETURN
 "<!DOCTYPE html>
 <html>
@@ -1108,8 +1114,8 @@ RETURN
   .left-group { display: flex; align-items: center; gap: 48px; }
   .brand-logo { color: #E50914; font-size: 38px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
   .nav-links { display: flex; gap: 36px; list-style: none; }
-  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: color 0.2s ease; cursor: pointer; }
-  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; padding-bottom: 6px; }
+  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
   .nav-item:hover { color: #E50914; }
   .right-group { display: flex; align-items: center; gap: 28px; }
   .live-badge {
@@ -1125,12 +1131,12 @@ RETURN
     <div class='left-group'>
       <div class='brand-logo'>STREAMPULSE</div>
       <ul class='nav-links'>
-        <li class='nav-item'>Portal Home</li>
-        <li class='nav-item active'>Executive Pulse</li>
-        <li class='nav-item'>Catalog Galaxy</li>
-        <li class='nav-item'>Viewership Telemetry</li>
-        <li class='nav-item'>Financial ROI</li>
-        <li class='nav-item'>Talent Creative Hub</li>
+        <li class='" & _P0_Class & "'>Portal Home</li>
+        <li class='" & _P1_Class & "'>Executive Pulse</li>
+        <li class='" & _P2_Class & "'>Catalog Galaxy</li>
+        <li class='" & _P3_Class & "'>Viewership Telemetry</li>
+        <li class='" & _P4_Class & "'>Financial ROI</li>
+        <li class='" & _P5_Class & "'>Talent Creative Hub</li>
       </ul>
     </div>
     <div class='right-group'>
@@ -1141,6 +1147,59 @@ RETURN
 </body>
 </html>"
 ```
+
+#### Page-Specific Drop-In Navbar Measures:
+If you prefer dedicated measures per page without a slicer table:
+- **`[HTML_Navbar_Page0_Home]`**: Sets `Portal Home` as `active`.
+- **`[HTML_Navbar_Page1_Executive]`**: Sets `Executive Pulse` as `active`.
+- **`[HTML_Navbar_Page2_Catalog]`**: Sets `Catalog Galaxy` as `active`.
+- **`[HTML_Navbar_Page3_Telemetry]`**: Sets `Viewership Telemetry` as `active`.
+- **`[HTML_Navbar_Page4_Financial]`**: Sets `Financial ROI` as `active`.
+- **`[HTML_Navbar_Page5_Talent]`**: Sets `Talent Creative Hub` as `active`.
+
+---
+
+### 🧭 Best Practice: Implementing Native Power BI Page Navigation
+
+Because sandboxed HTML visuals cannot execute direct page routing scripts, Power BI provides the **Native Page Navigator Visual** (`Insert > Buttons > Navigator > Page navigator`).
+
+#### Step-by-Step Styling for Native Netflix Page Navigator (4K UHD):
+1. Go to top ribbon $\to$ **Insert** $\to$ **Buttons** $\to$ **Navigator** $\to$ **Page navigator**.
+2. Position it inside the top header:
+   - **Horizontal ($X$)**: `360 px` (next to the `STREAMPULSE` logo)
+   - **Vertical ($Y$)**: `20 px`
+   - **Width ($W$)**: `2400 px`
+   - **Height ($H$)**: `75 px`
+3. In **Format visual** $\to$ **Visual** $\to$ **Grid / Layout**:
+   - **Orientation**: `Horizontal`
+   - **Space between buttons**: `16 px`
+4. In **Shape**:
+   - **Shape**: `Rounded rectangle` $\to$ **Corner radius**: `8 px`
+5. In **Style** (Configure the 3 Button States):
+   - **Default State**:
+     - **Text**: Font `Segoe UI Semibold` $\to$ Size: `18 px` $\to$ Color: `#AAAAAA`
+     - **Fill**: `Off` (Transparent)
+     - **Border**: `Off`
+   - **On Hover State**:
+     - **Text**: Color: `#FFFFFF`
+     - **Fill**: Color: `#1C1C1C` $\to$ Transparency: `20%`
+     - **Border**: Color: `#E50914` $\to$ Width: `1.5 px`
+   - **Selected State (Current Active Page)**:
+     - **Text**: Font `Segoe UI Bold` $\to$ Size: `18 px` $\to$ Color: `#FFFFFF`
+     - **Fill**: Color: `rgba(229, 9, 20, 0.15)`
+     - **Border**: Color: `#E50914` $\to$ Width: `2 px`
+     - **Accent Bar**: Bottom $\to$ Color: `#E50914` $\to$ Width: `3 px`
+6. Under **General > Effects**:
+   - Background: `Off`
+   - Border: `Off`
+
+#### Interactive Routing for Page 0 Navigation Hub (5 Module Cards):
+On **Page 0 (Home Page)**, place a transparent **Blank Button** over each of the 5 cards in the Navigation Hub:
+1. **Insert** $\to$ **Buttons** $\to$ **Blank**.
+2. Place it over Card 1: $(X: 60, Y: 610, W: 720, H: 460)$.
+3. In **Format button** $\to$ turn **Fill**, **Border**, and **Text** `Off`.
+4. In **Action**: Toggle **`On`** $\to$ **Type**: `Page navigation` $\to$ **Destination**: `Executive Pulse` (or respective page).
+5. Repeat for the other 4 cards!
 
 ---
 

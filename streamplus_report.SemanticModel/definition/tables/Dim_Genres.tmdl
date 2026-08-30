@@ -14,7 +14,7 @@ table Dim_Genres
 		dataType: int64
 		formatString: 0
 		lineageTag: c38ede62-2a5e-4ca6-9ef4-ae37afbf14da
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: tmdb_genre_id
 
 		annotation SummarizationSetBy = Automatic
@@ -42,7 +42,7 @@ table Dim_Genres
 		dataType: int64
 		formatString: 0
 		lineageTag: 19c4cfa8-ba56-4f56-86b8-0533e7ef8c69
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: sort_order
 
 		annotation SummarizationSetBy = Automatic

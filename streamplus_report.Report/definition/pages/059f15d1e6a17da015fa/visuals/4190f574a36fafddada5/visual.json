@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "98203ee4bc6e8cd4a40f",
+  "name": "4190f574a36fafddada5",
   "position": {
-    "x": 0,
-    "y": 0,
-    "z": 0,
-    "height": 120,
-    "width": 3839.1884466361394,
-    "tabOrder": 0
+    "x": 60,
+    "y": 150,
+    "z": 1000,
+    "height": 340,
+    "width": 3720,
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "HTML_Navbar_Page0_Home"
+                  "Property": "HTML_Home_Hero_Banner"
                 }
               },
-              "queryRef": "_Measures.HTML_Navbar_Page0_Home",
-              "nativeQueryRef": "HTML_Navbar_Page0_Home"
+              "queryRef": "_Measures.HTML_Home_Hero_Banner",
+              "nativeQueryRef": "HTML_Home_Hero_Banner"
             }
           ]
         }
@@ -89,6 +89,40 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }

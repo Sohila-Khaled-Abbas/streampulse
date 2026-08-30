@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "98203ee4bc6e8cd4a40f",
+  "name": "3bb95269d3b724d290cf",
   "position": {
-    "x": 0,
-    "y": 0,
-    "z": 0,
-    "height": 120,
-    "width": 3839.1884466361394,
-    "tabOrder": 0
+    "x": 60,
+    "y": 510,
+    "z": 2000,
+    "height": 80,
+    "width": 3720,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "HTML_Navbar_Page0_Home"
+                  "Property": "HTML_Home_Marquee_Ticker"
                 }
               },
-              "queryRef": "_Measures.HTML_Navbar_Page0_Home",
-              "nativeQueryRef": "HTML_Navbar_Page0_Home"
+              "queryRef": "_Measures.HTML_Home_Marquee_Ticker",
+              "nativeQueryRef": "HTML_Home_Marquee_Ticker"
             }
           ]
         }
@@ -56,13 +56,34 @@
       ]
     },
     "visualContainerObjects": {
-      "title": [
+      "padding": [
         {
           "properties": {
-            "show": {
+            "top": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -96,6 +117,19 @@
         }
       ],
       "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
         {
           "properties": {
             "show": {

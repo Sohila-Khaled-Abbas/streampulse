@@ -42,7 +42,7 @@ table Dim_Navigation
 
 	partition Dim_Navigation = calculated
 		mode: import
-		source = 
+		source =
 				DATATABLE(
 				    "page_id", INTEGER,
 				    "page_name", STRING,
@@ -59,3 +59,4 @@ table Dim_Navigation
 				)
 
 	annotation PBI_Id = 9b932c0201d44ea095c5b46d51923055
+

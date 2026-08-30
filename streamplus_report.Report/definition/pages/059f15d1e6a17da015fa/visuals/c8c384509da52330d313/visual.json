@@ -1,62 +1,18 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "98203ee4bc6e8cd4a40f",
+  "name": "c8c384509da52330d313",
   "position": {
-    "x": 0,
-    "y": 0,
-    "z": 0,
-    "height": 120,
-    "width": 3839.1884466361394,
-    "tabOrder": 0
+    "x": 400,
+    "y": 21.739130434782609,
+    "z": 7000,
+    "height": 80.434782608695642,
+    "width": 1106.5217391304348,
+    "tabOrder": 7000
   },
   "visual": {
-    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
-    "query": {
-      "queryState": {
-        "content": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "HTML_Navbar_Page0_Home"
-                }
-              },
-              "queryRef": "_Measures.HTML_Navbar_Page0_Home",
-              "nativeQueryRef": "HTML_Navbar_Page0_Home"
-            }
-          ]
-        }
-      }
-    },
+    "visualType": "pageNavigator",
     "objects": {
-      "contentFormatting": [
-        {
-          "properties": {
-            "hyperlinks": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "userSelect": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    "visualContainerObjects": {
-      "title": [
+      "text": [
         {
           "properties": {
             "show": {
@@ -69,7 +25,35 @@
           }
         }
       ],
-      "background": [
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "outline": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
         {
           "properties": {
             "show": {
@@ -94,21 +78,9 @@
             }
           }
         }
-      ],
-      "dropShadow": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
       ]
     },
     "drillFilterOtherVisuals": true
-  }
+  },
+  "howCreated": "InsertVisualButton"
 }

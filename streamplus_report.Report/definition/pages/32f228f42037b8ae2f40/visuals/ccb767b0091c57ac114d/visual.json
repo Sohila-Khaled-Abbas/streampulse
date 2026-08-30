@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "98203ee4bc6e8cd4a40f",
+  "name": "ccb767b0091c57ac114d",
   "position": {
     "x": 0,
     "y": 0,
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "HTML_Navbar_Page0_Home"
+                  "Property": "HTML_Navbar_Page1_Executive"
                 }
               },
-              "queryRef": "_Measures.HTML_Navbar_Page0_Home",
-              "nativeQueryRef": "HTML_Navbar_Page0_Home"
+              "queryRef": "_Measures.HTML_Navbar_Page1_Executive",
+              "nativeQueryRef": "HTML_Navbar_Page1_Executive"
             }
           ]
         }
@@ -37,6 +37,13 @@
       "contentFormatting": [
         {
           "properties": {
+            "showRawHtml": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
             "hyperlinks": {
               "expr": {
                 "Literal": {

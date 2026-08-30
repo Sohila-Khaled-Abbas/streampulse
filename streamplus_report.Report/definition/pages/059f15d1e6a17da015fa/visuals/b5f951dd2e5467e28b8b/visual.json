@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "98203ee4bc6e8cd4a40f",
+  "name": "b5f951dd2e5467e28b8b",
   "position": {
-    "x": 0,
-    "y": 0,
-    "z": 0,
-    "height": 120,
-    "width": 3839.1884466361394,
-    "tabOrder": 0
+    "x": 60,
+    "y": 610,
+    "z": 3000,
+    "height": 460,
+    "width": 3720,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "HTML_Navbar_Page0_Home"
+                  "Property": "HTML_Home_Navigation_Hub"
                 }
               },
-              "queryRef": "_Measures.HTML_Navbar_Page0_Home",
-              "nativeQueryRef": "HTML_Navbar_Page0_Home"
+              "queryRef": "_Measures.HTML_Home_Navigation_Hub",
+              "nativeQueryRef": "HTML_Home_Navigation_Hub"
             }
           ]
         }
@@ -37,6 +37,13 @@
       "contentFormatting": [
         {
           "properties": {
+            "showRawHtml": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
             "hyperlinks": {
               "expr": {
                 "Literal": {
@@ -56,19 +63,6 @@
       ]
     },
     "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
       "background": [
         {
           "properties": {
@@ -102,6 +96,53 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }

@@ -581,6 +581,55 @@
             "fontFamily": "Segoe UI Semibold",
             "fontSize": 13
           }
+        ],
+        "outspacePane": [
+          {
+            "backgroundColor": {
+              "solid": {
+                "color": "#000000"
+              }
+            },
+            "foregroundColor": {
+              "solid": {
+                "color": "#ffffff"
+              }
+            },
+            "inputBoxColor": {
+              "solid": {
+                "color": "#000000"
+              }
+            }
+          }
+        ],
+        "filterCard": [
+          {
+            "$id": "Available",
+            "foregroundColor": {
+              "solid": {
+                "color": "#ffffff"
+              }
+            },
+            "inputBoxColor": {
+              "solid": {
+                "color": "#000000"
+              }
+            }
+          }
+        ],
+        "visualTooltip": [
+          {
+            "actionFontColor": {
+              "solid": {
+                "color": "#EAEAEA"
+              }
+            },
+            "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif"
+          }
+        ],
+        "visualHeaderTooltip": [
+          {
+            "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif"
+          }
         ]
       }
     }

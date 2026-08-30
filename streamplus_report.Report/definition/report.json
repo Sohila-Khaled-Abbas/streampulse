@@ -11,7 +11,7 @@
       "type": "SharedResources"
     },
     "customTheme": {
-      "name": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
+      "name": "StreamPulse_Netflix_Cinematic_5764336686578361.json",
       "reportVersionAtImport": {
         "visual": "2.12.0",
         "report": "3.4.0",
@@ -68,8 +68,8 @@
       "type": "RegisteredResources",
       "items": [
         {
-          "name": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
-          "path": "StreamPulse_Netflix_Cinematic_7522340202905647.json",
+          "name": "StreamPulse_Netflix_Cinematic_5764336686578361.json",
+          "path": "StreamPulse_Netflix_Cinematic_5764336686578361.json",
           "type": "CustomTheme"
         }
       ]

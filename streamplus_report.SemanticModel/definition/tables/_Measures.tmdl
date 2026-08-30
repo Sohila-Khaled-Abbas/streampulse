@@ -672,10 +672,11 @@ table _Measures
 			  </div>
 			</body>
 			</html>"
-			
 			```
 		displayFolder: 00: SVG & HTML
 		lineageTag: 528af1f8-b03d-4323-8927-db7c919b8030
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	measure HTML_Modal_Detail_Tooltip = ```
 			
@@ -832,6 +833,11 @@ table _Measures
 		formatString: 0
 		displayFolder: 01: Core Streaming & Catalog KPIs
 		lineageTag: 0907f5cb-cd52-48d6-b13a-51accc499d2f
+
+	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: a7769531-152e-4b68-b8ce-35ce59039648
 
 	measure Total_Movies = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "Movie")
 		formatString: 0

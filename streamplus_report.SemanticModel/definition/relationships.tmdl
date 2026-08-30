@@ -1,6 +1,7 @@
 relationship 900c15f4-0108-82e8-a133-2b7c1f3141d9
 	fromColumn: Bridge_Title_Genre.title_key
 	toColumn: Dim_Titles.title_key
+	crossFilteringBehavior: bothDirections
 
 relationship e1eadbcb-2727-4264-40d3-1a8847b9c03e
 	fromColumn: Bridge_Title_Genre.genre_key
@@ -9,6 +10,7 @@ relationship e1eadbcb-2727-4264-40d3-1a8847b9c03e
 relationship 22e2cdb0-ab13-9b64-8d41-8ac62f78ba32
 	fromColumn: Bridge_Title_Talent.title_key
 	toColumn: Dim_Titles.title_key
+	crossFilteringBehavior: bothDirections
 
 relationship 4113b6d5-dbd3-11e9-7adc-e8ed085331fa
 	fromColumn: Bridge_Title_Talent.crew_key

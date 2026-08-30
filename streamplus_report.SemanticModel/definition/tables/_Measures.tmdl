@@ -1,6 +1,318 @@
 table _Measures
 	lineageTag: 18e00bf9-8da7-4512-9fb9-37d3c4ca2b04
 
+	measure HTML_Navbar_Page0_Home = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item active'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d001
+
+	measure HTML_Navbar_Page1_Executive = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item active'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d002
+
+	measure HTML_Navbar_Page2_Catalog = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item active'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d003
+
+	measure HTML_Navbar_Page3_Telemetry = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item active'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d004
+
+	measure HTML_Navbar_Page4_Financial = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item active'>Financial ROI</li>
+			        <li class='nav-item'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d005
+
+	measure HTML_Navbar_Page5_Talent = ```
+			
+			"<!DOCTYPE html>
+			<html>
+			<head>
+			<style>
+			  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, sans-serif; }
+			  .navbar {
+			    display: flex; align-items: center; justify-content: space-between;
+			    width: 100%; height: 110px; background: linear-gradient(180deg, rgba(0,0,0,0.96) 0%, rgba(18,18,18,0.85) 100%);
+			    backdrop-filter: blur(16px); border-bottom: 1.5px solid rgba(255,255,255,0.08); padding: 0 60px;
+			  }
+			  .left-group { display: flex; align-items: center; gap: 48px; }
+			  .brand-logo { color: #E50914; font-size: 36px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+			  .nav-links { display: flex; gap: 36px; list-style: none; }
+			  .nav-item { color: #CCCCCC; font-size: 20px; font-weight: 600; transition: all 0.2s ease; cursor: pointer; padding-bottom: 6px; }
+			  .nav-item.active { color: #FFFFFF; font-weight: 800; border-bottom: 3px solid #E50914; }
+			  .nav-item:hover { color: #E50914; }
+			  .right-group { display: flex; align-items: center; gap: 28px; }
+			  .live-badge {
+			    display: flex; align-items: center; gap: 10px; background: rgba(229, 9, 20, 0.15);
+			    border: 1.5px solid #E50914; color: #E50914; padding: 6px 16px; border-radius: 24px; font-size: 16px; font-weight: 800;
+			  }
+			  .pulse-dot { width: 10px; height: 10px; background: #E50914; border-radius: 50%; box-shadow: 0 0 10px #E50914; }
+			  .user-avatar { width: 48px; height: 48px; border-radius: 6px; background: #2A2A2A; border: 1.5px solid #444; display: flex; align-items: center; justify-content: center; color: #FFF; font-size: 16px; font-weight: bold; }
+			</style>
+			</head>
+			<body>
+			  <div class='navbar'>
+			    <div class='left-group'>
+			      <div class='brand-logo'>STREAMPULSE</div>
+			      <ul class='nav-links'>
+			        <li class='nav-item'>Portal Home</li>
+			        <li class='nav-item'>Executive Pulse</li>
+			        <li class='nav-item'>Catalog Galaxy</li>
+			        <li class='nav-item'>Viewership Telemetry</li>
+			        <li class='nav-item'>Financial ROI</li>
+			        <li class='nav-item active'>Talent Creative Hub</li>
+			      </ul>
+			    </div>
+			    <div class='right-group'>
+			      <div class='live-badge'><div class='pulse-dot'></div> DIRECTQUERY LIVE</div>
+			      <div class='user-avatar'>EX</div>
+			    </div>
+			  </div>
+			</body>
+			</html>"
+			
+			```
+		displayFolder: 00: SVG & HTML
+		lineageTag: 4c1186a1-098e-473d-9d41-9fb1b428d006
+
 	measure HTML_Home_Hero_Banner = ```
 			
 			VAR _Hour = HOUR(NOW())
@@ -834,11 +1146,6 @@ table _Measures
 		displayFolder: 01: Core Streaming & Catalog KPIs
 		lineageTag: 0907f5cb-cd52-48d6-b13a-51accc499d2f
 
-	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
-		formatString: 0
-		displayFolder: 01: Core Streaming & Catalog KPIs
-		lineageTag: a7769531-152e-4b68-b8ce-35ce59039648
-
 	measure Total_Movies = CALCULATE([Total_Catalog_Titles], Dim_Titles[title_type] = "Movie")
 		formatString: 0
 		displayFolder: 01: Core Streaming & Catalog KPIs
@@ -1067,6 +1374,12 @@ table _Measures
 		lineageTag: b8b537c2-d45c-493e-83ee-92dd7821eb75
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Titles_Ingested = DISTINCTCOUNT(Dim_Titles[title_key])
+		formatString: 0
+		displayFolder: 01: Core Streaming & Catalog KPIs
+		lineageTag: a7769531-152e-4b68-b8ce-35ce59039648
+
 	measure Bayesian_Quality_Badge =
 			
 			VAR _Score = [Bayesian_Weighted_Score]

@@ -1940,4 +1940,216 @@ To achieve an ultra-crisp, broadcast-grade streaming web platform experience in 
 
 ---
 
+## 10. Modern Enhanced Tooltip & Dynamic Sentence Template Engineering Blueprint
+
+Power BI's Modern Tooltip engine supports two enterprise-grade paradigms:
+1. **Dynamic Sentence Templates** (Natural Language Storytelling): Uses the `{field}` expression syntax with `Sentence format only: On` and `Bold values: On`.
+2. **Report Page Tooltips** (Rich Interactive Popups): Uses dedicated hidden canvas pages (e.g., $480 \times 360\text{ px}$) embedding custom HTML/CSS modal cards (`[HTML_Modal_Detail_Tooltip]`) and SVG sparklines.
+
+---
+
+### 🌐 Page 0: Streaming Platform Command Center & Home Portal Tooltips
+
+#### Visual `V0.6`: New Card (Platform Performance Vitals)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `The platform has conformed {Total_Titles_Ingested} titles generating {Total_View_Hours_Formatted} global streaming hours with a {Avg_Completion_Rate_Pct}% completion rate and {Bayesian_Weighted_Score} Bayesian quality index.`
+- **Tooltip Fields**: `[Total_Titles_Ingested]`, `[Total_View_Hours_Formatted]`, `[Avg_Completion_Rate_Pct]`, `[Bayesian_Weighted_Score]`
+- **Bold values**: `On`
+
+#### Visual `V0.7`: Table (Catalog Era Performance & Retention Matrix)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `Catalog era {catalog_era} encompasses {Total_Titles_Ingested} ingested titles with {Total_View_Hours_Formatted} streamed and an average Bayesian score of {Bayesian_Weighted_Score}.`
+- **Tooltip Fields**: `Dim_Titles[catalog_era]`, `[Total_Titles_Ingested]`, `[Total_View_Hours_Formatted]`, `[Bayesian_Weighted_Score]`
+- **Bold values**: `On`
+
+---
+
+### 🎬 Page 1: Executive Pulse & Live Radar Tooltips
+
+#### Visual `V1.3`: Table (Global Top 10 Streaming Leaderboard)
+- **Option A (Report Page Tooltip - Recommended)**:
+  - **Type**: `Report page` $\to$ **Page**: `Tooltip_Title_Modal` (renders `[HTML_Modal_Detail_Tooltip]` showing runtime, budget, gross, Bayesian score, and IMDb/Metascore).
+- **Option B (Sentence Template)**:
+  - **Sentence format only**: `On`
+  - **Sentence template**:
+    `#{#}: {title} ({maturity_rating}) has achieved {Total_View_Hours_M}M stream hours with a {Bayesian_Weighted_Score} Bayesian quality score.`
+  - **Tooltip Fields**: `[SVG_Top10_Rank_Badge]`, `Dim_Titles[title]`, `Dim_Titles[maturity_rating]`, `[Total_View_Hours_M]`, `[Bayesian_Weighted_Score]`
+  - **Bold values**: `On`
+
+#### Visual `V1.5`: Area Chart (Viewership Trajectory by Era)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Chart-specific tooltips**: `On`
+- **Sentence template**:
+  `In {month_name}, {catalog_era} titles generated {Total_View_Hours_M} million global stream hours.`
+- **Tooltip Fields**: `Dim_Date[month_name]`, `Dim_Titles[catalog_era]`, `[Total_View_Hours_M]`
+- **Bold values**: `On`
+
+#### Visual `V1.6`: Matrix (Multi-Genre Performance & Viewer Retention)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `The {genre_name} genre accounts for {Total_Titles_Ingested} titles with {Total_View_Hours_M}M viewing hours and a {Avg_Completion_Rate_Pct}% completion rate.`
+- **Tooltip Fields**: `Dim_Genres[genre_name]`, `[Total_Titles_Ingested]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`
+- **Bold values**: `On`
+
+#### Visual `V1.7`: Donut Chart (Global Regional Market Share)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `Region {region_group} generated {Total_View_Hours_M}M stream hours across connected subscriber territories.`
+- **Tooltip Fields**: `Dim_Territory[region_group]`, `[Total_View_Hours_M]`
+- **Bold values**: `On`
+
+#### Visual `V1.8`: Table (DirectQuery Live Scraped Releases)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{title} was released in {release_year} with an average audience rating of {Avg_IMDb_Rating} / 10.0.`
+- **Tooltip Fields**: `Dim_Titles[title]`, `Dim_Titles[release_year]`, `[Avg_IMDb_Rating]`
+- **Bold values**: `On`
+
+---
+
+### 🌌 Page 2: Kimball Galaxy Catalog Explorer Tooltips
+
+#### Visual `V2.3`: Clustered Bar (Catalog Era Breakdown: Movies vs. TV Shows)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{catalog_era} contains {Total_Titles_Ingested} titles categorized as {title_type}.`
+- **Tooltip Fields**: `Dim_Titles[catalog_era]`, `Dim_Titles[title_type]`, `[Total_Titles_Ingested]`
+- **Bold values**: `On`
+
+#### Visual `V2.4`: Column Chart (Bayesian Shrinkage vs. Raw Ratings)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{Total_Titles_Ingested} titles with raw vote average {vote_average} are adjusted to a Bayesian score of {Bayesian_Weighted_Score}.`
+- **Tooltip Fields**: `Fact_Catalog_Ratings[vote_average]`, `[Total_Titles_Ingested]`, `[Bayesian_Weighted_Score]`
+- **Bold values**: `On`
+
+#### Visual `V2.5`: Matrix (Detailed Conformed Title Explorer)
+- **Tooltip Type**: `Report page`
+- **Page**: `Tooltip_Title_Modal` *(Embeds `[HTML_Modal_Detail_Tooltip]`)*
+- **Alternative Sentence Template**:
+  `{title} ({release_year}) is a {maturity_rating} title with {runtime_minutes_clean}m runtime, classified in {Pareto_Catalog_Tier} with a Bayesian score of {Bayesian_Weighted_Score}.`
+- **Tooltip Fields**: `Dim_Titles[title]`, `Dim_Titles[release_year]`, `Dim_Titles[maturity_rating]`, `Dim_Titles[runtime_minutes_clean]`, `[Pareto_Catalog_Tier]`, `[Bayesian_Weighted_Score]`
+- **Bold values**: `On`
+
+#### Visual `V2.6`: Donut Chart (80/20 Pareto Concentration Tier)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `Catalog {Pareto_Catalog_Tier} accounts for {Total_View_Hours_M} million stream hours.`
+- **Tooltip Fields**: `[Pareto_Catalog_Tier]`, `[Total_View_Hours_M]`
+- **Bold values**: `On`
+
+---
+
+### 📊 Page 3: Viewership & Engagement Telemetry Tooltips
+
+#### Visual `V3.2`: Line Chart (Monthly Trends by Device Category)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `In {month_name}, users streamed {Total_View_Hours_M}M hours on {device_category} devices.`
+- **Tooltip Fields**: `Dim_Date[month_name]`, `Fact_Streaming_Performance[device_category]`, `[Total_View_Hours_M]`
+- **Bold values**: `On`
+
+#### Visual `V3.3`: New Card (Velocity & Acceleration Cards)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `Current month streaming reached {Total_View_Hours_M}M hours ({View_Hours_MoM_Pct}% MoM growth) with a 28-day rolling volume of {Rolling_28D_View_Hours}M hours.`
+- **Tooltip Fields**: `[Total_View_Hours_M]`, `[View_Hours_MoM_Pct]`, `[Rolling_28D_View_Hours]`
+- **Bold values**: `On`
+
+#### Visual `V3.4`: Scatter Plot (Engagement Quadrant Analysis)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{title} achieved {Total_View_Hours_M}M stream hours with a {Avg_Completion_Rate_Pct}% completion rate across {Total_Subscribers_Reached_K}K active subscribers.`
+- **Tooltip Fields**: `Dim_Titles[title]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`, `[Total_Subscribers_Reached_K]`
+- **Bold values**: `On`
+
+#### Visual `V3.5`: Matrix (Territory vs. Device Heatmap)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `Subscribers in {territory_name} streamed {Total_View_Hours_M}M hours on {device_category} devices with an average completion rate of {Avg_Completion_Rate_Pct}%.`
+- **Tooltip Fields**: `Dim_Territory[territory_name]`, `Fact_Streaming_Performance[device_category]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`
+- **Bold values**: `On`
+
+---
+
+### 💰 Page 4: Financial ROI & Unit Economics Tooltips
+
+#### Visual `V4.2`: Scatter Plot (Budget vs. Worldwide Gross & 2.5x Break-Even Line)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{title} had a production budget of ${Total_Production_Budget_M}M and grossed ${Total_Worldwide_Gross_M}M worldwide ({Financial_ROI_Multiplier}x ROI multiplier, categorized as {financial_roi_tier}).`
+- **Tooltip Fields**: `Dim_Titles[title]`, `[Total_Production_Budget_M]`, `[Total_Worldwide_Gross_M]`, `[Financial_ROI_Multiplier]`, `Fact_Financial_ROI[financial_roi_tier]`
+- **Bold values**: `On`
+
+#### Visual `V4.3`: Matrix (Financial Unit Economics Scorecard)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{title} generated a net box office profit of ${Net_Box_Office_Profit_M}M with a theatrical ROI multiplier of {Financial_ROI_Multiplier}x.`
+- **Tooltip Fields**: `Dim_Titles[title]`, `[Net_Box_Office_Profit_M]`, `[Financial_ROI_Multiplier]`
+- **Bold values**: `On`
+
+#### Visual `V4.4`: Clustered Column (Cost Per View Hour vs. Budget Efficiency Index)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{title} cost ${Cost_Per_View_Hour_USD} per streamed hour with a budget efficiency index of {Budget_Efficiency_Index}.`
+- **Tooltip Fields**: `Dim_Titles[title]`, `[Cost_Per_View_Hour_USD]`, `[Budget_Efficiency_Index]`
+- **Bold values**: `On`
+
+#### Visual `V4.5`: Waterfall Chart (Net Profit Contribution by Era)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{catalog_era} contributed ${Net_Box_Office_Profit_M} million to net theatrical and streaming profit.`
+- **Tooltip Fields**: `Dim_Titles[catalog_era]`, `[Net_Box_Office_Profit_M]`
+- **Bold values**: `On`
+
+---
+
+### 🎭 Page 5: Creative Talent & Star Power Hub Tooltips
+
+#### Visual `V5.2`: Clustered Bar (Top 15 Creative Directors & Producers)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{person_name} ({star_power_tier}) has driven {Total_View_Hours_M} million global stream hours across directed and produced titles.`
+- **Tooltip Fields**: `Dim_Talent_Crew[person_name]`, `Dim_Talent_Crew[star_power_tier]`, `[Total_View_Hours_M]`
+- **Bold values**: `On`
+
+#### Visual `V5.3`: Matrix (Talent Creative Scorecard)
+- **Tooltip Type**: `Default`
+- **Sentence format only**: `On`
+- **Sentence template**:
+  `{person_name} ({primary_role}) has {Total_Titles_Ingested} catalog titles with {Total_View_Hours_M}M streaming hours and a Bayesian quality score of {Bayesian_Weighted_Score}.`
+- **Tooltip Fields**: `Dim_Talent_Crew[person_name]`, `Dim_Talent_Crew[primary_role]`, `[Total_Titles_Ingested]`, `[Total_View_Hours_M]`, `[Bayesian_Weighted_Score]`
+- **Bold values**: `On`
+
+#### Visual `V5.4`: Matrix Table (Complete Creative Filmography Browser)
+- **Tooltip Type**: `Report page`
+- **Page**: `Tooltip_Title_Modal` *(Embeds `[HTML_Modal_Detail_Tooltip]`)*
+- **Alternative Sentence Template**:
+  `{person_name} worked on {title} ({release_year}, {genre_name}) which generated {Total_View_Hours_M}M stream hours with {Avg_Completion_Rate_Pct}% completion and ${Total_Worldwide_Gross_M}M in gross revenue.`
+- **Tooltip Fields**: `Dim_Talent_Crew[person_name]`, `Dim_Titles[title]`, `Dim_Titles[release_year]`, `Dim_Genres[genre_name]`, `[Total_View_Hours_M]`, `[Avg_Completion_Rate_Pct]`, `[Total_Worldwide_Gross_M]`
+- **Bold values**: `On`
+
+---
+
 *Authored for the StreamPulse Enterprise Analytics Platform 2026.*
+

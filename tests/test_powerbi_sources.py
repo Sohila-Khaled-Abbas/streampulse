@@ -5,7 +5,6 @@ contains no such files, so these tests create their own isolated inputs.
 """
 import csv
 import json
-from pathlib import Path
 
 import pandas as pd
 import pytest

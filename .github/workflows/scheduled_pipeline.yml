@@ -4,13 +4,18 @@ on:
   schedule:
     - cron: "0 6 * * *" # Runs daily at 06:00 UTC
   workflow_dispatch: # Allows manual trigger from GitHub UI
-  push:
-    branches:
-      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: streampulse-scheduled-ingestion
+  cancel-in-progress: false
 
 jobs:
   run-live-pipeline:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout Code Repository
@@ -29,7 +34,26 @@ jobs:
 
       - name: Run Test Suite
         run: |
-          pytest tests/ -v
+          python -m pytest tests/ -v
+
+      - name: Check live database configuration
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        shell: bash
+        run: |
+          for name in DB_HOST DB_USER DB_PASSWORD DB_NAME; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error title=Live ingestion configuration missing::Set GitHub Actions secret $name for scheduled warehouse ingestion."
+              exit 1
+            fi
+          done
+          if [[ "$DB_HOST" == "localhost" || "$DB_HOST" == "127.0.0.1" ]]; then
+            echo "::error title=Inaccessible host::The GitHub-hosted runner cannot reach your laptop's localhost database. Use an approved network-reachable endpoint or a self-hosted runner."
+            exit 1
+          fi
 
       - name: Execute Live 2026 ELT Pipeline
         env:
@@ -44,6 +68,7 @@ jobs:
           python -m src.pipeline --mode live --years 2026,2025 --limit 100
 
       - name: Archive Processed Data Artifacts & Profiling Reports
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: streampulse-2026-data-artifacts
@@ -51,4 +76,5 @@ jobs:
             data/processed/netflix_catalog_enriched_master.csv
             data/processed/live_2026_pulse.json
             data/processed/data_profiling_report.json
+          if-no-files-found: error
           retention-days: 14

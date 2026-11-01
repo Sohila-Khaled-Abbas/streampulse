@@ -161,3 +161,11 @@ docker compose -f docker/docker-compose.airbyte.yml up -d
 
 ## 📄 License
 This project is licensed under the [MIT License](LICENSE).
+
+## Scheduled workflow: reproducibility and external prerequisites
+
+The daily [scheduled ingestion workflow](.github/workflows/scheduled_pipeline.yml) runs the **offline** test suite before attempting a live ELT run. Its Power BI conformance tests generate isolated *synthetic fixture files* under a temporary directory, so they do not depend on untracked `data/raw/` files, a Kaggle download, or an active PostgreSQL service. The 5,000-record floor is the loader's actual integrity criterion; the 7,700+ catalog benchmark is not guaranteed by its 5,806-record mirror fallback.
+
+A successful unit test only validates schema and local logic: it does **not** establish that real streaming sources, TMDb, RapidAPI, or the live warehouse were reachable. Live scheduling requires `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` in GitHub Actions secrets, as well as a PostgreSQL host reachable from the runner. `localhost` on a GitHub-hosted runner is not your local Docker database. The job now fails **explicitly** at preflight when required warehouse configuration is missing rather than pretending the live ingest ran. Any live extract should be validated using the actual artifacts and warehouse record counts.
+
+The scheduled workflow does not run on every push; pull requests and pushes are tested separately through [CI](.github/workflows/ci.yml). Artifacts are uploaded only after successful live execution and must exist to mark the run successful.

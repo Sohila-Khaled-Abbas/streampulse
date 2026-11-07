@@ -1,6 +1,6 @@
 """Contract checks between PostgreSQL DDL and the Python warehouse loader."""
 
-import pathlib
+import pathlib  # noqa: I001
 import re
 
 

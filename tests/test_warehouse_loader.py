@@ -3,8 +3,9 @@
 import os
 
 import pandas as pd
+import pytest
 
-from src.load.warehouse_loader import WarehouseLoader
+from src.load.warehouse_loader import WarehouseLoader, db_manager
 
 
 def test_warehouse_loader_file_export(tmp_path):
@@ -60,3 +61,13 @@ def test_warehouse_loader_file_export(tmp_path):
     assert os.path.exists(
         os.path.join(lakehouse_dir, "fact_streaming_performance.parquet")
     )
+
+
+
+def test_required_database_fails_closed_when_unavailable(tmp_path, monkeypatch):
+    """Production runs must not report success when the warehouse is unreachable."""
+    loader = WarehouseLoader(output_dir=str(tmp_path / "processed"))
+    monkeypatch.setattr(db_manager, "test_connection", lambda: False)
+
+    with pytest.raises(ConnectionError, match="required for this run"):
+        loader.load_pipeline_records([], require_database=True)

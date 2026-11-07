@@ -140,7 +140,10 @@ This document serves as the enterprise data catalog for the **StreamPulse Multi-
 | `device_category` | `VARCHAR(50)` | NOT NULL | Streaming hardware category | `Connected TV`, `Mobile`, `Web` |
 | `global_view_hours_millions`| `NUMERIC(10,2)`| NOT NULL | Total streaming hours (Millions) | Additive (`SUM`) |
 | `avg_completion_pct` | `NUMERIC(5,2)` | NOT NULL | Average title completion rate | Non-Additive (`AVERAGE`) |
-| `subscribers_reached_thousands`| `INT` | NOT NULL | Unique active profiles reached (k) | Semi-Additive |
+| `subscribers_reached_thousands`| `INT` | NOT NULL | Estimated unique profiles reached (k) | Semi-Additive |
+| `watch_time_retention_pct` | `NUMERIC(5,2)` | NULL | Estimated watch-time retention rate | Non-Additive (`AVERAGE`) |
+| `budget_efficiency_ratio` | `NUMERIC(10,2)` | NULL | Estimated view hours relative to production budget (millions) | Non-Additive (`AVERAGE`) |
+| `global_top_10_rank` | `INT` | NULL | Estimated global Top 10 rank when applicable | Non-Additive (`MIN`) |
 
 ---
 

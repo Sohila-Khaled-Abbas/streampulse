@@ -44,7 +44,7 @@ class WarehouseLoader:
     - Automated `dim_date` generation & seeding (2020-2027 calendar & streaming cycles)
     - Conformed `dim_titles` with budget, language, country, and era attributes
     - Normalized `dim_genres` and weighted `bridge_title_genre` multi-genre mapping
-    - Normalized `dim_crew` and `bridge_title_crew` talent mapping
+    - Normalized `dim_talent_crew` and `bridge_title_talent` mapping
     - Snapshot logging into `reporting.fact_catalog_ratings`
     - Viewership performance logging into `reporting.fact_streaming_performance`
     - Multi-table Parquet Lakehouse exports for Power BI Star Schema ingestion
@@ -56,17 +56,24 @@ class WarehouseLoader:
         self.lakehouse_dir = os.path.join(output_dir, "lakehouse")
 
     def load_pipeline_records(
-        self, records: List[Dict[str, Any]], dry_run: bool = False
+        self,
+        records: List[Dict[str, Any]],
+        dry_run: bool = False,
+        require_database: bool = False,
     ) -> Dict[str, Any]:
         """Load resolved and enriched catalog records into database and export Parquet/CSV/JSON files.
 
         Args:
             records: Enriched title records.
             dry_run: If True, skips database writes and performs export only.
+            require_database: If True, fail instead of silently exporting without a database.
 
         Returns:
             Dictionary summary of load and export statistics.
         """
+        if require_database and dry_run:
+            raise ValueError("require_database=True cannot be combined with dry_run=True.")
+
         summary = {
             "total_records": len(records),
             "db_connected": False,
@@ -124,7 +131,13 @@ class WarehouseLoader:
                 )
             except Exception as err:
                 logger.error(f"Error during warehouse load: {err}", exc_info=True)
+                if require_database:
+                    raise
         else:
+            if require_database:
+                raise ConnectionError(
+                    "A PostgreSQL connection is required for this run, but the warehouse is unavailable."
+                )
             logger.info("Operating in offline/file export mode.")
 
         # 2. Export Master File & Star Schema Lakehouse Artifacts
@@ -288,13 +301,11 @@ class WarehouseLoader:
 
         fact_perf_stmt = """
             INSERT INTO reporting.fact_streaming_performance (
-                title_key, date_key, global_view_hours_millions, estimated_unique_viewers_k,
-                completion_rate_pct, watch_time_retention_pct, cost_per_view_hour_usd,
-                budget_efficiency_ratio, global_top_10_rank
+                title_key, date_key, global_view_hours_millions, avg_completion_pct,
+                subscribers_reached_thousands, cost_per_view_hour_usd,
+                watch_time_retention_pct, budget_efficiency_ratio, global_top_10_rank
             ) VALUES (
-                %s, %s, %s, %s,
-                %s, %s, %s,
-                %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s
             );
         """
 
@@ -440,7 +451,7 @@ class WarehouseLoader:
             chosen_dir = directors[seed_val % len(directors)]
             cursor.execute(
                 """
-                INSERT INTO reporting.dim_crew (person_name, primary_role, star_power_tier)
+                INSERT INTO reporting.dim_talent_crew (person_name, primary_role, star_power_tier)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (person_name) DO UPDATE SET primary_role = EXCLUDED.primary_role
                 RETURNING crew_key;
@@ -453,11 +464,11 @@ class WarehouseLoader:
                 dim_crew_count += 1
                 cursor.execute(
                     """
-                    INSERT INTO reporting.bridge_title_crew (title_key, crew_key, billing_order, role)
-                    VALUES (%s, %s, %s, %s)
-                    ON CONFLICT (title_key, crew_key, role) DO NOTHING;
+                    INSERT INTO reporting.bridge_title_talent (title_key, crew_key, billing_order)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (title_key, crew_key) DO NOTHING;
                     """,
-                    (title_key, crew_key, 1, "Director"),
+                    (title_key, crew_key, 1),
                 )
 
             # 3. Fact: Catalog Ratings Snapshot
@@ -515,10 +526,10 @@ class WarehouseLoader:
                 title_key,
                 date_key,
                 global_hours,
-                est_viewers_k,
                 completion_rate,
-                retention_rate,
+                est_viewers_k,
                 cost_per_hour,
+                retention_rate,
                 budget_eff,
                 top_10_rank,
             )

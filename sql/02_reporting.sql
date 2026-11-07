@@ -3,11 +3,7 @@
 -- Enterprise Kimball Galaxy Constellation Schema & Power BI DirectQuery Layer
 -- ==============================================================================
 
--- Drop existing reporting views
-DROP VIEW IF EXISTS reporting.vw_powerbi_galaxy_master CASCADE;
-DROP VIEW IF EXISTS reporting.vw_powerbi_financial_roi CASCADE;
-DROP VIEW IF EXISTS reporting.vw_powerbi_performance_matrix CASCADE;
-DROP VIEW IF EXISTS reporting.vw_powerbi_catalog_pulse CASCADE;
+-- Views below use CREATE OR REPLACE so schema setup is safe to repeat.
 
 -- -----------------------------------------------------------------------------
 -- 1. Conformed Dimensions
@@ -134,8 +130,17 @@ CREATE TABLE IF NOT EXISTS reporting.fact_streaming_performance (
     avg_completion_pct NUMERIC(5,2) NOT NULL,
     subscribers_reached_thousands INT NOT NULL,
     cost_per_view_hour_usd NUMERIC(8,4) DEFAULT 0.05,
+    watch_time_retention_pct NUMERIC(5,2),
+    budget_efficiency_ratio NUMERIC(10,2),
+    global_top_10_rank INT,
     recorded_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Additive upgrade path for warehouses created before these metrics were added.
+ALTER TABLE reporting.fact_streaming_performance
+    ADD COLUMN IF NOT EXISTS watch_time_retention_pct NUMERIC(5,2),
+    ADD COLUMN IF NOT EXISTS budget_efficiency_ratio NUMERIC(10,2),
+    ADD COLUMN IF NOT EXISTS global_top_10_rank INT;
 
 -- Fact 3: Production Budget & Financial ROI
 CREATE TABLE IF NOT EXISTS reporting.fact_financial_roi (
@@ -163,7 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_fact_roi_composite ON reporting.fact_financial_ro
 -- -----------------------------------------------------------------------------
 
 -- View 1: Master Catalog Pulse View
-CREATE VIEW reporting.vw_powerbi_catalog_pulse AS
+CREATE OR REPLACE VIEW reporting.vw_powerbi_catalog_pulse AS
 SELECT
     t.title_key,
     t.netflix_id,
@@ -195,7 +200,7 @@ LEFT JOIN (
 WHERE t.is_active = TRUE;
 
 -- View 2: Financial ROI & Box Office Performance
-CREATE VIEW reporting.vw_powerbi_financial_roi AS
+CREATE OR REPLACE VIEW reporting.vw_powerbi_financial_roi AS
 SELECT
     t.title_key,
     t.canonical_title AS title,
@@ -214,7 +219,7 @@ INNER JOIN reporting.fact_financial_roi f ON t.title_key = f.title_key
 WHERE t.is_active = TRUE;
 
 -- View 3: Master Galaxy Aggregation View
-CREATE VIEW reporting.vw_powerbi_galaxy_master AS
+CREATE OR REPLACE VIEW reporting.vw_powerbi_galaxy_master AS
 SELECT
     t.title_key,
     t.canonical_title AS title,

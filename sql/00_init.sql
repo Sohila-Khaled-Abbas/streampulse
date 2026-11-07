@@ -7,10 +7,5 @@
 CREATE SCHEMA IF NOT EXISTS staging;
 CREATE SCHEMA IF NOT EXISTS reporting;
 
--- Enable UUID & Trigram extensions for fuzzy matching & text search in PostgreSQL
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";
-
--- Grant permissions to default user
-GRANT ALL ON SCHEMA staging TO postgres;
-GRANT ALL ON SCHEMA reporting TO postgres;
+-- The connecting database role owns the schemas it creates. Avoid hard-coded
+-- provider-specific role names (for example, `postgres`) so this also works on Neon.

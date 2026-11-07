@@ -28,6 +28,7 @@ def run_pipeline_step(
     limit: int = 50,
     include_historical: bool = False,
     dry_run: bool = False,
+    require_database: bool = False,
 ) -> Dict[str, Any]:
     """Execute a complete 5-step ELT pipeline cycle with validation and profiling.
 
@@ -190,7 +191,9 @@ def run_pipeline_step(
     # -------------------------------------------------------------------------
     logger.info("--- STEP 5/5: WAREHOUSE LOADING & MASTER EXPORT ---")
     load_summary = warehouse_loader.load_pipeline_records(
-        resolved_records, dry_run=dry_run
+        resolved_records,
+        dry_run=dry_run,
+        require_database=require_database,
     )
 
     # Print 2026 Sample Highlights
@@ -303,6 +306,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Run pipeline in dry-run mode (skips database writes, exports files only)",
     )
+    parser.add_argument(
+        "--require-database",
+        action="store_true",
+        help="Fail the run if PostgreSQL cannot be reached or warehouse writes fail.",
+    )
     return parser.parse_args()
 
 
@@ -324,6 +332,7 @@ def main() -> None:
             limit=args.limit,
             include_historical=args.include_historical or (args.mode == "full"),
             dry_run=args.dry_run,
+            require_database=args.require_database,
         )
 
 

@@ -22,7 +22,7 @@ def test_talent_loader_targets_schema_tables():
 
 def test_performance_insert_columns_exist_in_reporting_schema():
     match = re.search(
-        r"INSERT INTO reporting\\.fact_streaming_performance\\s*\\((.*?)\\)\\s*VALUES",
+        r"INSERT INTO reporting\.fact_streaming_performance\s*\((.*?)\)\s*VALUES",
         LOADER_SOURCE,
         re.DOTALL,
     )
@@ -30,7 +30,7 @@ def test_performance_insert_columns_exist_in_reporting_schema():
     insert_columns = [column.strip() for column in match.group(1).split(",")]
 
     for column in insert_columns:
-        assert re.search(rf"\\b{re.escape(column)}\\b", REPORTING_SQL), column
+        assert re.search(rf"\b{re.escape(column)}\b", REPORTING_SQL), column
 
 
 def test_initialization_has_no_provider_specific_postgres_role_grant():

@@ -1,10 +1,10 @@
 """Contract checks between PostgreSQL DDL and the Python warehouse loader."""
 
-from pathlib import Path
+import pathlib
 import re
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 REPORTING_SQL = (ROOT / "sql" / "02_reporting.sql").read_text(encoding="utf-8")
 LOADER_SOURCE = (ROOT / "src" / "load" / "warehouse_loader.py").read_text(
     encoding="utf-8"

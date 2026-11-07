@@ -1,7 +1,7 @@
 """Contract checks between PostgreSQL DDL and the Python warehouse loader."""
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]

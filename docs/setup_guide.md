@@ -53,7 +53,10 @@ StreamPulse features a **zero-cost hybrid architecture** requiring **no paid sub
    DB_NAME=streampulse
    DB_HOST=localhost
    DB_PORT=5432
+   DB_SSLMODE=prefer
    ```
+
+   For Neon or another TLS-required hosted PostgreSQL service, set `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME` from its connection details, and use `DB_SSLMODE=require`. Keep credentials in GitHub Actions secrets or a local untracked `.env`; never commit them.
 
 ---
 

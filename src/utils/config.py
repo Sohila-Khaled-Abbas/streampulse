@@ -1,6 +1,7 @@
 """Configuration settings management via Pydantic Settings."""
 
 from typing import Optional
+from urllib.parse import quote
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -29,6 +30,7 @@ class Settings(BaseSettings):
     db_name: str = Field(default="streampulse", alias="DB_NAME")
     db_user: str = Field(default="postgres", alias="DB_USER")
     db_password: str = Field(default="postgres", alias="DB_PASSWORD")
+    db_sslmode: str = Field(default="prefer", alias="DB_SSLMODE")
     db_schema_staging: str = Field(default="staging", alias="DB_SCHEMA_STAGING")
     db_schema_reporting: str = Field(default="reporting", alias="DB_SCHEMA_REPORTING")
 
@@ -52,9 +54,13 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         """Construct SQLAlchemy PostgreSQL connection string."""
+        username = quote(self.db_user, safe="")
+        password = quote(self.db_password, safe="")
+        sslmode = quote(self.db_sslmode, safe="")
         return (
-            f"postgresql://{self.db_user}:{self.db_password}"
+            f"postgresql://{username}:{password}"
             f"@{self.db_host}:{self.db_port}/{self.db_name}"
+            f"?sslmode={sslmode}"
         )
 
 

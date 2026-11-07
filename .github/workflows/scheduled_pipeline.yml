@@ -42,6 +42,8 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PORT: 5432
+          DB_SSLMODE: require
         shell: bash
         run: |
           for name in DB_HOST DB_USER DB_PASSWORD DB_NAME; do
@@ -55,6 +57,72 @@ jobs:
             exit 1
           fi
 
+      - name: Bootstrap and verify PostgreSQL warehouse
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_PORT: 5432
+          DB_SSLMODE: require
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from sqlalchemy import text
+          from src.utils.db import db_manager
+
+          scripts = (
+              "sql/00_init.sql",
+              "sql/01_staging.sql",
+              "sql/02_reporting.sql",
+          )
+          required_relations = (
+              "staging.stg_netflix_titles",
+              "reporting.dim_date",
+              "reporting.dim_titles",
+              "reporting.dim_genres",
+              "reporting.dim_talent_crew",
+              "reporting.bridge_title_genre",
+              "reporting.bridge_title_talent",
+              "reporting.fact_catalog_ratings",
+              "reporting.fact_streaming_performance",
+              "reporting.fact_financial_roi",
+              "reporting.vw_powerbi_catalog_pulse",
+          )
+
+          with db_manager.connect() as connection:
+              for script in scripts:
+                  print(f"Applying {script}")
+                  connection.exec_driver_sql(Path(script).read_text(encoding="utf-8"))
+
+              missing = [
+                  relation
+                  for relation in required_relations
+                  if connection.execute(
+                      text("SELECT to_regclass(:relation)"),
+                      {"relation": relation},
+                  ).scalar_one() is None
+              ]
+              if missing:
+                  raise RuntimeError(
+                      "Warehouse bootstrap is incomplete: " + ", ".join(missing)
+                  )
+
+              identity = connection.execute(
+                  text("SELECT current_database(), current_user")
+              ).one()
+              ssl_enabled = connection.execute(
+                  text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
+              ).scalar_one()
+              if not ssl_enabled:
+                  raise RuntimeError("PostgreSQL connection is not using TLS.")
+
+          print(
+              f"PostgreSQL ready: database={identity[0]}, role={identity[1]}, "
+              f"TLS=enabled, required_relations={len(required_relations)}"
+          )
+          PY
+
       - name: Execute Live 2026 ELT Pipeline
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -64,8 +132,9 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PORT: 5432
+          DB_SSLMODE: require
         run: |
-          python -m src.pipeline --mode live --years 2026,2025 --limit 100
+          python -m src.pipeline --mode live --years 2026,2025 --limit 100 --require-database
 
       - name: Archive Processed Data Artifacts & Profiling Reports
         if: success()

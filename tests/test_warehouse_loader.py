@@ -7,6 +7,7 @@ import pytest
 
 from src.load.warehouse_loader import WarehouseLoader, db_manager
 
+
 @pytest.mark.parametrize(
     ("runtime_value", "expected_minutes"),
     [

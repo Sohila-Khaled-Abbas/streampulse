@@ -7,6 +7,29 @@ import pytest
 
 from src.load.warehouse_loader import WarehouseLoader, db_manager
 
+@pytest.mark.parametrize(
+    ("runtime_value", "expected_minutes"),
+    [
+        (None, 90.0),
+        (0, 90.0),
+        (-15, 90.0),
+        ("", 90.0),
+        ("unknown", 90.0),
+        (float("nan"), 90.0),
+        (118, 118.0),
+        ("95", 95.0),
+    ],
+)
+def test_safe_runtime_minutes(runtime_value, expected_minutes):
+    """Unknown, invalid, or non-positive runtimes use the documented estimate."""
+    assert WarehouseLoader._safe_runtime_minutes(runtime_value) == expected_minutes
+
+
+def test_viewer_estimate_uses_fallback_for_missing_runtime():
+    """A missing runtime must not crash streaming-performance fact calculations."""
+    assert WarehouseLoader._estimate_viewers_thousands(90.0, None) == 60000
+
+
 
 def test_warehouse_loader_file_export(tmp_path):
     """Test warehouse loader file and Parquet export mechanism."""

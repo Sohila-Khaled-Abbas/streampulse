@@ -111,11 +111,17 @@ jobs:
               identity = connection.execute(
                   text("SELECT current_database(), current_user")
               ).one()
-              ssl_enabled = connection.execute(
-                  text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
-              ).scalar_one()
+              # Inspect the client-side libpq socket. pg_stat_ssl reports the
+              # PostgreSQL backend connection, which can be different when a
+              # provider routes clients through a connection pooler (for example,
+              # Neon PgBouncer).
+              dbapi_connection = connection.connection.driver_connection
+              ssl_enabled = dbapi_connection.info.ssl_in_use
               if not ssl_enabled:
-                  raise RuntimeError("PostgreSQL connection is not using TLS.")
+                  raise RuntimeError(
+                      "PostgreSQL client connection is not using TLS "
+                      "(psycopg2 ssl_in_use=False)."
+                  )
 
           print(
               f"PostgreSQL ready: database={identity[0]}, role={identity[1]}, "

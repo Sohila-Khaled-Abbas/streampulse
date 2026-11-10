@@ -3,6 +3,7 @@
 import csv
 import datetime
 import json
+import math
 import os
 import random
 from typing import Any, Dict, List, Tuple
@@ -54,6 +55,29 @@ class WarehouseLoader:
     def __init__(self, output_dir: str = os.path.join("data", "processed")) -> None:
         self.output_dir = output_dir
         self.lakehouse_dir = os.path.join(output_dir, "lakehouse")
+
+    @staticmethod
+    def _safe_runtime_minutes(value: Any, default: float = 90.0) -> float:
+        """Return a positive finite runtime, defaulting when source metadata is unusable."""
+        try:
+            runtime_minutes = float(value)
+        except (TypeError, ValueError):
+            return default
+
+        if not math.isfinite(runtime_minutes) or runtime_minutes <= 0:
+            return default
+
+        return runtime_minutes
+
+    @classmethod
+    def _estimate_viewers_thousands(
+        cls, global_view_hours_millions: float, runtime_value: Any
+    ) -> int:
+        """Estimate viewers using a safe runtime in minutes."""
+        runtime_minutes = cls._safe_runtime_minutes(runtime_value)
+        return int(
+            global_view_hours_millions * 1000 / (runtime_minutes / 60.0)
+        )
 
     def load_pipeline_records(
         self,
@@ -240,7 +264,7 @@ class WarehouseLoader:
         """
         inserted = 0
         for r in records:
-            runtime_mins = r.get("runtime_minutes") or 90
+            runtime_mins = self._safe_runtime_minutes(r.get("runtime_minutes"))
             date_added = str(r.get("date_added") or "2026-01-01")[:10] + " 00:00:00"
 
             params = (
@@ -345,6 +369,7 @@ class WarehouseLoader:
 
             # Realistic budget calibration based on media type & era
             media_type = str(r.get("media_type", "movie"))
+            runtime_minutes = self._safe_runtime_minutes(r.get("runtime_minutes"))
             vote_avg = float(r.get("vote_average", 0.0) or 7.0)
             pop = float(r.get("popularity", 0.0) or 15.0)
 
@@ -378,7 +403,7 @@ class WarehouseLoader:
                 f"{rel_year}-01-01",
                 date_str,
                 str(r.get("maturity_rating", "PG-13")),
-                r.get("runtime_minutes") or 90,
+                runtime_minutes,
                 budget_usd,
                 lang,
                 country,
@@ -505,8 +530,8 @@ class WarehouseLoader:
                 ),
                 2,
             )
-            est_viewers_k = int(
-                global_hours * 1000 / (r.get("runtime_minutes", 90) / 60.0)
+            est_viewers_k = self._estimate_viewers_thousands(
+                global_hours, runtime_minutes
             )
             completion_rate = round(
                 min(94.0, max(58.0, 65.0 + (vote_avg * 3.0) + random.uniform(-3, 3))), 2
